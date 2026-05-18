@@ -1,0 +1,49 @@
+(defcfg
+  concurrent-tap-hold yes
+  linux-dev /dev/input/event0:/dev/input/event1
+  process-unmapped-keys yes
+)
+
+(defsrc
+ tab q w e r t y u i o
+ caps a s d f g h j k l ;
+ lsft z x c v
+ lctl lmet lalt spc ralt rctl
+)
+
+(defvar
+  tap-time 200
+  hold-time 200
+  combo-time 40
+)
+
+(defchordsv2
+  (u i o) (multi lctl w)                $combo-time all-released  ()
+  (u i) bspc                $combo-time all-released  ()
+  (e r)    (multi lctl y)                $combo-time all-released  ()
+  (j k)    ret                $combo-time all-released  ()
+  (d f) esc $combo-time                  all-released ()
+)
+
+(defalias
+  mehkey (tap-hold-press $tap-time $hold-time esc (multi lsft lctl lalt))
+  hyperkey (tap-hold-press $tap-time $hold-time esc (multi lsft lctl lalt lmet))
+  tmux (tap-hold $tap-time $hold-time (multi lctl b) lctl)
+  a (tap-hold $tap-time $hold-time a lalt)
+  s (tap-hold $tap-time $hold-time s lmet)
+  d (tap-hold $tap-time $hold-time d lctl)
+  f (tap-hold $tap-time $hold-time f lsft)
+  g (tap-hold $tap-time $hold-time g (multi lsft lctl lalt lmet))
+  h (tap-hold $tap-time $hold-time h (multi lsft lctl lalt lmet))
+  j (tap-hold $tap-time $hold-time j lsft)
+  k (tap-hold $tap-time $hold-time k rctl)
+  l (tap-hold $tap-time $hold-time l rmet)
+  ; (tap-hold $tap-time $hold-time ; ralt)
+)
+
+(deflayer base
+  tab q w e r t y u i o
+  @tmux @a @s @d @f @g @h @j @k @l @;
+  lsft z x c v
+  caps lalt lmet spc @mehkey @hyperkey
+)
