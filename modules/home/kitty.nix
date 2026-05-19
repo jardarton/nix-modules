@@ -26,10 +26,6 @@ in
   };
 
   config = mkIf cfg.enable {
-    home.sessionVariables = {
-      TERMINFO_DIRS = "${pkgs.kitty.terminfo.outPath}/share/terminfo";
-    };
-
     stylix.targets.kitty.variant256Colors = true;
 
     programs.kitty = {
