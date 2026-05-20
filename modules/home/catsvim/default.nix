@@ -2,24 +2,73 @@
 {
   pkgs,
   config,
-  inputs,
   lib,
   ...
 }:
 with lib;
 let
   cfg = config.modules.home.catsvim;
+
+  neovimInput = localFlake.inputs.nixCats;
+  wrapperModules = neovimInput.inputs."nix-wrapper-modules";
+  baseModule = modules.importApply "${neovimInput}/module.nix" neovimInput.inputs;
+
   # Grab stylix override
   stylix16 = pkgs.lib.filterAttrs (
     k: v: builtins.match "base0[0-9A-F]" k != null
   ) config.lib.stylix.colors.withHashtag;
-in
-{
 
-  imports = [
-    localFlake.inputs.nixCats.homeModules.default
+  commonAliases = [
+    "catsvim"
+    "neovim-nixCats"
+    "nvim-nixCats"
+    "neovimCats"
+    "nvimCats"
+    "nx"
   ];
 
+  mkCatsvimPackage =
+    profile: overrides:
+    (wrapperModules.lib.evalModules {
+      modules = [
+        baseModule
+        profile
+        overrides
+      ];
+      specialArgs = { inherit pkgs; };
+    }).config.wrap
+      { inherit pkgs; };
+
+  themeInfo = themeName: {
+    settings.theme.name = mkForce themeName;
+    info.opts.theme.name = mkForce themeName;
+    info.opts.theme.base16 = mkIf (cfg.theme == "stylix") {
+      enable = mkForce true;
+      table = mkForce stylix16;
+    };
+  };
+
+  catsvimPackage = mkCatsvimPackage (neovimInput + "/nix/profiles/full.nix") (
+    { ... }:
+    mkMerge [
+      (themeInfo cfg.theme)
+      {
+        settings.aliases = mkForce commonAliases;
+      }
+    ]
+  );
+
+  catsviPackage = mkCatsvimPackage (neovimInput + "/nix/profiles/minimal.nix") (
+    { ... }:
+    mkMerge [
+      (themeInfo "gruvbox")
+      {
+        settings.aliases = mkForce (commonAliases ++ [ "catsvi" ]);
+      }
+    ]
+  );
+in
+{
   options.modules.home.catsvim = {
     enable = mkOption {
       type = types.bool;
@@ -41,99 +90,10 @@ in
   };
 
   config = mkIf (cfg.enable || cfg.catsvi) {
-    # Neovim nixCats
-    catsvim = {
-      enable = true;
-      nixpkgs_version = inputs.nixpkgs;
-      packageNames =
-        [ ]
-        ++ (
-          if cfg.enable then
-            [
-              "catsvim"
-            ]
-          else
-            [ "catsvi" ]
-        );
-      packageDefinitions.replace = {
-        catsvim =
-          { ... }:
-          {
-            settings = {
-              aliases = [
-                "neovim-nixCats"
-                "nvim-nixCats"
-                "neovimCats"
-                "nvimCats"
-                "nx"
-              ];
-              configDirName = "nvim-nixCats";
-            };
-            categories = {
-              general = true;
-              extras = true;
-              practice = true;
-              undotree = true;
-              welcome = true;
-              opts = {
-                theme = {
-                  base16 = mkIf (cfg.theme == "stylix") {
-                    enable = true;
-                    table = stylix16;
-                  };
-                  name = cfg.theme;
-                };
-                # Pass configuration to obsidian.nvim
-                # obsidian.workspaces = [
-                #   {
-                #     name = "Personal";
-                #     path = config.xdg.userDirs.extraConfig.XDG_NOTES_DIR;
-                #   }
-                # ];
-              };
-            };
-          };
-        catsvi =
-          { ... }:
-          {
-            settings = {
-              aliases = [
-                "neovim-nixCats"
-                "nvim-nixCats"
-                "neovimCats"
-                "nvimCats"
-                "nx"
-              ];
-              configDirName = "nvim-nixCats";
-            };
-            categories = {
-              general = true;
-              extras = true;
-              practice = false;
-              undotree = false;
-              welcome = true;
-              formatlint = true;
-              opts = {
-                theme = {
-                  base16 = {
-                    enable = true;
-                    table = stylix16;
-                  };
-                  name = "gruvbox";
-                };
-                # Pass configuration to obsidian.nvim
-                # obsidian.workspaces = [
-                #   {
-                #     name = "Personal";
-                #     path = config.xdg.userDirs.extraConfig.XDG_NOTES_DIR;
-                #   }
-                # ];
-              };
-            };
-          };
-      };
+    home.packages = [
+      (if cfg.enable then catsvimPackage else catsviPackage)
+    ];
 
-    };
     home.sessionVariables = {
       CATSVIM = mkDefault (if cfg.enable then "catsvim" else "catsvi");
     };
