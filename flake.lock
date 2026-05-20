@@ -500,11 +500,11 @@
         "treefmt-nix": "treefmt-nix_2"
       },
       "locked": {
-        "lastModified": 1779257624,
-        "narHash": "sha256-pXnXgFvoFQKt4gDnOx0OjKSsv0T51QmN5thbzWf9WX0=",
+        "lastModified": 1779303886,
+        "narHash": "sha256-R6MQlBFm87TILEahMyI4Sm6eNSiWkGAGRSRPcL2N3wA=",
         "owner": "numtide",
         "repo": "llm-agents.nix",
-        "rev": "3c69691d60d50f87cc0d5f6222992b63c90b010d",
+        "rev": "ba8b46324161d81358771a7aea6ddf8dac56c392",
         "type": "github"
       },
       "original": {
@@ -615,7 +615,6 @@
         "nixpkgs": [
           "nixpkgs"
         ],
-        "plugins-blink-css-vars": "plugins-blink-css-vars",
         "plugins-blink-indent": "plugins-blink-indent",
         "plugins-lze": "plugins-lze",
         "plugins-lzextras": "plugins-lzextras",
@@ -626,11 +625,11 @@
         "plugins-ts-error-translator": "plugins-ts-error-translator"
       },
       "locked": {
-        "lastModified": 1779282647,
-        "narHash": "sha256-QpX597oszn2YJwwLiLMuvWQxaM9ghfU/MNfgyNevx0s=",
+        "lastModified": 1779304195,
+        "narHash": "sha256-7bHJcgRS4CVTFZXN2kL3jnM4IwR9/X3ElJLgbGu8e94=",
         "owner": "jardt",
         "repo": "neovim",
-        "rev": "4a4a381c4f91bdc5ebd66d6f9916e0eb1f44dc77",
+        "rev": "7e2270ed527b74dd39f29b091fb55b5de1b4e21c",
         "type": "github"
       },
       "original": {
@@ -849,22 +848,6 @@
       "original": {
         "owner": "nix-community",
         "repo": "NUR",
-        "type": "github"
-      }
-    },
-    "plugins-blink-css-vars": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1738051935,
-        "narHash": "sha256-TAwfi1wyKSzQEOK34pCHuyD3mLylFQX2K8UPBjU9Oo0=",
-        "owner": "jdrupal-dev",
-        "repo": "css-vars.nvim",
-        "rev": "0615782c320f729b04d9c51a8a61fb498ee4234a",
-        "type": "github"
-      },
-      "original": {
-        "owner": "jdrupal-dev",
-        "repo": "css-vars.nvim",
         "type": "github"
       }
     },
