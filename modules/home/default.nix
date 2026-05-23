@@ -67,6 +67,10 @@ in
       inherit withSystem;
     };
     node = importApply ./node.nix { localFlake = moduleFlake; };
+    gondolin = importApply ./gondolin.nix {
+      localFlake = moduleFlake;
+      inherit withSystem;
+    };
     nh = importApply ./nh.nix { localFlake = moduleFlake; };
   };
 }
