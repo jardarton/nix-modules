@@ -616,6 +616,8 @@
           "nixpkgs"
         ],
         "plugins-blink-indent": "plugins-blink-indent",
+        "plugins-delta-lua": "plugins-delta-lua",
+        "plugins-deltaview": "plugins-deltaview",
         "plugins-lze": "plugins-lze",
         "plugins-lzextras": "plugins-lzextras",
         "plugins-nvim-ansible": "plugins-nvim-ansible",
@@ -625,11 +627,11 @@
         "plugins-ts-error-translator": "plugins-ts-error-translator"
       },
       "locked": {
-        "lastModified": 1779304195,
-        "narHash": "sha256-7bHJcgRS4CVTFZXN2kL3jnM4IwR9/X3ElJLgbGu8e94=",
+        "lastModified": 1780426133,
+        "narHash": "sha256-jBXxpAbARTf+nL63hOmzvTYlKHQ8evmHTFXnJ2yQgvE=",
         "owner": "jardt",
         "repo": "neovim",
-        "rev": "7e2270ed527b74dd39f29b091fb55b5de1b4e21c",
+        "rev": "f2a8e71c7bb73da69a8172c4d988a995e33a186b",
         "type": "github"
       },
       "original": {
@@ -864,6 +866,38 @@
       "original": {
         "owner": "saghen",
         "repo": "blink.indent",
+        "type": "github"
+      }
+    },
+    "plugins-delta-lua": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1779940041,
+        "narHash": "sha256-wssLviY2unqUPxtwSYiOP6DQqEILpFlg/flq6KTQpmM=",
+        "owner": "kokusenz",
+        "repo": "delta.lua",
+        "rev": "570d8a6c8c41d99ac051d5c36a85461693d42a9c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "kokusenz",
+        "repo": "delta.lua",
+        "type": "github"
+      }
+    },
+    "plugins-deltaview": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1779939939,
+        "narHash": "sha256-zdrwfVXO+x6VCwKEbtGd70cemGy37xqab8Jxl7idhL4=",
+        "owner": "kokusenz",
+        "repo": "deltaview.nvim",
+        "rev": "fed02694ad2a174954b8d6d42b095269786f23d7",
+        "type": "github"
+      },
+      "original": {
+        "owner": "kokusenz",
+        "repo": "deltaview.nvim",
         "type": "github"
       }
     },
