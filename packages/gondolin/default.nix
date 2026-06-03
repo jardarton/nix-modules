@@ -22,7 +22,7 @@ buildNpmPackage rec {
   npmDepsHash = "sha256-cV7p7NAL6JaICqUWFQFYfKc5JpzfIOPdJYbBgem9RRQ=";
 
   postPatch = ''
-    node -e 'const fs = require("fs"); const pkg = JSON.parse(fs.readFileSync("package.json", "utf8")); delete pkg.optionalDependencies; fs.writeFileSync("package.json", JSON.stringify(pkg, null, 2) + String.fromCharCode(10));'
+    sed -i '/^  "optionalDependencies": {/,/^  },$/d' package.json
   '';
 
   npmFlags = [ "--omit=optional" ];
