@@ -25,6 +25,8 @@ buildNpmPackage rec {
 
   npmDepsHash = "sha256-Z44jcaxWcgIn4f9jQMo72bNsPl1Cv2//aUYt2Q7VSCQ=";
 
+  npmFlags = [ "--legacy-peer-deps" ];
+
   npmBuildScript = "build";
 
   nativeBuildInputs = [
