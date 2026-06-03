@@ -28,16 +28,25 @@
 (defalias
   mehkey (tap-hold-press $tap-time $hold-time esc (multi lsft lctl lalt))
   hyperkey (tap-hold-press $tap-time $hold-time esc (multi lsft lctl lalt lmet))
+  metl (multi lmet (layer-while-held meta))
+  metr (multi rmet (layer-while-held meta))
+  mac-a (multi (release-key lmet) (release-key rmet) lctl a)
+  mac-c (multi (release-key lmet) (release-key rmet) lctl c)
+  mac-f (multi (release-key lmet) (release-key rmet) lctl f)
+  mac-r (multi (release-key lmet) (release-key rmet) lctl r)
+  mac-v (multi (release-key lmet) (release-key rmet) lctl lsft v)
+  mac-x (multi (release-key lmet) (release-key rmet) lctl x)
+  mac-z (multi (release-key lmet) (release-key rmet) lctl z)
   tmux (tap-hold $tap-time $hold-time (multi lctl b) lctl)
   a (tap-hold $tap-time $hold-time a lalt)
-  s (tap-hold $tap-time $hold-time s lmet)
+  s (tap-hold $tap-time $hold-time s @metl)
   d (tap-hold $tap-time $hold-time d lctl)
   f (tap-hold $tap-time $hold-time f lsft)
   g (tap-hold $tap-time $hold-time g (multi lsft lctl lalt lmet))
   h (tap-hold $tap-time $hold-time h (multi lsft lctl lalt lmet))
   j (tap-hold $tap-time $hold-time j lsft)
   k (tap-hold $tap-time $hold-time k rctl)
-  l (tap-hold $tap-time $hold-time l rmet)
+  l (tap-hold $tap-time $hold-time l @metr)
   ; (tap-hold $tap-time $hold-time ; ralt)
 )
 
@@ -45,5 +54,12 @@
   tab q w e r t y u i o
   @tmux @a @s @d @f @g @h @j @k @l @;
   lsft z x c v
-  caps lalt lmet spc @mehkey @hyperkey
+  caps lalt @metl spc @mehkey @hyperkey
+)
+
+(deflayer meta
+  _ _ _ _ @mac-r _ _ _ _ _
+  _ @mac-a _ _ @mac-f _ _ _ _ _ _
+  _ @mac-z @mac-x @mac-c @mac-v
+  _ _ _ _ _ _
 )
