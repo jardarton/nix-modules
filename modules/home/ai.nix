@@ -18,14 +18,23 @@ in
       example = true;
       description = "enable ai packages";
     };
+
+    agentBrowser = mkOption {
+      type = types.bool;
+      default = false;
+      example = true;
+      description = "install the agent-browser package";
+    };
   };
 
   config = mkIf cfg.enable {
 
     home.packages = withSystem pkgs.stdenv.hostPlatform.system (
       { pkgs, system, ... }:
-      [ ]
-      ++ (with localFlake.inputs.llm-agents.packages.${system}; [
+      let
+        llmPackages = localFlake.inputs.llm-agents.packages.${system};
+      in
+      (with llmPackages; [
         claude-code
         opencode
         pi
@@ -33,8 +42,8 @@ in
         workmux
         codex
         copilot-cli
-        agent-browser
       ])
+      ++ optional cfg.agentBrowser llmPackages.agent-browser
     );
 
     xdg.configFile."workmux/config.yaml".text = ''
