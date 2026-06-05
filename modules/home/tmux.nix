@@ -566,6 +566,7 @@ in
         # Configure Tmux
         set-option -sg escape-time 10
         set -g extended-keys on
+        set -g extended-keys-format csi-u
         set -g focus-events on
         set -s set-clipboard on
 
