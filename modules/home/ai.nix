@@ -42,6 +42,7 @@ in
         workmux
         codex
         copilot-cli
+        rtk
       ])
       ++ optional cfg.agentBrowser llmPackages.agent-browser
     );
