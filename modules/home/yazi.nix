@@ -92,18 +92,18 @@ in
         open = {
           prepend_rules = [
             {
-              name = "*.json";
+              url = "*.json";
               use = "edit";
             }
             {
-              name = "*.html";
+              url = "*.html";
               use = [
                 "open"
                 "edit"
               ];
             }
             {
-              name = "*.pdf";
+              url = "*.pdf";
               use = [
                 "pdff"
                 "open"
