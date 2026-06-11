@@ -28,6 +28,7 @@ This repository is the public module layer: shared defaults, application modules
 - `fzf`
 - `ghostty`
 - `git`
+- `hermes-desktop`
 - `hyprland`
 - `i3`
 - `kitty`
