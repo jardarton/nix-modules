@@ -77,6 +77,16 @@ in
   };
 
   config = lib.mkIf cfg.enable {
+    systemd.tmpfiles.rules = [
+      "d ${cfg.confDir} 0755 root root -"
+    ]
+    ++ lib.optionals cfg.zigbee2mqtt.enable [
+      "d ${cfg.zigbee2mqtt.dataDir} 0755 root root -"
+    ]
+    ++ lib.optionals cfg.mosquitto.enable [
+      "d ${cfg.mosquitto.dataDir} 0755 1883 1883 -"
+      "d ${cfg.mosquitto.logDir} 0755 1883 1883 -"
+    ];
 
     virtualisation.oci-containers = {
       backend = "podman";
