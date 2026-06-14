@@ -1,9 +1,8 @@
 { localFlake, ... }:
-{
-  lib,
-  config,
-  pkgs,
-  ...
+{ lib
+, config
+, pkgs
+, ...
 }:
 with lib;
 let
@@ -104,12 +103,20 @@ in
 
         bindkey -M vicmd 'k' history-substring-search-up
         bindkey -M vicmd 'j' history-substring-search-down
-        bindkey '^y' autosuggest-accept
+        bindkey '^Y' autosuggest-accept
         bindkey -s ^o ". fzf-cd .\n"
 
 
         function zvm_config() {
         ZVM_CURSOR_STYLE_ENABLED=false
+        }
+
+        function zvm_custom_keybindings() {
+        zvm_bindkey viins '^Y' autosuggest-accept
+        ${lib.optionalString televisionEnabled "zvm_bindkey viins '^R' tv-shell-history"}
+        ${lib.optionalString televisionEnabled "zvm_bindkey vicmd '^R' tv-shell-history"}
+        ${lib.optionalString (!televisionEnabled) "zvm_bindkey viins '^R' fzf-history-widget"}
+        ${lib.optionalString (!televisionEnabled) "zvm_bindkey vicmd '^R' fzf-history-widget"}
         }
 
         function zvm_vi_yank() {
@@ -119,11 +126,11 @@ in
         }
 
         function zvm_after_init() {
-        zvm_bindkey viins '^y' autosuggest-accept
-        ${lib.optionalString televisionEnabled "zvm_bindkey viins '^R' tv-shell-history"}
-        ${lib.optionalString televisionEnabled "zvm_bindkey vicmd '^R' tv-shell-history"}
-        ${lib.optionalString (!televisionEnabled) "zvm_bindkey viins '^R' fzf-history-widget"}
-        ${lib.optionalString (!televisionEnabled) "zvm_bindkey vicmd '^R' fzf-history-widget"}
+        zvm_custom_keybindings
+        }
+
+        function zvm_after_lazy_keybindings() {
+        zvm_custom_keybindings
         }
 
         zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
