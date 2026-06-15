@@ -1,0 +1,31 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Local environment
+.env
+.env.*
+!.env.example
+.direnv/
+
+# Nix build outputs
+/result
+/result-*
+*.drv
+
+# Logs and temporary files
+*.log
+*.tmp
+*.temp
+.cache/
+
+# Local agent/session state
+.pi/
