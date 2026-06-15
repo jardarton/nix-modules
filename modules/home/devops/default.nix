@@ -46,6 +46,7 @@ in
             talosctl
             talhelper
             cmctl
+            localFlake.packages.${pkgs.stdenv.hostPlatform.system}.kli
           ]
         else
           [ ]

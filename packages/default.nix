@@ -5,5 +5,6 @@
     cclip = pkgs.callPackage ./cclip { };
     stack = pkgs.callPackage ./stack { };
     gondolin = pkgs.callPackage ./gondolin { };
+    kli = pkgs.callPackage ./kli { };
   };
 }
