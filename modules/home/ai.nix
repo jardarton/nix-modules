@@ -38,7 +38,6 @@ in
         claude-code
         opencode
         pi
-        mcporter
         workmux
         codex
         copilot-cli
