@@ -1,8 +1,8 @@
-{
-  lib,
-  buildNpmPackage,
-  fetchFromGitHub,
-  nodejs_24,
+{ lib
+, buildNpmPackage
+, fetchFromGitHub
+, nodejs_24
+,
 }:
 
 buildNpmPackage rec {
@@ -33,6 +33,6 @@ buildNpmPackage rec {
     homepage = "https://github.com/earendil-works/gondolin";
     license = lib.licenses.asl20;
     mainProgram = "gondolin";
-    platforms = lib.platforms.linux;
+    platforms = lib.platforms.unix;
   };
 }

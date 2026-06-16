@@ -1,29 +1,29 @@
-{
-  lib,
-  buildNpmPackage,
-  fetchFromGitHub,
-  bun,
-  nodejs,
-  git,
-  gh,
+{ lib
+, buildNpmPackage
+, fetchFromGitHub
+, bun
+, nodejs
+, git
+, gh
+,
 }:
 
 buildNpmPackage rec {
   pname = "stack";
-  version = "0.1.5";
+  version = "0.2.0";
 
   src = fetchFromGitHub {
     owner = "kitlangton";
     repo = "stack";
-    rev = "1be576f03ef265d223f62e02b589c06d6edcf47e";
-    hash = "sha256-auCYibRmSMndzruwHK+yfkAWJweKzTs5SA/kxLvp+Ps=";
+    rev = "ac714a3d841dba95b51b2307fc74f359ef0a7036";
+    hash = "sha256-IZW1/7iKjNvpbGvLBd2PGDaJXpreoZeemUsNswChZeE=";
   };
 
   postPatch = ''
     cp ${./package-lock.json} package-lock.json
   '';
 
-  npmDepsHash = "sha256-Z44jcaxWcgIn4f9jQMo72bNsPl1Cv2//aUYt2Q7VSCQ=";
+  npmDepsHash = "sha256-UqOC1OU8CjWjcdvfESPzbJRG+56uxbsRRNNVa58OVLE=";
 
   npmFlags = [ "--legacy-peer-deps" ];
 

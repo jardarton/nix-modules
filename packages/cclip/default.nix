@@ -1,22 +1,21 @@
-{
-  lib,
-  stdenv,
-  sqlite,
-  wayland,
-  wayland-scanner,
-  fetchgit,
-  meson,
-  ninja,
-  git,
-  xxhash,
-  cmake,
-  pkg-config,
-  ...
+{ lib
+, stdenv
+, sqlite
+, wayland
+, wayland-scanner
+, fetchgit
+, meson
+, ninja
+, git
+, xxhash
+, cmake
+, pkg-config
+, ...
 }:
 
 stdenv.mkDerivation rec {
   pname = "cclip";
-  version = "3.0.0";
+  version = "3.3.1";
 
   src = fetchgit {
     url = "https://github.com/heather7283/cclip.git";
