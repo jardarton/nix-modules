@@ -455,6 +455,26 @@
         "type": "github"
       }
     },
+    "herdr": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1781567785,
+        "narHash": "sha256-r9mEIeaqvC+p4rXXky/zRbovI7Dt7LMCaLPQMQzUzqg=",
+        "owner": "ogulcancelik",
+        "repo": "herdr",
+        "rev": "2fe57a57a2b335c6d300a96b442d428b9b2cadf8",
+        "type": "github"
+      },
+      "original": {
+        "owner": "ogulcancelik",
+        "repo": "herdr",
+        "type": "github"
+      }
+    },
     "hermes-agent": {
       "inputs": {
         "flake-parts": "flake-parts_2",
@@ -1174,6 +1194,7 @@
         "firefox-addons": "firefox-addons",
         "flake-parts": "flake-parts",
         "fsel": "fsel",
+        "herdr": "herdr",
         "hermes-agent": "hermes-agent",
         "home-manager": "home-manager",
         "hunk": "hunk",

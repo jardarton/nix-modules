@@ -75,5 +75,9 @@ in
       localFlake = moduleFlake;
       inherit withSystem;
     };
+    herdr = importApply ./herdr.nix {
+      localFlake = moduleFlake;
+      inherit withSystem;
+    };
   };
 }
