@@ -33,19 +33,13 @@ in
       ++ (
         if cfg.enableK8sTools then
           [
-            k3sup
             kubectl
-            kind
-            kubernetes-helm
             fluxcd
             kustomize
             cilium-cli
             kubefetch
             kubeseal
-            helmfile
             talosctl
-            talhelper
-            cmctl
             localFlake.packages.${pkgs.stdenv.hostPlatform.system}.kli
           ]
         else
