@@ -1,9 +1,8 @@
 { localFlake, withSystem, ... }:
-{
-  config,
-  lib,
-  pkgs,
-  ...
+{ config
+, lib
+, pkgs
+, ...
 }:
 let
   cfg = config.modules.home.herdr;
@@ -36,9 +35,9 @@ in
         keys = {
           prefix = "ctrl+b";
           detach = "prefix+shift+d";
-          goto = "prefix+tab";
+          goto = "prefix+g";
           workspace_picker = "prefix+w";
-          new_workspace = "prefix+o";
+          new_workspace = "prefix+shift+n";
           new_worktree = "prefix+t";
           open_notification_target = "prefix+shift+o";
           reload_config = "prefix+comma";
@@ -70,6 +69,20 @@ in
           toggle_sidebar = "prefix+shift+b";
           copy_mode = "prefix+[";
           resize_mode = "prefix+r";
+          command = [
+            {
+              key = "prefix+o";
+              type = "pane";
+              command = "herdr-sessionizer";
+              description = "Pick a directory and create a workspace there";
+            }
+            {
+              key = "prefix+tab";
+              type = "pane";
+              command = "herdr-workspace-fzf";
+              description = "Fuzzy find and focus a workspace";
+            }
+          ];
         };
         ui = {
           confirm_close = true;
@@ -107,7 +120,77 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    home.packages = [ cfg.package ];
+    home.packages = [
+      cfg.package
+      pkgs.fd
+      pkgs.fzf
+      pkgs.jq
+    ];
+
+    home.file.".local/scripts/herdr-sessionizer" = {
+      executable = true;
+      text = ''
+        #!/usr/bin/env bash
+        set -euo pipefail
+
+        fzf_opts=(
+          --height=80%
+          --reverse
+          --border=rounded
+          --prompt='directory> '
+          --color='bg:-1,bg+:#3c3836,fg:#ebdbb2,fg+:#fbf1c7,hl:#fabd2f,hl+:#fabd2f'
+          --color='border:#665c54,prompt:#83a598,pointer:#fe8019,marker:#b8bb26,info:#8ec07c,spinner:#d3869b'
+        )
+
+        if [[ $# -eq 1 ]]; then
+          selected=$1
+        else
+          selected=$(fd . ~ -t d -d 3 -H -E Applications -E Library -E Music -E Movies -E Pictures -E Downloads -E Desktop -E Documents | fzf "''${fzf_opts[@]}" || true)
+        fi
+
+        if [[ -z ''${selected:-} ]]; then
+          exit 0
+        fi
+
+        selected=$(realpath "$selected")
+        selected_name=$(basename "$selected" | tr . _)
+
+        herdr workspace create --cwd "$selected" --label "$selected_name" --focus >/dev/null
+      '';
+    };
+
+    home.file.".local/scripts/herdr-workspace-fzf" = {
+      executable = true;
+      text = ''
+        #!/usr/bin/env bash
+        set -euo pipefail
+
+        fzf_opts=(
+          --height=80%
+          --reverse
+          --border=rounded
+          --prompt='workspace> '
+          --with-nth=2..
+          --color='bg:-1,bg+:#3c3836,fg:#ebdbb2,fg+:#fbf1c7,hl:#fabd2f,hl+:#fabd2f'
+          --color='border:#665c54,prompt:#83a598,pointer:#fe8019,marker:#b8bb26,info:#8ec07c,spinner:#d3869b'
+        )
+
+        selected=$(
+          herdr workspace list \
+            | jq -r '.result.workspaces[] | [.workspace_id, .number, .label, .focused, .pane_count, .tab_count] | @tsv' \
+            | awk -F '\t' '{ marker = ($4 == "true" ? "*" : " "); printf "%s\t%s%s: %s (%s panes, %s tabs)\n", $1, marker, $2, $3, $5, $6 }' \
+            | fzf "''${fzf_opts[@]}" \
+            || true
+        )
+
+        if [[ -z ''${selected:-} ]]; then
+          exit 0
+        fi
+
+        workspace_id=''${selected%%$'\t'*}
+        herdr workspace focus "$workspace_id" >/dev/null
+      '';
+    };
 
     xdg.configFile."herdr/config.toml" = lib.mkIf (cfg.settings != { }) {
       source = toml.generate "herdr-config.toml" cfg.settings;
