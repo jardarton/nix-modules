@@ -20,6 +20,7 @@ in
     programs.fzf = {
       enable = true;
       enableZshIntegration = lib.mkForce (!televisionEnabled);
+      defaultOptions = [ "--layout=reverse-list" ];
       colors = {
         bg = lib.mkForce "-1";
         fg = lib.mkForce "#${config.lib.stylix.colors.base05}";
