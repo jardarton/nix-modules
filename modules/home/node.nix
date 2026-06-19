@@ -27,6 +27,7 @@ in
         color = true;
         prefix = "\${HOME}/.npm";
         min-release-age = 7;
+        minimum-release-age = 10080;
         ignore-scripts = true;
         allow-git = "none";
       };

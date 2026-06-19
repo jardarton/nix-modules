@@ -12,8 +12,8 @@ let
     smol = false;
     telemetry = false;
     install = {
-      # Only install package versions published at least 3 days ago
-      minimumReleaseAge = 259200; # seconds
+      # Only install package versions published at least 7 days ago
+      minimumReleaseAge = 604800; # seconds
 
       # Exclude trusted packages from the age gate
       minimumReleaseAgeExcludes = [ ];
