@@ -1,8 +1,12 @@
 # ❄️ nix-modules
 
-Reusable NixOS and Home Manager modules packaged as a flake.
-
-This repository is the public module layer: shared defaults, application modules, desktop wiring, packages, and small utilities. It intentionally does not contain host composition, secrets, private network layout, users, SSH keys, or machine-specific state. Those belong in the consuming configuration repo.
+Reusable NixOS and Home Manager modules packaged as a
+  flake.This
+  repository
+  is
+  the
+  public
+  module layer: shared defaults, application modules, desktop wiring, packages, and small utilities. It intentionally does not contain host composition, secrets, private network layout, users, SSH keys, or machine-specific state. Those belong in the consuming configuration repo.
 
 ## What is included
 
@@ -29,7 +33,6 @@ This repository is the public module layer: shared defaults, application modules
 - `ghostty`
 - `git`
 - `herdr`
-- `hermes-desktop`
 - `hyprland`
 - `i3`
 - `kitty`
@@ -76,11 +79,11 @@ Add this repository as an input:
 
 ```nix
 {
-  inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-    home-manager.url = "github:nix-community/home-manager";
-    nix-modules.url = "github:USER/nix-modules";
-  };
+inputs = {
+nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+home-manager.url = "github:nix-community/home-manager";
+nix-modules.url = "github:USER/nix-modules";
+};
 }
 ```
 
@@ -96,15 +99,15 @@ nix-modules.url = "path:/home/jdr/nix-modules";
 
 ```nix
 {
-  inputs,
-  ...
+inputs,
+...
 }:
 {
-  imports = [
-    inputs.nix-modules.nixosModules.base-packages
-    inputs.nix-modules.nixosModules.bluetooth
-    inputs.nix-modules.nixosModules.fonts
-  ];
+imports = [
+inputs.nix-modules.nixosModules.base-packages
+inputs.nix-modules.nixosModules.bluetooth
+inputs.nix-modules.nixosModules.fonts
+];
 }
 ```
 
@@ -112,21 +115,21 @@ nix-modules.url = "path:/home/jdr/nix-modules";
 
 ```nix
 {
-  inputs,
-  ...
+inputs,
+...
 }:
 {
-  imports = [
-    inputs.nix-modules.homeModules.default
-    inputs.nix-modules.homeModules.git
-    inputs.nix-modules.homeModules.firefox
-    inputs.nix-modules.homeModules.zsh
-  ];
+imports = [
+inputs.nix-modules.homeModules.default
+inputs.nix-modules.homeModules.git
+inputs.nix-modules.homeModules.firefox
+inputs.nix-modules.homeModules.zsh
+];
 
-  modules.home.firefox = {
-    enable = true;
-    profile = "default";
-  };
+modules.home.firefox = {
+enable = true;
+profile = "default";
+};
 }
 ```
 
@@ -136,13 +139,13 @@ If your consuming repository also uses `flake-parts`, import the module tree and
 
 ```nix
 {
-  inputs,
-  ...
+inputs,
+...
 }:
 {
-  imports = [
-    "${inputs.nix-modules}/modules"
-  ];
+imports = [
+"${inputs.nix-modules}/modules"
+];
 }
 ```
 
