@@ -1,8 +1,9 @@
-{ flake-parts-lib
-, self
-, inputs
-, withSystem
-, ...
+{
+  flake-parts-lib,
+  self,
+  inputs,
+  withSystem,
+  ...
 }:
 let
   inherit (flake-parts-lib) importApply;
@@ -71,10 +72,6 @@ in
       inherit withSystem;
     };
     nh = importApply ./nh.nix { localFlake = moduleFlake; };
-    hermes-desktop = importApply ./hermes-desktop.nix {
-      localFlake = moduleFlake;
-      inherit withSystem;
-    };
     herdr = importApply ./herdr.nix {
       localFlake = moduleFlake;
       inherit withSystem;
