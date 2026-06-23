@@ -35,6 +35,7 @@ Reusable NixOS and Home Manager modules packaged as a
 - `herdr`
 - `hyprland`
 - `i3`
+- `jujutsu`
 - `kitty`
 - `mango`
 - `media`

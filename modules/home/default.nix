@@ -34,6 +34,7 @@ in
       localFlake = moduleFlake;
       inherit withSystem;
     };
+    jujutsu = importApply ./jujutsu.nix { localFlake = moduleFlake; };
     eza = importApply ./eza.nix { localFlake = moduleFlake; };
     kitty = importApply ./kitty.nix { localFlake = moduleFlake; };
     tmux = importApply ./tmux.nix { localFlake = moduleFlake; };
