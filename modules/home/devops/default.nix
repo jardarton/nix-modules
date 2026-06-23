@@ -1,13 +1,14 @@
 { localFlake, ... }:
-{
-  lib,
-  pkgs,
-  config,
-  ...
+{ lib
+, pkgs
+, config
+, ...
 }:
 with lib;
 let
   cfg = config.modules.home.devops;
+  enableLimaOnMacOS = cfg.enableLima && pkgs.stdenv.isDarwin;
+  enableColimaOnMacOS = cfg.enableColima && pkgs.stdenv.isDarwin;
 in
 {
 
@@ -15,6 +16,7 @@ in
     enableDocker = mkEnableOption "enable docker and related";
     enableK8sTools = mkEnableOption "enable k8s tools";
     enableLima = mkEnableOption "enable lima for macos";
+    enableColima = mkEnableOption "enable colima for macos";
   };
   config = {
 
@@ -46,10 +48,17 @@ in
           [ ]
       )
       ++ (
-        if cfg.enableLima then
+        if enableLimaOnMacOS then
           [
             lima-additional-guestagents
             lima
+          ]
+        else
+          [ ]
+      )
+      ++ (
+        if enableColimaOnMacOS then
+          [
             colima
           ]
         else
@@ -60,8 +69,7 @@ in
       enable = cfg.enableDocker;
     };
 
-    services.colima = {
-
+    services.colima = mkIf enableColimaOnMacOS {
       enable = true;
     };
 
@@ -91,9 +99,16 @@ in
           ""
       )
       + (
-        if cfg.enableLima then
+        if enableLimaOnMacOS then
           ''
             source <(limactl completion zsh)
+          ''
+        else
+          ""
+      )
+      + (
+        if enableColimaOnMacOS then
+          ''
             source <(colima completion zsh)
           ''
         else
@@ -102,8 +117,8 @@ in
 
     home.shellAliases = {
       k = mkIf cfg.enableK8sTools "kubectl";
-      limakube = mkIf cfg.enableLima ''export KUBECONFIG="${config.home.homeDirectory}/.lima/k8s/copied-from-guest/kubeconfig.yaml"'';
-      limassh = mkIf cfg.enableLima "ssh -F ~/.lima/default/ssh.config lima-default";
+      limakube = mkIf enableLimaOnMacOS ''export KUBECONFIG="${config.home.homeDirectory}/.lima/k8s/copied-from-guest/kubeconfig.yaml"'';
+      limassh = mkIf enableLimaOnMacOS "ssh -F ~/.lima/default/ssh.config lima-default";
       ld = mkIf cfg.enableDocker "lazydocker";
     };
   };
