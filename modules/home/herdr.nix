@@ -7,6 +7,136 @@
 let
   cfg = config.modules.home.herdr;
   toml = pkgs.formats.toml { };
+  json = pkgs.formats.json { };
+  mkHerdrPluginPackage =
+    {
+      pluginId,
+      src,
+      rustPackage,
+    }:
+    pkgs.runCommand "herdr-plugin-${lib.replaceStrings [ "." ] [ "-" ] pluginId}"
+      { }
+      ''
+        mkdir -p "$out/target/release"
+        cp ${src}/herdr-plugin.toml "$out/herdr-plugin.toml"
+        cp ${rustPackage}/bin/${rustPackage.meta.mainProgram or rustPackage.pname} "$out/target/release/${rustPackage.meta.mainProgram or rustPackage.pname}"
+      '';
+  defaultJjWorkspaceRustPackage = pkgs.rustPlatform.buildRustPackage {
+    pname = "jj-workspace";
+    version = "0.1.0";
+    src = localFlake.inputs.herdr-plugin-jj-workspace;
+    cargoLock.lockFile = localFlake.inputs.herdr-plugin-jj-workspace + "/Cargo.lock";
+    meta.mainProgram = "jj-workspace";
+  };
+  defaultJjWorkspacePlugin = {
+    id = "nathanflurry.jj-workspace";
+    package = mkHerdrPluginPackage {
+      pluginId = "nathanflurry.jj-workspace";
+      src = localFlake.inputs.herdr-plugin-jj-workspace;
+      rustPackage = defaultJjWorkspaceRustPackage;
+    };
+    enabled = true;
+  };
+  configuredPlugins =
+    lib.optional cfg.enableJjWorkspacePlugin defaultJjWorkspacePlugin
+    ++ cfg.plugins;
+  jjWorkspaceKeybindCommands = lib.optionals (cfg.enableJjWorkspacePlugin && cfg.pluginKeybinds.jjWorkspace.enable) [
+    {
+      key = cfg.pluginKeybinds.jjWorkspace.new;
+      type = "pane";
+      command = "herdr plugin action invoke nathanflurry.jj-workspace.new";
+      description = "New jj workspace";
+    }
+    {
+      key = cfg.pluginKeybinds.jjWorkspace.remove;
+      type = "pane";
+      command = "herdr plugin action invoke nathanflurry.jj-workspace.remove";
+      description = "Remove jj workspace";
+    }
+  ];
+  effectiveSettings =
+    cfg.settings
+    // {
+      keys = (cfg.settings.keys or { }) // {
+        command = (cfg.settings.keys.command or [ ]) ++ jjWorkspaceKeybindCommands;
+      };
+    };
+  pluginRegistry = builtins.map (
+    plugin:
+    let
+      manifest = builtins.fromTOML (builtins.readFile "${plugin.package}/herdr-plugin.toml");
+    in
+    {
+      plugin_id = plugin.id;
+      inherit (manifest)
+        name
+        version
+        min_herdr_version
+        ;
+      description = manifest.description or null;
+      manifest_path = "${plugin.package}/herdr-plugin.toml";
+      plugin_root = toString plugin.package;
+      enabled = plugin.enabled;
+      platforms = manifest.platforms or null;
+      build = manifest.build or [ ];
+      actions = manifest.actions or [ ];
+      events = manifest.events or [ ];
+      panes = manifest.panes or [ ];
+      link_handlers = manifest.link_handlers or [ ];
+      source.kind = "local";
+      warnings = [ ];
+    }
+  ) configuredPlugins;
+  pluginConfigDirName =
+    pluginId:
+    let
+      chars = lib.stringToCharacters pluginId;
+      mapped = builtins.map (
+        ch:
+        if builtins.match "[a-z0-9._-]" ch != null then
+          ch
+        else
+          let
+            code = lib.toHexString (lib.strings.charToInt ch);
+            normalized = if lib.stringLength code == 1 then "0${code}" else code;
+          in
+          "%${lib.toUpper normalized}"
+      ) chars;
+      component = lib.concatStrings mapped;
+      stem = builtins.head (lib.splitString "." component);
+      reserved = [
+        "CON"
+        "PRN"
+        "AUX"
+        "NUL"
+        "COM1"
+        "COM2"
+        "COM3"
+        "COM4"
+        "COM5"
+        "COM6"
+        "COM7"
+        "COM8"
+        "COM9"
+        "LPT1"
+        "LPT2"
+        "LPT3"
+        "LPT4"
+        "LPT5"
+        "LPT6"
+        "LPT7"
+        "LPT8"
+        "LPT9"
+      ];
+    in
+    if component == "" then
+      "%plugin"
+    else if lib.hasSuffix "." component then
+      lib.removeSuffix "." component + "%2E"
+    else if builtins.elem (lib.toUpper stem) reserved then
+      "%${component}"
+    else
+      component;
 in
 {
   options.modules.home.herdr = with lib; {
@@ -20,6 +150,60 @@ in
       );
       defaultText = literalExpression "localFlake.inputs.herdr.packages.\${pkgs.stdenv.hostPlatform.system}.default";
       description = "Herdr package to install.";
+    };
+
+    enableJjWorkspacePlugin = mkOption {
+      type = types.bool;
+      default = true;
+      description = "Enable the bundled NathanFlurry jj workspace Herdr plugin.";
+    };
+
+    plugins = mkOption {
+      type = types.listOf (types.submodule ({ ... }: {
+        options = {
+          id = mkOption {
+            type = types.str;
+            description = "Plugin id matching the herdr-plugin.toml manifest.";
+          };
+          package = mkOption {
+            type = types.package;
+            description = "Package containing herdr-plugin.toml at its root.";
+          };
+          enabled = mkOption {
+            type = types.bool;
+            default = true;
+            description = "Whether the plugin is enabled in Herdr.";
+          };
+        };
+      }));
+      default = [ ];
+      example = literalExpression ''
+        [
+          {
+            id = "example.layout";
+            package = pkgs.callPackage ./my-herdr-plugin.nix { };
+          }
+        ]
+      '';
+      description = "Declarative Herdr plugins registered via ~/.config/herdr/plugins.json.";
+    };
+
+    pluginKeybinds.jjWorkspace = {
+      enable = mkOption {
+        type = types.bool;
+        default = true;
+        description = "Add default keybinds for the bundled jj workspace plugin.";
+      };
+      new = mkOption {
+        type = types.str;
+        default = "prefix+j";
+        description = "Keybind for creating a new jj workspace.";
+      };
+      remove = mkOption {
+        type = types.str;
+        default = "prefix+shift+j";
+        description = "Keybind for removing the current jj workspace.";
+      };
     };
 
     settings = mkOption {
@@ -125,7 +309,7 @@ in
       pkgs.fd
       pkgs.fzf
       pkgs.jq
-    ];
+    ] ++ map (plugin: plugin.package) configuredPlugins;
 
     home.file.".local/scripts/herdr-sessionizer" = {
       executable = true;
@@ -192,8 +376,27 @@ in
       '';
     };
 
-    xdg.configFile."herdr/config.toml" = lib.mkIf (cfg.settings != { }) {
-      source = toml.generate "herdr-config.toml" cfg.settings;
+    xdg.configFile."herdr/config.toml" = lib.mkIf (effectiveSettings != { }) {
+      source = toml.generate "herdr-config.toml" effectiveSettings;
     };
+
+    xdg.configFile."herdr/plugins.json" = lib.mkIf (configuredPlugins != [ ]) {
+      source = json.generate "herdr-plugins.json" pluginRegistry;
+    };
+
+    home.activation.herdrPluginDirs = lib.hm.dag.entryAfter [ "writeBoundary" ] (
+      lib.concatStringsSep "\n" (
+        builtins.map (
+          plugin:
+          let
+            configDir = pluginConfigDirName plugin.id;
+          in
+          ''
+            mkdir -p "$HOME/.config/herdr/plugins/config/${configDir}"
+            mkdir -p "$HOME/.local/state/herdr/plugins/${configDir}"
+          ''
+        ) configuredPlugins
+      )
+    );
   };
 }

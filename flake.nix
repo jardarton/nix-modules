@@ -37,6 +37,10 @@
       url = "github:ogulcancelik/herdr";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    herdr-plugin-jj-workspace = {
+      url = "github:NathanFlurry/herdr-plugin-jj-workspace";
+      flake = false;
+    };
     jj-starship = {
       url = "github:dmmulroy/jj-starship";
       inputs.nixpkgs.follows = "nixpkgs";
