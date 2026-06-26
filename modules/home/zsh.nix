@@ -9,6 +9,7 @@ let
   cfg = config.modules.home.zsh;
   catsvimEnabled = attrByPath [ "modules" "home" "catsvim" "enable" ] false config;
   televisionEnabled = attrByPath [ "modules" "home" "television" "enable" ] false config;
+  jujutsuEnabled = attrByPath [ "modules" "home" "jujutsu" "enable" ] false config;
   editor = if catsvimEnabled then "catsvim" else "nvim";
   clipboard = if pkgs.stdenv.hostPlatform.isDarwin then "pbcopy" else "wlcopy";
   zshSysClip =
@@ -99,6 +100,9 @@ in
 
         ${lib.optionalString televisionEnabled ''
           eval "$(tv init zsh)"
+        ''}
+        ${lib.optionalString jujutsuEnabled ''
+          source <(COMPLETE=zsh jj)
         ''}
 
         bindkey -M vicmd 'k' history-substring-search-up

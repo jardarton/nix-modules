@@ -1,8 +1,9 @@
 { localFlake, withSystem, ... }:
-{ pkgs
-, lib
-, config
-, ...
+{
+  pkgs,
+  lib,
+  config,
+  ...
 }:
 with lib;
 let
@@ -88,9 +89,13 @@ in
       };
     };
 
+    programs.difftastic.enable = true;
+    programs.difftastic.jujutsu.enable = true;
+
     home.packages = [
       pkgs.lazyjj
-    ] ++ optionals cfg.jjStarship.enable [
+    ]
+    ++ optionals cfg.jjStarship.enable [
       cfg.jjStarship.package
     ];
 
