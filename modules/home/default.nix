@@ -1,9 +1,8 @@
-{
-  flake-parts-lib,
-  self,
-  inputs,
-  withSystem,
-  ...
+{ flake-parts-lib
+, self
+, inputs
+, withSystem
+, ...
 }:
 let
   inherit (flake-parts-lib) importApply;
@@ -34,7 +33,10 @@ in
       localFlake = moduleFlake;
       inherit withSystem;
     };
-    jujutsu = importApply ./jujutsu.nix { localFlake = moduleFlake; };
+    jujutsu = importApply ./jujutsu.nix {
+      localFlake = moduleFlake;
+      inherit withSystem;
+    };
     eza = importApply ./eza.nix { localFlake = moduleFlake; };
     kitty = importApply ./kitty.nix { localFlake = moduleFlake; };
     tmux = importApply ./tmux.nix { localFlake = moduleFlake; };
