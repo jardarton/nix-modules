@@ -210,8 +210,12 @@ in
       type = toml.type;
       default = {
         onboarding = false;
-        theme.name = "gruvbox";
+        theme = {
+          name = "terminal";
+          custom.panel_bg = "reset";
+        };
         terminal = {
+          default_shell = "zsh";
           shell_mode = "auto";
           new_cwd = "follow";
         };
@@ -236,6 +240,8 @@ in
           previous_tab = "prefix+p";
           next_tab = "prefix+n";
           switch_tab = "prefix+1..9";
+          switch_workspace = "prefix+shift+1..9";
+          focus_agent = "prefix+alt+1..9";
           split_vertical = "prefix+v";
           split_horizontal = "prefix+b";
           close_pane = "prefix+x";
@@ -297,6 +303,7 @@ in
           prompt_new_tab_name = true;
           show_agent_labels_on_pane_borders = true;
           agent_panel_scope = "all";
+          agent_panel_sort = "priority";
           toast = {
             delivery = "herdr";
             delay_seconds = 1;
@@ -383,7 +390,6 @@ in
 
         fzf_opts=(
           --height=80%
-          --reverse
           --border=rounded
           --prompt='directory> '
           --color='bg:-1,bg+:#3c3836,fg:#ebdbb2,fg+:#fbf1c7,hl:#fabd2f,hl+:#fabd2f'
@@ -415,18 +421,17 @@ in
 
         fzf_opts=(
           --height=80%
-          --reverse
           --border=rounded
           --prompt='workspace> '
-          --with-nth=2..
+          --with-nth=3..
           --color='bg:-1,bg+:#3c3836,fg:#ebdbb2,fg+:#fbf1c7,hl:#fabd2f,hl+:#fabd2f'
           --color='border:#665c54,prompt:#83a598,pointer:#fe8019,marker:#b8bb26,info:#8ec07c,spinner:#d3869b'
         )
 
         selected=$(
           herdr workspace list \
-            | jq -r '.result.workspaces[] | [.workspace_id, .number, .label, .focused, .pane_count, .tab_count] | @tsv' \
-            | awk -F '\t' '{ marker = ($4 == "true" ? "*" : " "); printf "%s\t%s%s: %s (%s panes, %s tabs)\n", $1, marker, $2, $3, $5, $6 }' \
+            | jq -r '.result.workspaces[] | [.workspace_id, .active_tab_id, .number, .label, .focused, .pane_count, .tab_count] | @tsv' \
+            | awk -F '\t' '{ marker = ($5 == "true" ? "*" : " "); printf "%s\t%s\t%s%s: %s (%s panes, %s tabs)\n", $1, $2, marker, $3, $4, $6, $7 }' \
             | fzf "''${fzf_opts[@]}" \
             || true
         )
@@ -436,7 +441,9 @@ in
         fi
 
         workspace_id=''${selected%%$'\t'*}
-        herdr workspace focus "$workspace_id" >/dev/null
+        rest=''${selected#*$'\t'}
+        tab_id=''${rest%%$'\t'*}
+        herdr tab focus "$tab_id" >/dev/null
       '';
     };
 
