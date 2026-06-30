@@ -38,37 +38,11 @@ in
         claude-code
         opencode
         pi
-        workmux
-        codex
         copilot-cli
-        rtk
       ])
+      ++ [ pkgs.codex ]
       ++ optional cfg.agentBrowser llmPackages.agent-browser
     );
 
-    xdg.configFile."workmux/config.yaml".text = ''
-      nerdfont: true
-      merge_strategy: rebase
-      agent: pi
-      theme: default
-      status_icons:
-        working: "🗡️" # Agent is processing
-        waiting: "🌙" # Agent needs input (auto-clears on focus)
-        done: "👑" # Agent finished (auto-clears on focus)
-      post_create:
-        - direnv allow
-      mode: session
-      windows:
-        - name: goblin
-          panes:
-            - command: <agent>
-              focus: true
-              zoom: true
-            - split: horizontal
-        - name: editor 
-          panes:
-            - name: nvim
-            - split: horizontal
-    '';
   };
 }
