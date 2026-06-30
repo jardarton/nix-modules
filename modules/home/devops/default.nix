@@ -27,8 +27,8 @@ in
         if cfg.enableDocker then
           [
             docker
-            podman
           ]
+          ++ lib.optionals pkgs.stdenv.isLinux [ podman ]
         else
           [ ]
       )
