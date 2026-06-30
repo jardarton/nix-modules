@@ -390,6 +390,7 @@ in
 
         fzf_opts=(
           --height=80%
+          --layout=reverse-list
           --border=rounded
           --prompt='directory> '
           --color='bg:-1,bg+:#3c3836,fg:#ebdbb2,fg+:#fbf1c7,hl:#fabd2f,hl+:#fabd2f'
@@ -421,6 +422,7 @@ in
 
         fzf_opts=(
           --height=80%
+          --layout=reverse-list
           --border=rounded
           --prompt='workspace> '
           --with-nth=3..
