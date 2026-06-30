@@ -78,7 +78,7 @@ in
         {
           ui.default-command = "log";
           ui.pager = [
-            "${lib.getExe hunk}"
+            "${hunk}/bin/hunk"
             "pager"
           ];
           ui.diff-formatter = ":git";
