@@ -240,10 +240,10 @@ in
           split_horizontal = "prefix+b";
           close_pane = "prefix+x";
           zoom = "prefix+enter";
-          focus_pane_left = "ctrl+h";
-          focus_pane_down = "ctrl+j";
-          focus_pane_up = "ctrl+k";
-          focus_pane_right = "ctrl+l";
+          focus_pane_left = "";
+          focus_pane_down = "";
+          focus_pane_up = "";
+          focus_pane_right = "";
           navigate_pane_left = "h";
           navigate_pane_down = "j";
           navigate_pane_up = "k";
@@ -265,6 +265,30 @@ in
               type = "pane";
               command = "herdr-workspace-fzf";
               description = "Fuzzy find and focus a workspace";
+            }
+            {
+              key = "ctrl+h";
+              type = "shell";
+              command = "herdr-vim-navigate left";
+              description = "Navigate left (Vim/Herdr)";
+            }
+            {
+              key = "ctrl+j";
+              type = "shell";
+              command = "herdr-vim-navigate down";
+              description = "Navigate down (Vim/Herdr)";
+            }
+            {
+              key = "ctrl+k";
+              type = "shell";
+              command = "herdr-vim-navigate up";
+              description = "Navigate up (Vim/Herdr)";
+            }
+            {
+              key = "ctrl+l";
+              type = "shell";
+              command = "herdr-vim-navigate right";
+              description = "Navigate right (Vim/Herdr)";
             }
           ];
         };
@@ -310,6 +334,46 @@ in
       pkgs.fzf
       pkgs.jq
     ] ++ map (plugin: plugin.package) configuredPlugins;
+
+    home.file.".local/scripts/herdr-vim-navigate" = {
+      executable = true;
+      text = ''
+        #!/usr/bin/env bash
+        set -euo pipefail
+
+        dir="''${1:?usage: herdr-vim-navigate <left|down|up|right>}"
+        herdr="''${HERDR_BIN_PATH:-herdr}"
+        pane="''${HERDR_ACTIVE_PANE_ID:-''${HERDR_PANE_ID:-}}"
+
+        case "$dir" in
+          left) key="ctrl+h" ;;
+          down) key="ctrl+j" ;;
+          up) key="ctrl+k" ;;
+          right) key="ctrl+l" ;;
+          *) echo "herdr-vim-navigate: unknown direction: $dir" >&2; exit 2 ;;
+        esac
+
+        vim_re='^g?(view|l?n?vim?x?)(diff)?$'
+        passthrough_re="''${HERDR_NAV_PASSTHROUGH_RE:-}"
+
+        forward=0
+        if [[ -n "$pane" ]] && command -v jq >/dev/null 2>&1; then
+          if "$herdr" pane process-info --pane "$pane" 2>/dev/null \
+            | jq -e --arg vim "$vim_re" --arg pass "$passthrough_re" \
+                '.result.process_info.foreground_processes[]?.name
+                 | ascii_downcase
+                 | select(test($vim) or ($pass != "" and (try test($pass) catch false)))' >/dev/null 2>&1; then
+            forward=1
+          fi
+        fi
+
+        if [[ "$forward" -eq 1 && -n "$pane" ]]; then
+          exec "$herdr" pane send-keys "$pane" "$key"
+        else
+          exec "$herdr" pane focus --direction "$dir" --current
+        fi
+      '';
+    };
 
     home.file.".local/scripts/herdr-sessionizer" = {
       executable = true;
