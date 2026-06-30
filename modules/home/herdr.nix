@@ -1,8 +1,9 @@
 { localFlake, withSystem, ... }:
-{ config
-, lib
-, pkgs
-, ...
+{
+  config,
+  lib,
+  pkgs,
+  ...
 }:
 let
   cfg = config.modules.home.herdr;
@@ -14,13 +15,13 @@ let
       src,
       rustPackage,
     }:
-    pkgs.runCommand "herdr-plugin-${lib.replaceStrings [ "." ] [ "-" ] pluginId}"
-      { }
-      ''
-        mkdir -p "$out/target/release"
-        cp ${src}/herdr-plugin.toml "$out/herdr-plugin.toml"
-        cp ${rustPackage}/bin/${rustPackage.meta.mainProgram or rustPackage.pname} "$out/target/release/${rustPackage.meta.mainProgram or rustPackage.pname}"
-      '';
+    pkgs.runCommand "herdr-plugin-${lib.replaceStrings [ "." ] [ "-" ] pluginId}" { } ''
+      mkdir -p "$out/target/release"
+      cp ${src}/herdr-plugin.toml "$out/herdr-plugin.toml"
+      cp ${rustPackage}/bin/${rustPackage.meta.mainProgram or rustPackage.pname} "$out/target/release/${
+        rustPackage.meta.mainProgram or rustPackage.pname
+      }"
+    '';
   defaultJjWorkspaceRustPackage = pkgs.rustPlatform.buildRustPackage {
     pname = "jj-workspace";
     version = "0.1.0";
@@ -38,29 +39,28 @@ let
     enabled = true;
   };
   configuredPlugins =
-    lib.optional cfg.enableJjWorkspacePlugin defaultJjWorkspacePlugin
-    ++ cfg.plugins;
-  jjWorkspaceKeybindCommands = lib.optionals (cfg.enableJjWorkspacePlugin && cfg.pluginKeybinds.jjWorkspace.enable) [
-    {
-      key = cfg.pluginKeybinds.jjWorkspace.new;
-      type = "pane";
-      command = "herdr plugin action invoke nathanflurry.jj-workspace.new";
-      description = "New jj workspace";
-    }
-    {
-      key = cfg.pluginKeybinds.jjWorkspace.remove;
-      type = "pane";
-      command = "herdr plugin action invoke nathanflurry.jj-workspace.remove";
-      description = "Remove jj workspace";
-    }
-  ];
-  effectiveSettings =
-    cfg.settings
-    // {
-      keys = (cfg.settings.keys or { }) // {
-        command = (cfg.settings.keys.command or [ ]) ++ jjWorkspaceKeybindCommands;
-      };
+    lib.optional cfg.enableJjWorkspacePlugin defaultJjWorkspacePlugin ++ cfg.plugins;
+  jjWorkspaceKeybindCommands =
+    lib.optionals (cfg.enableJjWorkspacePlugin && cfg.pluginKeybinds.jjWorkspace.enable)
+      [
+        {
+          key = cfg.pluginKeybinds.jjWorkspace.new;
+          type = "pane";
+          command = "herdr plugin action invoke nathanflurry.jj-workspace.new";
+          description = "New jj workspace";
+        }
+        {
+          key = cfg.pluginKeybinds.jjWorkspace.remove;
+          type = "pane";
+          command = "herdr plugin action invoke nathanflurry.jj-workspace.remove";
+          description = "Remove jj workspace";
+        }
+      ];
+  effectiveSettings = cfg.settings // {
+    keys = (cfg.settings.keys or { }) // {
+      command = (cfg.settings.keys.command or [ ]) ++ jjWorkspaceKeybindCommands;
     };
+  };
   pluginRegistry = builtins.map (
     plugin:
     let
@@ -159,23 +159,27 @@ in
     };
 
     plugins = mkOption {
-      type = types.listOf (types.submodule ({ ... }: {
-        options = {
-          id = mkOption {
-            type = types.str;
-            description = "Plugin id matching the herdr-plugin.toml manifest.";
-          };
-          package = mkOption {
-            type = types.package;
-            description = "Package containing herdr-plugin.toml at its root.";
-          };
-          enabled = mkOption {
-            type = types.bool;
-            default = true;
-            description = "Whether the plugin is enabled in Herdr.";
-          };
-        };
-      }));
+      type = types.listOf (
+        types.submodule (
+          { ... }: {
+            options = {
+              id = mkOption {
+                type = types.str;
+                description = "Plugin id matching the herdr-plugin.toml manifest.";
+              };
+              package = mkOption {
+                type = types.package;
+                description = "Package containing herdr-plugin.toml at its root.";
+              };
+              enabled = mkOption {
+                type = types.bool;
+                default = true;
+                description = "Whether the plugin is enabled in Herdr.";
+              };
+            };
+          }
+        )
+      );
       default = [ ];
       example = literalExpression ''
         [
@@ -210,10 +214,7 @@ in
       type = toml.type;
       default = {
         onboarding = false;
-        theme = {
-          name = "terminal";
-          custom.panel_bg = "reset";
-        };
+        theme.name = "gruvbox";
         terminal = {
           default_shell = "zsh";
           shell_mode = "auto";
@@ -340,7 +341,8 @@ in
       pkgs.fd
       pkgs.fzf
       pkgs.jq
-    ] ++ map (plugin: plugin.package) configuredPlugins;
+    ]
+    ++ map (plugin: plugin.package) configuredPlugins;
 
     home.file.".local/scripts/herdr-vim-navigate" = {
       executable = true;
@@ -362,15 +364,56 @@ in
 
         vim_re='^g?(view|l?n?vim?x?)(diff)?$'
         passthrough_re="''${HERDR_NAV_PASSTHROUGH_RE:-}"
+        cache_ttl="''${HERDR_NAV_CACHE_TTL_SECONDS:-2}"
+        [[ "$cache_ttl" =~ ^[0-9]+$ ]] || cache_ttl=2
+
+        process_name_matches() {
+          local name
+          name=$(printf '%s' "$1" | tr '[:upper:]' '[:lower:]')
+          [[ "$name" =~ $vim_re ]] && return 0
+          if [[ -n "$passthrough_re" ]] && printf '%s\n' "$name" | grep -Eq "$passthrough_re" 2>/dev/null; then
+            return 0
+          fi
+          return 1
+        }
+
+        detect_forward() {
+          local info name
+          info=$("$herdr" pane process-info --pane "$pane" 2>/dev/null || true)
+          [[ -n "$info" ]] || return 1
+          while IFS= read -r name; do
+            if process_name_matches "$name"; then
+              return 0
+            fi
+          done < <(
+            printf '%s\n' "$info" \
+              | grep -oE '"name"[[:space:]]*:[[:space:]]*"[^"]+"' \
+              | sed -E 's/.*"name"[[:space:]]*:[[:space:]]*"([^"]+)".*/\1/' \
+              || true
+          )
+          return 1
+        }
 
         forward=0
-        if [[ -n "$pane" ]] && command -v jq >/dev/null 2>&1; then
-          if "$herdr" pane process-info --pane "$pane" 2>/dev/null \
-            | jq -e --arg vim "$vim_re" --arg pass "$passthrough_re" \
-                '.result.process_info.foreground_processes[]?.name
-                 | ascii_downcase
-                 | select(test($vim) or ($pass != "" and (try test($pass) catch false)))' >/dev/null 2>&1; then
-            forward=1
+        cached=0
+        if [[ -n "$pane" ]]; then
+          cache_dir="''${XDG_RUNTIME_DIR:-''${TMPDIR:-/tmp}}/herdr-vim-navigate-''${UID:-$(id -u)}"
+          cache_key=$(printf '%s' "$pane" | tr -c 'A-Za-z0-9_.-' '_')
+          cache_file="$cache_dir/$cache_key"
+          now=$(date +%s)
+          if [[ -r "$cache_file" ]]; then
+            read -r cached_at cached_forward < "$cache_file" || true
+            if [[ "''${cached_at:-}" =~ ^[0-9]+$ && "''${cached_forward:-}" =~ ^[01]$ && $((now - cached_at)) -le "$cache_ttl" ]]; then
+              forward="$cached_forward"
+              cached=1
+            fi
+          fi
+          if [[ "$cached" -eq 0 ]]; then
+            if detect_forward; then
+              forward=1
+            fi
+            mkdir -p "$cache_dir" 2>/dev/null || true
+            printf '%s %s\n' "$now" "$forward" > "$cache_file" 2>/dev/null || true
           fi
         fi
 
@@ -389,8 +432,7 @@ in
         set -euo pipefail
 
         fzf_opts=(
-          --height=80%
-          --layout=reverse-list
+          --layout=default
           --border=rounded
           --prompt='directory> '
           --color='bg:-1,bg+:#3c3836,fg:#ebdbb2,fg+:#fbf1c7,hl:#fabd2f,hl+:#fabd2f'
@@ -421,8 +463,7 @@ in
         set -euo pipefail
 
         fzf_opts=(
-          --height=80%
-          --layout=reverse-list
+          --layout=default
           --border=rounded
           --prompt='workspace> '
           --with-nth=3..
