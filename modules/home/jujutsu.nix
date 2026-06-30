@@ -8,6 +8,7 @@
 with lib;
 let
   cfg = config.modules.home.jujutsu;
+  hunk = localFlake.inputs.hunk.packages.${pkgs.stdenv.hostPlatform.system}.default;
 in
 {
   options.modules.home.jujutsu = {
@@ -76,6 +77,11 @@ in
         })
         {
           ui.default-command = "log";
+          ui.pager = [
+            "${lib.getExe hunk}"
+            "pager"
+          ];
+          ui.diff-formatter = ":git";
         }
         cfg.settings
       ];
@@ -89,20 +95,33 @@ in
       };
     };
 
-    programs.difftastic.enable = true;
-    programs.difftastic.jujutsu.enable = true;
+    programs.jjui = {
+      enable = true;
+      settings = {
+        ui = {
+          mouse_support = true;
+          auto_refresh_interval = 0;
+        };
+        preview = {
+          position = "auto";
+          show_at_start = false;
+          width_percentage = 50.0;
+        };
+        revisions = {
+          log_batching = true;
+          log_batch_size = 50;
+        };
+      };
+    };
 
-    home.packages = [
-      pkgs.lazyjj
-    ]
-    ++ optionals cfg.jjStarship.enable [
+    home.packages = optionals cfg.jjStarship.enable [
       cfg.jjStarship.package
     ];
 
     home.shellAliases = {
       jj = lib.getExe pkgs.jujutsu;
-      lazyjj = lib.getExe pkgs.lazyjj;
-      lj = lib.getExe pkgs.lazyjj;
+      jui = lib.getExe pkgs.jjui;
+      lj = lib.getExe pkgs.jjui;
     };
   };
 }
