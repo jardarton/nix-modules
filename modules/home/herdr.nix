@@ -56,9 +56,14 @@ let
           description = "Remove jj workspace";
         }
       ];
-  effectiveSettings = cfg.settings // {
-    keys = (cfg.settings.keys or { }) // {
-      command = (cfg.settings.keys.command or [ ]) ++ jjWorkspaceKeybindCommands;
+  settingsWithTheme =
+    if cfg.theme == null then
+      cfg.settings
+    else
+      lib.recursiveUpdate cfg.settings { theme.name = cfg.theme; };
+  effectiveSettings = settingsWithTheme // {
+    keys = (settingsWithTheme.keys or { }) // {
+      command = (settingsWithTheme.keys.command or [ ]) ++ jjWorkspaceKeybindCommands;
     };
   };
   pluginRegistry = builtins.map (
@@ -150,6 +155,13 @@ in
       );
       defaultText = literalExpression "localFlake.inputs.herdr.packages.\${pkgs.stdenv.hostPlatform.system}.default";
       description = "Herdr package to install.";
+    };
+
+    theme = mkOption {
+      type = types.nullOr types.str;
+      default = null;
+      example = "kanagawa";
+      description = "Optional Herdr theme name override. When null, settings.theme is left untouched.";
     };
 
     enableJjWorkspacePlugin = mkOption {
