@@ -6,5 +6,6 @@
     stack = pkgs.callPackage ./stack { };
     gondolin = pkgs.callPackage ./gondolin { };
     kli = pkgs.callPackage ./kli { };
+    playwright-cli = pkgs.callPackage ./playwright-cli { };
   };
 }
