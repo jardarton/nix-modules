@@ -71,19 +71,48 @@ in
 
   config = mkIf cfg.enable {
 
+    home.sessionVariables =
+      let
+        system = pkgs.stdenv.hostPlatform.system;
+        playwrightBrowser =
+          if elem system [
+            "x86_64-linux"
+            "x86_64-darwin"
+            "aarch64-darwin"
+          ] then
+            pkgs.google-chrome
+          else
+            pkgs.chromium;
+      in
+      mkIf cfg.playwright-cli.enable {
+        PLAYWRIGHT_MCP_EXECUTABLE_PATH = getExe playwrightBrowser;
+      };
+
     home.packages = withSystem pkgs.stdenv.hostPlatform.system (
       { pkgs, system, ... }:
       let
         llmPackages = localFlake.inputs.llm-agents.packages.${system};
         packageOr =
           agentCfg: defaultPackage: if agentCfg.package != null then agentCfg.package else defaultPackage;
+        playwrightBrowser =
+          if elem system [
+            "x86_64-linux"
+            "x86_64-darwin"
+            "aarch64-darwin"
+          ] then
+            pkgs.google-chrome
+          else
+            pkgs.chromium;
       in
       optional cfg.pi.enable (packageOr cfg.pi llmPackages.pi)
       ++ optional cfg.claude.enable (packageOr cfg.claude llmPackages.claude-code)
       ++ optional cfg.codex.enable (packageOr cfg.codex pkgs.codex)
       ++ optional cfg.opencode.enable (packageOr cfg.opencode llmPackages.opencode)
       ++ optional cfg.copilot-cli.enable (packageOr cfg.copilot-cli llmPackages.copilot-cli)
-      ++ optional cfg.playwright-cli.enable (packageOr cfg.playwright-cli localFlake.packages.${system}.playwright-cli)
+      ++ optionals cfg.playwright-cli.enable [
+        (packageOr cfg.playwright-cli localFlake.packages.${system}.playwright-cli)
+        playwrightBrowser
+      ]
       ++ optional cfg.agentBrowser llmPackages.agent-browser
     );
 
