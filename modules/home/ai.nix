@@ -1,19 +1,18 @@
 { localFlake, withSystem, ... }:
-{
-  config,
-  lib,
-  pkgs,
-  ...
+{ config
+, lib
+, pkgs
+, ...
 }:
 with lib;
 let
   cfg = config.modules.home.ai;
   agentOptions =
-    {
-      name,
-      packageName ? name,
-      default ? true,
-      description ? "install ${name}",
+    { name
+    , packageName ? name
+    , default ? true
+    , description ? "install ${name}"
+    ,
     }:
     {
       enable = mkOption {
@@ -63,6 +62,11 @@ in
       name = "copilot-cli";
       packageName = "copilot-cli";
     };
+
+    playwright-cli = agentOptions {
+      name = "playwright-cli";
+      packageName = "playwright-cli";
+    };
   };
 
   config = mkIf cfg.enable {
@@ -79,6 +83,7 @@ in
       ++ optional cfg.codex.enable (packageOr cfg.codex pkgs.codex)
       ++ optional cfg.opencode.enable (packageOr cfg.opencode llmPackages.opencode)
       ++ optional cfg.copilot-cli.enable (packageOr cfg.copilot-cli llmPackages.copilot-cli)
+      ++ optional cfg.playwright-cli.enable (packageOr cfg.playwright-cli localFlake.packages.${system}.playwright-cli)
       ++ optional cfg.agentBrowser llmPackages.agent-browser
     );
 
