@@ -79,5 +79,6 @@ in
       localFlake = moduleFlake;
       inherit withSystem;
     };
+    setup-script = importApply ./setup-script.nix { localFlake = moduleFlake; };
   };
 }
