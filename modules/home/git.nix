@@ -1,9 +1,8 @@
 { localFlake, withSystem, ... }:
-{
-  config,
-  lib,
-  pkgs,
-  ...
+{ config
+, lib
+, pkgs
+, ...
 }:
 with lib;
 let
@@ -30,6 +29,11 @@ in
       settings = {
         core.pager = "${hunk}/bin/hunk pager";
       };
+    };
+
+    programs.gh = {
+      enable = true;
+      gitCredentialHelper.enable = true;
     };
 
     home.packages = withSystem pkgs.stdenv.hostPlatform.system (
