@@ -1,0 +1,27 @@
+keys:
+  - &gamlam age15pnwhmq4vscqrjs9cruu3f8an3dgqu8agzhqdwwzdtc594kvpdtq9ft00s
+  - &test-vm age164zmmt6a0u6fsvkckupk54cztw203kww5kexpr3u7ralxvqw3gks7n4grf
+  - &job age1t009qz0w56ve83lz968nzsszu23e46z767xars96f02snj0anqvsgmrnzf
+  - &miamia age1rw0un0876rxu0qvmq4uw2nvs8wykep24vgy6pgycgfv6eceptq3suu7huh
+  - &nurket age1dyca5u4uaynf5au7q8peuktsh84hmxrfuplmc3ph52fdz5q7adhsrxmpu2
+  - &midnight age10uu9fpd2tde9jtfpslcet7qw65ee03fh7z3av87h8vlv985gcvesvpfa0h
+  - &bigbox age1s6ykxdggtvapsjkr9adl2tghmtcrnvcmwzua0afs6yndj86mk3gqhljygk
+  - &etaten age1uglg978wr522ughj3y2easghyzaqd98jh6c2zcehqtn40xg72s8sqz2enw
+  - &padden age1uvzzpm36jc5ndm2demfwrkuuhwm3ujy5xclhxa5xe7nt5t3l7saq4zum2j
+  - &biggen age1mzlxswj0dnurvzsegm3cnrlkk9c3wrfm4p5080r3earfer23wahsuq4q4t
+  - &svetten age1vk2k4mf2tkesfk05pan5rkwlmla5htgxf8u39nn6esq05he96pqs5kpjt4
+creation_rules:
+  - path_regex: secrets/.*\.sops\.yaml
+    key_groups:
+      - age:
+          - *test-vm
+          - *job
+          - *miamia
+          - *nurket
+          - *midnight
+          - *bigbox
+          - *gamlam
+          - *etaten
+          - *padden
+          - *biggen
+          - *svetten
