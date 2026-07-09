@@ -46,9 +46,6 @@ in
         pkgs.difftastic
         hunk
       ]
-      ++ (with localFlake.inputs.llm-agents.packages.${system}; [
-        but
-      ])
     );
 
     programs.lazygit = {
