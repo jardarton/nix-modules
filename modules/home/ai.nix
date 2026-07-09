@@ -47,8 +47,6 @@ in
       description = "install the agent-browser package";
     };
 
-    pi = agentOptions { name = "pi"; };
-
     claude = agentOptions {
       name = "claude";
       packageName = "claude-code";
@@ -104,8 +102,7 @@ in
           else
             pkgs.chromium;
       in
-      optional cfg.pi.enable (packageOr cfg.pi llmPackages.pi)
-      ++ optional cfg.claude.enable (packageOr cfg.claude llmPackages.claude-code)
+      optional cfg.claude.enable (packageOr cfg.claude llmPackages.claude-code)
       ++ optional cfg.codex.enable (packageOr cfg.codex pkgs.codex)
       ++ optional cfg.opencode.enable (packageOr cfg.opencode llmPackages.opencode)
       ++ optional cfg.copilot-cli.enable (packageOr cfg.copilot-cli llmPackages.copilot-cli)
