@@ -10,20 +10,20 @@
 
 buildNpmPackage rec {
   pname = "stack";
-  version = "0.2.0";
+  version = "0.4.2";
 
   src = fetchFromGitHub {
     owner = "kitlangton";
     repo = "stack";
-    rev = "ac714a3d841dba95b51b2307fc74f359ef0a7036";
-    hash = "sha256-IZW1/7iKjNvpbGvLBd2PGDaJXpreoZeemUsNswChZeE=";
+    rev = "7c4227689ed91ee63c5770c3f9943a0253a35a35";
+    hash = "sha256-kgkmSE03/6dFh1w1QqaW78ObKSwaDv9THZ+mrzbzc4k=";
   };
 
   postPatch = ''
     cp ${./package-lock.json} package-lock.json
   '';
 
-  npmDepsHash = "sha256-UqOC1OU8CjWjcdvfESPzbJRG+56uxbsRRNNVa58OVLE=";
+  npmDepsHash = "sha256-RxR1wRkoXCvONqpATH/v5L+1+MhLxmxmYL0AgWTcTGA=";
 
   npmFlags = [ "--legacy-peer-deps" ];
 
