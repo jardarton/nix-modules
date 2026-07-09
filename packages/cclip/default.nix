@@ -15,14 +15,14 @@
 
 stdenv.mkDerivation rec {
   pname = "cclip";
-  version = "3.3.1";
+  version = "3.3.1-unstable-2026-03-17";
 
   src = fetchgit {
     url = "https://github.com/heather7283/cclip.git";
-    rev = "4286de1c8407ccba51060764e82c6b425b4ca3dd";
+    rev = "83b0d80519acd5868bf7ed0114cb312c89828e74";
     branchName = "main";
     leaveDotGit = false;
-    sha256 = "sha256-rjDCYag0aG9mZuwzWNS5z/CzeEtpdjc9iMypKqIZK60=";
+    sha256 = "sha256-EFfLqMfP3MgEKK0NYEETHTMhWpe64MMXnNNPVBaeTQw=";
 
   };
 

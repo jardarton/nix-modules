@@ -7,13 +7,13 @@
 
 buildNpmPackage rec {
   pname = "gondolin";
-  version = "0.12.0-unstable-2026-05-23";
+  version = "0.12.0-unstable-2026-07-06";
 
   src = fetchFromGitHub {
     owner = "earendil-works";
     repo = "gondolin";
-    rev = "e0b339e74bdbd47bc21b943330a128d81cd1070a";
-    hash = "sha256-3/N8KzYFs7F9n5jenDpXrroSsOFNv8FextxMcRU89IE=";
+    rev = "29fa74d802112f29c720990aced26165e0d57d84";
+    hash = "sha256-pjXCSIIbnwxbsAR+heX6j56Ygtt2yDlv6wQ7Y+rtAGk=";
   };
 
   sourceRoot = "${src.name}/host";

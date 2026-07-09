@@ -6,16 +6,16 @@
 
 buildGoModule rec {
   pname = "kli";
-  version = "0.2.0";
+  version = "0.8.1";
 
   src = fetchFromGitHub {
     owner = "bjarneo";
     repo = "kli";
-    rev = "bf1b6e41f079e5d77469107f7d1899f6269a4d13";
-    hash = "sha256-8zBTxIdKlRDlFYvnjNZvqweSVcMvIQIgSxbPVB4IlBw=";
+    rev = "f06c23134312d9371c98a4c8f4971d59bc9274ac";
+    hash = "sha256-vXNOES9pVz6O6YX832Q+6zhctSvOgrZ/RoScppnLdYM=";
   };
 
-  vendorHash = "sha256-0gLwvJSEMgCw23YG8rMzoI7ubo0I5nvguex2HBJE1dU=";
+  vendorHash = "sha256-x7O2/uKnIIFDr8WK0ej3FJiIGxN5Fq5Czqrv4OJ5A44=";
 
   ldflags = [
     "-s"
