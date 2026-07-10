@@ -8,8 +8,8 @@
 let
   cfg = config.modules.nixos.home-assistant;
   mosquittoConfig = pkgs.writeText "mosquitto-home-assistant.conf" ''
-    listener ${toString cfg.mosquitto.port} 0.0.0.0
-    allow_anonymous true
+    listener ${toString cfg.mosquitto.port} ${cfg.mosquitto.bindAddress}
+    allow_anonymous ${if cfg.mosquitto.allowAnonymous then "true" else "false"}
 
     persistence true
     persistence_location /mosquitto/data/
@@ -72,6 +72,18 @@ in
         type = types.port;
         default = 1883;
         description = "MQTT listener port.";
+      };
+      bindAddress = mkOption {
+        type = types.str;
+        default = "127.0.0.1";
+        example = "0.0.0.0";
+        description = "Address on which the MQTT broker listens.";
+      };
+      allowAnonymous = mkOption {
+        type = types.bool;
+        default = true;
+        example = false;
+        description = "Whether the MQTT broker accepts unauthenticated clients. Safe by default with the loopback-only bind address.";
       };
     };
   };
