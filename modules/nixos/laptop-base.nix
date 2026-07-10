@@ -1,9 +1,8 @@
 { ... }:
-{
-  pkgs,
-  config,
-  lib,
-  ...
+{ pkgs
+, config
+, lib
+, ...
 }:
 with lib;
 let
@@ -13,20 +12,17 @@ in
   options.modules.nixos.laptop-base = {
     enable = mkOption {
       type = types.bool;
-      default = true;
+      default = false;
       example = true;
-      description = "enable base laptop settings";
+      description = "Whether to enable base laptop settings.";
     };
     useTlp = mkOption {
       type = types.bool;
       default = false;
       example = true;
-      description = "enable tlp powr mangement instaed of ppd";
+      description = "Whether to use TLP power management instead of power-profiles-daemon.";
     };
   };
-
-  imports = [
-  ];
 
   config = mkIf cfg.enable {
     environment.systemPackages = with pkgs; [
