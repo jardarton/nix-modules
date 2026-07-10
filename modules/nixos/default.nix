@@ -1,8 +1,7 @@
-{
-  flake-parts-lib,
-  self,
-  inputs,
-  ...
+{ flake-parts-lib
+, self
+, inputs
+, ...
 }:
 let
   inherit (flake-parts-lib) importApply;
@@ -21,6 +20,5 @@ in
     home-assistant = importApply ./home-assistant { localFlake = moduleFlake; };
     oryx = importApply ./oryx.nix { localFlake = moduleFlake; };
     wifi = importApply ./wifi.nix { localFlake = moduleFlake; };
-    setup-script = importApply ./setup-script.nix { localFlake = moduleFlake; };
   };
 }
