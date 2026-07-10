@@ -97,7 +97,7 @@ in
     };
     home.file.".config/nvim" = {
       source = fetchGit {
-        url = "https://github.com/jardt/neovim.git";
+        url = "https://github.com/jardarton/neovim.git";
         rev = "4c64fbfa9224a53f909c713bccacb59a9858f727";
         ref = "nixcats";
       };

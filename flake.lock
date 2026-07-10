@@ -798,13 +798,13 @@
       "locked": {
         "lastModified": 1783337537,
         "narHash": "sha256-yJ7/3ES4GTtHn2XY1VGuhlOVL/zcYxs1UTnDbWY4/tM=",
-        "owner": "jardt",
+        "owner": "jardarton",
         "repo": "neovim",
         "rev": "4fdefd705b268083a117271cdc9368a0d37a60eb",
         "type": "github"
       },
       "original": {
-        "owner": "jardt",
+        "owner": "jardarton",
         "repo": "neovim",
         "type": "github"
       }
