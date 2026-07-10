@@ -11,12 +11,6 @@ let
   televisionEnabled = attrByPath [ "modules" "home" "television" "enable" ] false config;
   jujutsuEnabled = attrByPath [ "modules" "home" "jujutsu" "enable" ] false config;
   editor = if catsvimEnabled then "catsvim" else "nvim";
-  clipboard = if pkgs.stdenv.hostPlatform.isDarwin then "pbcopy" else "wlcopy";
-  zshSysClip =
-    lib.optionalString pkgs.stdenv.hostPlatform.isLinux # sh
-      ''
-        export ZSH_SYSTEM_CLIPBOARD_USE_WL_CLIPBOARD="wl-clipboard"
-      '';
 in
 {
 
@@ -33,6 +27,8 @@ in
     home.packages =
       with pkgs;
       [
+        bat
+        fd
         neovim
         fzf
       ]
@@ -68,83 +64,91 @@ in
         size = 10000;
       };
 
-      profileExtra = ''
-        ${zshSysClip}
-      '';
-
       enableCompletion = true;
       autosuggestion.enable = true;
       syntaxHighlighting.enable = true;
       historySubstringSearch.enable = true;
 
-      initContent = ''
-        DISABLE_AUTO_UPDATE="true"
-        DISABLE_MAGIC_FUNCTIONS="true"
-        DISABLE_COMPFIX="true"
+      initContent = lib.mkMerge [
+        # zsh-vi-mode reads zvm_config when Home Manager sources the plugin at
+        # order 560, so all of its callbacks must already be defined.
+        (lib.mkOrder 550 ''
+          function zvm_config() {
+            ZVM_CURSOR_STYLE_ENABLED=false
+          }
 
-        # Smarter completion initialization
-        autoload -Uz compinit
-        if [ "$(date +'%j')" != "$(stat -f '%Sm' -t '%j' ~/.zcompdump 2>/dev/null)" ]; then
-            compinit
-        else
-            compinit -C
-        fi
+          function zvm_custom_keybindings() {
+            zvm_bindkey viins '^Y' autosuggest-accept
+            ${lib.optionalString televisionEnabled "zvm_bindkey viins '^R' tv-shell-history"}
+            ${lib.optionalString televisionEnabled "zvm_bindkey vicmd '^R' tv-shell-history"}
+            ${lib.optionalString (!televisionEnabled) "zvm_bindkey viins '^R' fzf-history-widget"}
+            ${lib.optionalString (!televisionEnabled) "zvm_bindkey vicmd '^R' fzf-history-widget"}
+          }
 
-        ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE="20"
-        ZSH_AUTOSUGGEST_USE_ASYNC=1
+          function zvm_vi_yank() {
+            zvm_yank
+            if (( $+functions[zsh-system-clipboard-set] )); then
+              print -rn -- "''${CUTBUFFER}" | zsh-system-clipboard-set
+            fi
+            zvm_exit_visual_mode
+          }
 
-        set -o inc_append_history
+          function zvm_after_init() {
+            zvm_custom_keybindings
+          }
 
-        export VISUAL="${editor}"
-        export EDITOR="${editor}"
+          function zvm_after_lazy_keybindings() {
+            zvm_custom_keybindings
+          }
+        '')
+        # Herdr forwards OSC 52 writes from pane applications to the attached
+        # client's clipboard, including when its server is headless. Outside
+        # Herdr, initialize only a clipboard backend available in this session.
+        (lib.mkOrder 565 ''
+          if [[ "''${HERDR_ENV:-}" == 1 ]]; then
+            function zsh-system-clipboard-set() {
+              local encoded
+              encoded="$(${pkgs.coreutils}/bin/base64 | ${pkgs.coreutils}/bin/tr -d '\n')" || return
+              printf '\e]52;c;%s\a' "$encoded"
+            }
+          elif [[ -n "''${WAYLAND_DISPLAY:-}" ]]; then
+            ZSH_SYSTEM_CLIPBOARD_USE_WL_CLIPBOARD=1
+            source ${pkgs.zsh-system-clipboard}/share/zsh/zsh-system-clipboard/zsh-system-clipboard.zsh
+          elif [[ "''${OSTYPE:-}" == darwin* ]]; then
+            source ${pkgs.zsh-system-clipboard}/share/zsh/zsh-system-clipboard/zsh-system-clipboard.zsh
+          elif [[ -n "''${DISPLAY:-}" ]] && (( $+commands[xclip] || $+commands[xsel] )); then
+            source ${pkgs.zsh-system-clipboard}/share/zsh/zsh-system-clipboard/zsh-system-clipboard.zsh
+          fi
+        '')
+        ''
+          ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE="20"
+          ZSH_AUTOSUGGEST_USE_ASYNC=1
 
-        ${lib.optionalString televisionEnabled ''
-          eval "$(tv init zsh)"
-        ''}
-        ${lib.optionalString jujutsuEnabled ''
-          source <(COMPLETE=zsh jj)
-        ''}
+          set -o inc_append_history
 
-        bindkey -M vicmd 'k' history-substring-search-up
-        bindkey -M vicmd 'j' history-substring-search-down
-        bindkey '^Y' autosuggest-accept
-        bindkey -s ^o ". fzf-cd .\n"
+          export VISUAL="${editor}"
+          export EDITOR="${editor}"
 
+          ${lib.optionalString televisionEnabled ''
+            eval "$(tv init zsh)"
+          ''}
+          ${lib.optionalString jujutsuEnabled ''
+            source <(COMPLETE=zsh jj)
+          ''}
 
-        function zvm_config() {
-        ZVM_CURSOR_STYLE_ENABLED=false
-        }
+          bindkey -M vicmd 'k' history-substring-search-up
+          bindkey -M vicmd 'j' history-substring-search-down
+          bindkey '^Y' autosuggest-accept
+          bindkey -s ^o ". fzf-cd .\n"
 
-        function zvm_custom_keybindings() {
-        zvm_bindkey viins '^Y' autosuggest-accept
-        ${lib.optionalString televisionEnabled "zvm_bindkey viins '^R' tv-shell-history"}
-        ${lib.optionalString televisionEnabled "zvm_bindkey vicmd '^R' tv-shell-history"}
-        ${lib.optionalString (!televisionEnabled) "zvm_bindkey viins '^R' fzf-history-widget"}
-        ${lib.optionalString (!televisionEnabled) "zvm_bindkey vicmd '^R' fzf-history-widget"}
-        }
+          zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
+          zstyle ':completion:*' menu no
+          zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls --color $realpath'
 
-        function zvm_vi_yank() {
-          zvm_yank
-          echo ''${CUTBUFFER} | ${clipboard}
-          zvm_exit_visual_mode
-        }
-
-        function zvm_after_init() {
-        zvm_custom_keybindings
-        }
-
-        function zvm_after_lazy_keybindings() {
-        zvm_custom_keybindings
-        }
-
-        zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
-        zstyle ':completion:*' menu no
-        zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls --color $realpath'
-
-        path+=($HOME/.local/scripts/)
-        path+=($HOME/.npm/bin)
-        ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=3'
-      '';
+          path+=($HOME/.npm/bin)
+          ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=3'
+        ''
+      ];
 
       plugins = [
         {
@@ -156,11 +160,6 @@ in
           name = "zsh-fzf-tab";
           src = pkgs.zsh-fzf-tab;
           file = "share/fzf-tab/fzf-tab.plugin.zsh";
-        }
-        {
-          name = "zsh-system-clipboard";
-          src = pkgs.zsh-system-clipboard;
-          file = "share/zsh/zsh-system-clipboard/zsh-system-clipboard.zsh";
         }
       ];
     };
