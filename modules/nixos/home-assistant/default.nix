@@ -32,6 +32,11 @@ in
       default = "/var/lib/hass";
       description = "Location to store config";
     };
+    image = mkOption {
+      type = types.str;
+      default = "ghcr.io/home-assistant/home-assistant@sha256:f73512ba4fe06bb4d57636fe3578d0820cdec46f81e8f837ab59e451662ff3cb";
+      description = "Home Assistant container image, preferably pinned by digest.";
+    };
     zigbee2mqtt = {
       enable = mkOption {
         type = types.bool;
@@ -43,6 +48,11 @@ in
         type = types.str;
         default = "/var/lib/zigbee2mqtt";
         description = "Location to store Zigbee2MQTT data and configuration.";
+      };
+      image = mkOption {
+        type = types.str;
+        default = "ghcr.io/koenkk/zigbee2mqtt@sha256:80f7f04f72a99e4c4ef51ef7e98ee736edba6db0ecbb7abc626d0c4b0f1871f1";
+        description = "Zigbee2MQTT container image, preferably pinned by digest.";
       };
       adapter = mkOption {
         type = types.nullOr types.str;
@@ -62,6 +72,11 @@ in
         type = types.str;
         default = "/var/lib/mosquitto";
         description = "Location to store Mosquitto persistent data.";
+      };
+      image = mkOption {
+        type = types.str;
+        default = "docker.io/library/eclipse-mosquitto@sha256:6f8d8a947c506f8a2290ec65cd4bd2bc7cb4d43fb5f6271f861cb013e2ef9797";
+        description = "Mosquitto container image, preferably pinned by digest.";
       };
       logDir = mkOption {
         type = types.str;
@@ -105,8 +120,7 @@ in
       containers.homeassistant = {
         volumes = [ "${cfg.confDir}:/config" ];
         environment.TZ = "Europe/Berlin";
-        # Note: The image will not be updated on rebuilds, unless the version label changes
-        image = "ghcr.io/home-assistant/home-assistant:stable";
+        image = cfg.image;
         extraOptions = [
           # Use the host network namespace for all sockets
           "--network=host"
@@ -115,7 +129,7 @@ in
         ];
       };
       containers.zigbee2mqtt = lib.mkIf cfg.zigbee2mqtt.enable {
-        image = "ghcr.io/koenkk/zigbee2mqtt:latest";
+        image = cfg.zigbee2mqtt.image;
         volumes = [
           "${cfg.zigbee2mqtt.dataDir}:/app/data"
           "/run/udev:/run/udev:ro"
@@ -128,7 +142,7 @@ in
         ];
       };
       containers.mosquitto = lib.mkIf cfg.mosquitto.enable {
-        image = "eclipse-mosquitto:latest";
+        image = cfg.mosquitto.image;
         volumes = [
           "${mosquittoConfig}:/mosquitto/config/mosquitto.conf:ro"
           "${cfg.mosquitto.dataDir}:/mosquitto/data"
