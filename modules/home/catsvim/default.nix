@@ -1,22 +1,44 @@
 { localFlake, ... }:
-{
-  pkgs,
-  config,
-  lib,
-  ...
+{ pkgs
+, config
+, lib
+, options
+, ...
 }:
 with lib;
 let
   cfg = config.modules.home.catsvim;
+  stylix = import ../lib/stylix.nix { inherit config options; };
 
   neovimInput = localFlake.inputs.nixCats;
   wrapperModules = neovimInput.inputs."nix-wrapper-modules";
   baseModule = modules.importApply "${neovimInput}/module.nix" neovimInput.inputs;
 
   # Grab stylix override
-  stylix16 = pkgs.lib.filterAttrs (
-    k: v: builtins.match "base0[0-9A-F]" k != null
-  ) config.lib.stylix.colors.withHashtag;
+  stylix16 = builtins.listToAttrs (
+    map
+      (name: {
+        inherit name;
+        value = stylix.withHashtag name;
+      }) [
+      "base00"
+      "base01"
+      "base02"
+      "base03"
+      "base04"
+      "base05"
+      "base06"
+      "base07"
+      "base08"
+      "base09"
+      "base0A"
+      "base0B"
+      "base0C"
+      "base0D"
+      "base0E"
+      "base0F"
+    ]
+  );
 
   commonAliases = [
     "catsvim"

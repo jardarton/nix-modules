@@ -1,16 +1,17 @@
 { localFlake, ... }:
-{
-  config,
-  lib,
-  pkgs,
-  ...
+{ config
+, lib
+, pkgs
+, options
+, ...
 }:
 with lib;
 let
   cfg = config.modules.home.waybar;
-  color = config.lib.stylix.colors.withHashtag.base07;
-  border-color = config.lib.stylix.colors.withHashtag.base04;
-  background-color = config.lib.stylix.colors.withHashtag.base02;
+  stylix = import ../lib/stylix.nix { inherit config options; };
+  color = stylix.withHashtag "base07";
+  border-color = stylix.withHashtag "base04";
+  background-color = stylix.withHashtag "base02";
 in
 {
 
@@ -23,10 +24,7 @@ in
     };
   };
 
-  config = mkIf cfg.enable {
-
-    stylix.targets.waybar.enable = true;
-    stylix.targets.waybar.addCss = false;
+  config = mkIf cfg.enable ({
     programs.waybar = {
       enable = true;
     };
@@ -303,8 +301,8 @@ in
         border-radius: 4px;
         border-width: 2px;
         border-style: solid;
-        border-color: ${config.lib.stylix.colors.withHashtag.base06};
-        color: ${config.lib.stylix.colors.withHashtag.base06};
+        border-color: ${stylix.withHashtag "base06"};
+        color: ${stylix.withHashtag "base06"};
       }
 
       #language,
@@ -340,7 +338,7 @@ in
         border-radius: 4px;
         border-width: 2px;
         border-style: solid;
-        border-color: ${config.lib.stylix.colors.withHashtag.base06};
+        border-color: ${stylix.withHashtag "base06"};
         margin-left: 2px;
         background: rgba(40, 40, 40, 0.9);
       }
@@ -350,7 +348,7 @@ in
         background: none;
         box-shadow: inherit;
         text-shadow: inherit;
-        color: ${config.lib.stylix.colors.withHashtag.base05};
+        color: ${stylix.withHashtag "base05"};
         padding: 1px;
         padding-left: 1px;
         padding-right: 1px;
@@ -371,7 +369,7 @@ in
       }
 
       #workspaces button.active {
-        background-color: ${config.lib.stylix.colors.withHashtag.base0F};
+        background-color: ${stylix.withHashtag "base0F"};
         color: #282828;
         margin-top: 5px;
         margin-bottom: 5px;
@@ -381,7 +379,7 @@ in
       }
 
       #workspaces button.urgent {
-        background-color: ${config.lib.stylix.colors.withHashtag.base08};
+        background-color: ${stylix.withHashtag "base08"};
         color: #282828;
         margin-top: 5px;
         margin-bottom: 5px;
@@ -394,7 +392,7 @@ in
         border-radius: 4px;
         border-width: 2px;
         border-style: solid;
-        border-color: ${config.lib.stylix.colors.withHashtag.base06};
+        border-color: ${stylix.withHashtag "base06"};
         margin-left: 2px;
         padding-left: 10px;
         padding-right: 6px;
@@ -428,7 +426,7 @@ in
       }
 
       #tags button.occupied {
-        color: ${config.lib.stylix.colors.withHashtag.base0A};
+        color: ${stylix.withHashtag "base0A"};
       }
 
       #tags button.overview {
@@ -464,13 +462,13 @@ in
         border-radius: 4px;
         border-width: 2px;
         border-style: solid;
-        border-color: ${config.lib.stylix.colors.withHashtag.base06};
+        border-color: ${stylix.withHashtag "base06"};
         margin-right: 2px;
         margin-left: 2px;
         padding-right: 8px;
         padding-left: 9px;
         padding-top: 2px;
-        background-color: ${config.lib.stylix.colors.withHashtag.base0A};
+        background-color: ${stylix.withHashtag "base0A"};
       }
 
       #network {
@@ -478,9 +476,9 @@ in
         border-radius: 4px;
         border-width: 2px;
         border-style: solid;
-        border-color: ${config.lib.stylix.colors.withHashtag.base06};
+        border-color: ${stylix.withHashtag "base06"};
         padding-top: 10px;
-        color: ${config.lib.stylix.colors.withHashtag.base0D};
+        color: ${stylix.withHashtag "base0D"};
       }
 
       #workspaces {
@@ -488,15 +486,15 @@ in
         border-radius: 4px;
         border-width: 2px;
         border-style: solid;
-        border-color: ${config.lib.stylix.colors.withHashtag.base06};
+        border-color: ${stylix.withHashtag "base06"};
       }
 
       #language {
         background: rgba(40, 40, 40, 0.9);
-        background-color: ${config.lib.stylix.colors.withHashtag.base0C};
+        background-color: ${stylix.withHashtag "base0C"};
         border-width: 2px;
         border-style: solid;
-        border-color: ${config.lib.stylix.colors.withHashtag.base06};
+        border-color: ${stylix.withHashtag "base06"};
         border-right: 0px;
         border-radius: 4px 0px 0px 4px;
         min-width: 24px;
@@ -516,23 +514,23 @@ in
         border-width: 2px;
         border-left: 0px;
         border-style: solid;
-        border-color: ${config.lib.stylix.colors.withHashtag.base06};
+        border-color: ${stylix.withHashtag "base06"};
       }
 
       #window {
         background: rgba(40, 40, 40, 0.9);
         border-width: 2px;
         border-style: solid;
-        border-color: ${config.lib.stylix.colors.withHashtag.base06};
+        border-color: ${stylix.withHashtag "base06"};
         border-radius: 4px;
-        color: ${config.lib.stylix.colors.withHashtag.base05};
+        color: ${stylix.withHashtag "base05"};
       }
 
       #taskbar {
         background: rgba(40, 40, 40, 0.9);
         border-width: 2px;
         border-style: solid;
-        border-color: ${config.lib.stylix.colors.withHashtag.base06};
+        border-color: ${stylix.withHashtag "base06"};
         border-radius: 4px;
         margin-left: 10px;
         margin-right: 10px;
@@ -594,7 +592,7 @@ in
         background: rgba(40, 40, 40, 0.9);
         border-width: 2px;
         border-style: solid;
-        border-color: ${config.lib.stylix.colors.withHashtag.base06};
+        border-color: ${stylix.withHashtag "base06"};
         border-right: 0px;
         border-left: 0px;
         color: #ddca9e;
@@ -606,11 +604,11 @@ in
         border-width: 2px;
         border-style: solid;
         margin-left: 4px;
-        color: ${config.lib.stylix.colors.withHashtag.base0D};
+        color: ${stylix.withHashtag "base0D"};
       }
 
       #clock {
-        color: ${config.lib.stylix.colors.withHashtag.base0A};
+        color: ${stylix.withHashtag "base0A"};
         background: rgba(40, 40, 40, 0.9);
         border-width: 2px;
         border-style: solid;
@@ -624,7 +622,7 @@ in
 
       #cpu {
         background: rgba(40, 40, 40, 0.9);
-        color: ${config.lib.stylix.colors.withHashtag.base0C};
+        color: ${stylix.withHashtag "base0C"};
         border-width: 2px;
         border-style: solid;
       }
@@ -639,15 +637,15 @@ in
         background: rgba(40, 40, 40, 0.9);
         border-width: 2px;
         border-style: solid;
-        border-color: ${config.lib.stylix.colors.withHashtag.base06};
+        border-color: ${stylix.withHashtag "base06"};
       }
 
       #battery {
         background: rgba(40, 40, 40, 0.9);
-        color: ${config.lib.stylix.colors.withHashtag.base0B};
+        color: ${stylix.withHashtag "base0B"};
         border-width: 2px;
         border-style: solid;
-        border-color: ${config.lib.stylix.colors.withHashtag.base06};
+        border-color: ${stylix.withHashtag "base06"};
       }
 
       #custom-weather {
@@ -655,7 +653,7 @@ in
         border-radius: 4px 0px 0px 4px;
         border-width: 2px;
         border-style: solid;
-        border-color: ${config.lib.stylix.colors.withHashtag.base06};
+        border-color: ${stylix.withHashtag "base06"};
         border-right: 0px;
         padding-top: 1px;
       }
@@ -664,21 +662,21 @@ in
         background: rgba(40, 40, 40, 0.9);
         border-width: 2px;
         border-style: solid;
-        border-color: ${config.lib.stylix.colors.withHashtag.base06};
+        border-color: ${stylix.withHashtag "base06"};
       }
 
       #custom-power {
         background: rgba(40, 40, 40, 0.9);
         border-width: 2px;
         border-style: solid;
-        border-color: ${config.lib.stylix.colors.withHashtag.base06};
+        border-color: ${stylix.withHashtag "base06"};
         border-radius: 4px;
       }
 
       menu {
         border-width: 2px;
         border-style: solid;
-        border-color: ${config.lib.stylix.colors.withHashtag.base06};
+        border-color: ${stylix.withHashtag "base06"};
         background: rgba(40, 40, 40, 0.9);
         border-radius: 10px;
       }
@@ -694,5 +692,9 @@ in
         background: #c9b890;
       }
     '';
-  };
+  }
+  // optionalAttrs stylix.hasStylix {
+    stylix.targets.waybar.enable = true;
+    stylix.targets.waybar.addCss = false;
+  });
 }

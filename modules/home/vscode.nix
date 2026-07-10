@@ -1,13 +1,14 @@
 { localFlake, ... }:
-{
-  pkgs,
-  config,
-  lib,
-  ...
+{ pkgs
+, config
+, lib
+, options
+, ...
 }:
 with lib;
 let
   cfg = config.modules.home.vscode;
+  stylix = import ./lib/stylix.nix { inherit config options; };
 in
 {
 
@@ -20,8 +21,7 @@ in
     };
   };
 
-  config = mkIf cfg.enable {
-    stylix.targets.vscode.profileNames = [ "default" ];
+  config = mkIf cfg.enable ({
     programs.vscode = {
       enable = true;
       profiles = {
@@ -33,5 +33,8 @@ in
         };
       };
     };
-  };
+  }
+  // optionalAttrs stylix.hasStylix {
+    stylix.targets.vscode.profileNames = [ "default" ];
+  });
 }

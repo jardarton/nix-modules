@@ -1,15 +1,16 @@
 { localFlake, ... }:
-{
-  pkgs,
-  lib,
-  config,
-  ...
+{ pkgs
+, lib
+, config
+, options
+, ...
 }:
 with lib;
 let
   cfg = config.modules.home.tmux;
   televisionEnabled = attrByPath [ "modules" "home" "television" "enable" ] false config;
   televisionCableDir = "$HOME/.config/television/cable";
+  stylix = import ./lib/stylix.nix { inherit config options; };
 in
 {
 
@@ -22,14 +23,12 @@ in
     };
   };
 
-  config = mkIf cfg.enable {
+  config = mkIf cfg.enable ({
     home.packages = with pkgs; [
       fzf
       fd
       tmuxPlugins.continuum # needs to be last in config; so adding it here
     ];
-
-    stylix.targets.tmux.enable = false;
 
     home.sessionPath = [
       "$HOME/.local/scripts"
@@ -642,5 +641,8 @@ in
       '';
 
     };
-  };
+  }
+  // optionalAttrs stylix.hasStylix {
+    stylix.targets.tmux.enable = false;
+  });
 }
