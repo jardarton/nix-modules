@@ -28,6 +28,7 @@ in
       ];
       settings = {
         core.pager = "${hunk}/bin/hunk pager";
+        pull.rebase = true;
       };
     };
 
