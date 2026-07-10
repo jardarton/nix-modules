@@ -1,14 +1,15 @@
 { localFlake, ... }:
-{
-  pkgs,
-  lib,
-  config,
-  inputs,
-  ...
+{ pkgs
+, lib
+, config
+, inputs
+, options
+, ...
 }:
 with lib;
 let
   cfg = config.modules.home.aerospace;
+  stylix = import ../lib/stylix.nix { inherit config options; };
 in
 {
 
@@ -28,8 +29,8 @@ in
         style = "round";
         order = "above";
         width = 4.0;
-        active_color = config.lib.stylix.colors.withHashtag.base08;
-        inactive_color = config.lib.stylix.colors.withHashtag.base00;
+        active_color = stylix.withHashtag "base08";
+        inactive_color = stylix.withHashtag "base00";
       };
     };
 

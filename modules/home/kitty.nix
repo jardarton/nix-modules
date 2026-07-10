@@ -1,13 +1,14 @@
 { localFlake, ... }:
-{
-  pkgs,
-  lib,
-  config,
-  ...
+{ pkgs
+, lib
+, config
+, options
+, ...
 }:
 with lib;
 let
   cfg = config.modules.home.kitty;
+  stylix = import ./lib/stylix.nix { inherit config options; };
 in
 {
 
@@ -25,9 +26,7 @@ in
     };
   };
 
-  config = mkIf cfg.enable {
-    stylix.targets.kitty.variant256Colors = true;
-
+  config = mkIf cfg.enable ({
     programs.kitty = {
       enable = true;
       shellIntegration.enableZshIntegration = true;
@@ -60,5 +59,8 @@ in
         close_on_child_death = "yes";
       };
     };
-  };
+  }
+  // optionalAttrs stylix.hasStylix {
+    stylix.targets.kitty.variant256Colors = true;
+  });
 }

@@ -1,13 +1,14 @@
 { localFlake, withSystem, ... }:
-{
-  config,
-  pkgs,
-  lib,
-  ...
+{ config
+, pkgs
+, lib
+, options
+, ...
 }:
 with lib;
 let
   cfg = config.modules.home.firefox;
+  stylix = import ../lib/stylix.nix { inherit config options; };
 in
 {
 
@@ -31,7 +32,7 @@ in
     };
   };
 
-  config = mkIf cfg.enable {
+  config = mkIf cfg.enable ({
     textfox = {
       enable = mkIf (cfg.profile == "default") true;
       profiles = [ cfg.profile ];
@@ -50,10 +51,10 @@ in
           size = "16px";
         };
         background = {
-          color = "#${config.lib.stylix.colors.base00}";
+          color = stylix.withHashtag "base00";
         };
         border = {
-          color = "#${config.lib.stylix.colors.base0A}";
+          color = stylix.withHashtag "base0A";
           width = "2px";
           transition = "1.0s ease";
           radius = "5px";
@@ -61,9 +62,8 @@ in
       };
     };
     programs.firefox = withSystem pkgs.stdenv.hostPlatform.system (
-      {
-        system,
-        ...
+      { system
+      , ...
       }:
       let
         firefox-addons = localFlake.inputs.firefox-addons.packages.${system};
@@ -75,17 +75,17 @@ in
       }
     );
 
-    stylix.targets.firefox.enable = true;
-    stylix.targets.firefox.profileNames = [
-      cfg.profile
-    ];
-
     xdg.mimeApps.defaultApplications = {
       "text/html" = [ "firefox.desktop" ];
       "text/xml" = [ "firefox.desktop" ];
       "x-scheme-handler/http" = [ "firefox.desktop" ];
       "x-scheme-handler/https" = [ "firefox.desktop" ];
     };
-
-  };
+  }
+  // optionalAttrs stylix.hasStylix {
+    stylix.targets.firefox.enable = true;
+    stylix.targets.firefox.profileNames = [
+      cfg.profile
+    ];
+  });
 }
