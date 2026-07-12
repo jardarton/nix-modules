@@ -41,6 +41,7 @@ Reusable NixOS and Home Manager modules packaged as a
 - `media`
 - `neovim`
 - `node`
+- `reverse-engineering`
 - `screenshot`
 - `starship`
 - `stylix`
@@ -130,6 +131,12 @@ inputs.nix-modules.homeModules.zsh
 modules.home.firefox = {
 enable = true;
 profile = "default";
+};
+
+modules.home.reverse-engineering = {
+enable = true;
+android.enable = true;
+extraPackages = with pkgs; [ ghidra ];
 };
 }
 ```

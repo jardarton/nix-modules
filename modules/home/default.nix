@@ -49,6 +49,7 @@ in
     sway = importApply ./sway.nix { localFlake = moduleFlake; };
     neovim = importApply ./neovim.nix { localFlake = moduleFlake; };
     cli-tools = importApply ./cli-tools.nix { localFlake = moduleFlake; };
+    reverse-engineering = importApply ./reverse-engineering.nix { localFlake = moduleFlake; };
     direnv = importApply ./direnv.nix { localFlake = moduleFlake; };
     catsvim = importApply ./catsvim { localFlake = moduleFlake; };
     aerospace = importApply ./aerospace { localFlake = moduleFlake; };
