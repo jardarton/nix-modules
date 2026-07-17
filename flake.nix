@@ -4,6 +4,10 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     flake-parts.url = "github:hercules-ci/flake-parts";
+    pre-commit-hooks = {
+      url = "github:cachix/git-hooks.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -59,16 +63,22 @@
       imports = [
         inputs.flake-parts.flakeModules.flakeModules
         inputs.home-manager.flakeModules.home-manager
+        inputs.pre-commit-hooks.flakeModule
         ./modules
       ];
 
       flake.flakeModule = ./modules;
 
       perSystem =
-        { system, pkgs, ... }:
+        { config, system, pkgs, ... }:
         {
           imports = [ ./packages ];
           formatter = pkgs.nixpkgs-fmt;
+          pre-commit.settings.hooks.nixpkgs-fmt.enable = true;
+          devShells.default = pkgs.mkShell {
+            inherit (config.pre-commit) shellHook;
+            packages = config.pre-commit.settings.enabledPackages;
+          };
           _module.args.pkgs = import inputs.nixpkgs {
             inherit system;
             config.allowUnfree = true;

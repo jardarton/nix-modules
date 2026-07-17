@@ -1,9 +1,8 @@
 { localFlake, ... }:
-{
-  config,
-  lib,
-  pkgs,
-  ...
+{ config
+, lib
+, pkgs
+, ...
 }:
 let
   inherit (lib) literalExpression mkEnableOption mkIf mkOption optionals types;

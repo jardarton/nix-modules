@@ -15,6 +15,7 @@
 .env.*
 !.env.example
 .direnv/
+.pre-commit-config.yaml
 
 # Nix build outputs
 /result

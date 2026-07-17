@@ -1,10 +1,9 @@
 { localFlake, ... }:
-{
-  osConfig,
-  pkgs,
-  config,
-  lib,
-  ...
+{ osConfig
+, pkgs
+, config
+, lib
+, ...
 }:
 with lib;
 let
@@ -21,7 +20,8 @@ in
     };
     package = mkOption {
       type = types.package;
-      default = if osConfig != null && osConfig.programs ? hyprland
+      default =
+        if osConfig != null && osConfig.programs ? hyprland
         then osConfig.programs.hyprland.package
         else pkgs.hyprland;
     };
