@@ -1,4 +1,4 @@
-{ localFlake, ... }:
+_:
 {
   config,
   lib,
@@ -36,15 +36,27 @@ in
       file
       findutils
       which
-      tree
       gnutar
       rsync
+      curl
+      wget
+      zip
+      unzip
+      xz
+      zstd
+      p7zip
+      jq
+      yq-go
       dust
-      fd
       ripgrep
       dysk
       htop
-      cmake
+      hyperfine
+      watchexec
+      nix-output-monitor
+      nvd
+      nix-tree
+      nix-diff
       just
       tealdeer
     ];

@@ -1,4 +1,4 @@
-{ localFlake, withSystem, ... }:
+{ withSystem, ... }:
 {
   config,
   lib,
@@ -89,54 +89,36 @@ in
     home.file.".config/television/cable/tmux-sessions.toml".text = tmuxSessionsChannelText;
     home.file.".config/television/cable/git-worktrees.toml".text = gitWorktreesChannelText;
 
-    programs.television = withSystem pkgs.stdenv.hostPlatform.system (
-      { system, pkgs, ... }:
-      let
-        upstreamPackage = localFlake.inputs.television.packages.${system}.default;
-        televisionPackage = pkgs.symlinkJoin {
-          name = upstreamPackage.name;
-          paths = [ upstreamPackage ];
-          postBuild = ''
-            mkdir -p "$out/share/television"
-            cat > "$out/share/television/completion.zsh" <<EOF
-            fpath+=("$out/share/zsh/site-functions")
-            autoload -Uz _tv
-            compdef _tv tv
-            EOF
-          '';
+    programs.television = withSystem pkgs.stdenv.hostPlatform.system (_: {
+      enable = true;
+      enableZshIntegration = true;
+      settings = {
+        ui.theme = "gruvbox-dark";
+      };
+      channels.env = {
+        metadata = {
+          name = "env";
+          description = "A channel to select from environment variables";
         };
-      in
-      {
-        enable = true;
-        enableZshIntegration = true;
-        settings = {
-          ui.theme = "gruvbox-dark";
+        source = {
+          command = "printenv";
+          output = "{split:=:1..}";
         };
-        channels.env = {
-          metadata = {
-            name = "env";
-            description = "A channel to select from environment variables";
-          };
-          source = {
-            command = "printenv";
-            output = "{split:=:1..}";
-          };
-          preview.command = "echo '{split:=:1..}'";
-          ui = {
-            layout = "portrait";
-            preview_panel = {
-              size = 20;
-              header = "{split:=:0}";
-            };
-          };
-          keybindings.shortcut = "f3";
-          actions.name = {
-            description = "Output the variable name instead of the value";
-            command = "echo '{split:=:0}'";
-            mode = "execute";
+        preview.command = "echo '{split:=:1..}'";
+        ui = {
+          layout = "portrait";
+          preview_panel = {
+            size = 20;
+            header = "{split:=:0}";
           };
         };
-      }
-    );
+        keybindings.shortcut = "f3";
+        actions.name = {
+          description = "Output the variable name instead of the value";
+          command = "echo '{split:=:0}'";
+          mode = "execute";
+        };
+      };
+    });
   };
 }

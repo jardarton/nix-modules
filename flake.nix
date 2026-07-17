@@ -79,7 +79,19 @@
         {
           imports = [ ./packages ];
           formatter = pkgs.nixfmt-tree;
-          pre-commit.settings.hooks.nixfmt.enable = true;
+          pre-commit.settings.hooks = {
+            nixfmt.enable = true;
+            statix = {
+              enable = true;
+              settings.config = toString (
+                pkgs.writeText "statix.toml" ''
+                  disabled = ["repeated_keys"]
+                  ignore = [".direnv"]
+                ''
+              );
+            };
+            deadnix.enable = true;
+          };
           devShells.default = pkgs.mkShell {
             inherit (config.pre-commit) shellHook;
             packages = config.pre-commit.settings.enabledPackages;
@@ -87,20 +99,24 @@
           checks = pkgs.lib.mapAttrs' (
             name: module:
             let
-              activationPackage =
-                (inputs.home-manager.lib.homeManagerConfiguration {
-                  inherit pkgs;
-                  modules = [
-                    module
-                    {
-                      home = {
-                        username = "module-test";
-                        homeDirectory = "/home/module-test";
-                        stateVersion = "26.05";
-                      };
-                    }
-                  ];
-                }).activationPackage;
+              inherit
+                (
+                  (inputs.home-manager.lib.homeManagerConfiguration {
+                    inherit pkgs;
+                    modules = [
+                      module
+                      {
+                        home = {
+                          username = "module-test";
+                          homeDirectory = "/home/module-test";
+                          stateVersion = "26.05";
+                        };
+                      }
+                    ];
+                  })
+                )
+                activationPackage
+                ;
               evaluated = builtins.addErrorContext "while evaluating homeModules.${name}: " activationPackage.drvPath;
             in
             pkgs.lib.nameValuePair "home-module-${name}" (

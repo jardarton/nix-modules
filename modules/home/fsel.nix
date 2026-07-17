@@ -52,7 +52,7 @@ in
     '';
 
     home.file.".local/bin/dmenu".source = withSystem pkgs.stdenv.hostPlatform.system (
-      { system, config, ... }: "${localFlake.inputs.fsel.packages.${system}.default}/bin/fsel"
+      { system, ... }: "${localFlake.inputs.fsel.packages.${system}.default}/bin/fsel"
     );
   };
 

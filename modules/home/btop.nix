@@ -1,9 +1,7 @@
-{ localFlake, ... }:
+_:
 {
   config,
-  pkgs,
   lib,
-  inputs,
   ...
 }:
 with lib;

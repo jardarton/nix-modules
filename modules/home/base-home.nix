@@ -1,5 +1,4 @@
-{ localFlake, ... }:
-{ config, ... }:
+_: _:
 
 {
   programs.home-manager.enable = true;

@@ -1,4 +1,4 @@
-{ localFlake, ... }:
+_:
 {
   config,
   lib,
@@ -37,7 +37,7 @@ in
   config = mkIf cfg.enable {
     programs.ghostty = {
       enable = true;
-      package = cfg.package;
+      inherit (cfg) package;
       enableZshIntegration = true;
       settings = {
         font-feature = [
@@ -63,7 +63,7 @@ in
         window-decoration = true;
         background-opacity = cfg.opacity;
         background-blur = true;
-        custom-shader = cfg.custom-shader;
+        inherit (cfg) custom-shader;
       };
     };
 

@@ -38,17 +38,14 @@ in
       gitCredentialHelper.enable = true;
     };
 
-    home.packages = withSystem pkgs.stdenv.hostPlatform.system (
-      { system, config, ... }:
-      [
-        pkgs.git
-        pkgs.gh
-        pkgs.gh-dash
-        pkgs.mergiraf
-        pkgs.difftastic
-        hunk
-      ]
-    );
+    home.packages = withSystem pkgs.stdenv.hostPlatform.system (_: [
+      pkgs.git
+      pkgs.gh
+      pkgs.gh-dash
+      pkgs.mergiraf
+      pkgs.difftastic
+      hunk
+    ]);
 
     programs.lazygit = {
       enable = true;

@@ -1,8 +1,7 @@
-{ localFlake, ... }:
+_:
 {
   config,
   lib,
-  pkgs,
   options,
   ...
 }:

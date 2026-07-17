@@ -7,7 +7,6 @@
 }:
 with lib;
 let
-  inherit (pkgs.stdenv) isLinux;
   cfg = config.modules.shared.stylix;
 in
 {
