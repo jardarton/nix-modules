@@ -1,7 +1,4 @@
-{ localFlake }:
-{
-  ...
-}:
+_: _:
 
 {
   services.udev = {

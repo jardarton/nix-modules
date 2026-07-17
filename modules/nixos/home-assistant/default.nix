@@ -1,4 +1,4 @@
-{ ... }:
+_:
 {
   config,
   lib,
@@ -121,7 +121,7 @@ in
       containers.homeassistant = {
         volumes = [ "${cfg.confDir}:/config" ];
         environment.TZ = "Europe/Berlin";
-        image = cfg.image;
+        inherit (cfg) image;
         extraOptions = [
           # Use the host network namespace for all sockets
           "--network=host"

@@ -81,7 +81,7 @@ let
       description = manifest.description or null;
       manifest_path = "${plugin.package}/herdr-plugin.toml";
       plugin_root = toString plugin.package;
-      enabled = plugin.enabled;
+      inherit (plugin) enabled;
       platforms = manifest.platforms or null;
       build = manifest.build or [ ];
       actions = manifest.actions or [ ];
@@ -172,25 +172,23 @@ in
 
     plugins = mkOption {
       type = types.listOf (
-        types.submodule (
-          { ... }: {
-            options = {
-              id = mkOption {
-                type = types.str;
-                description = "Plugin id matching the herdr-plugin.toml manifest.";
-              };
-              package = mkOption {
-                type = types.package;
-                description = "Package containing herdr-plugin.toml at its root.";
-              };
-              enabled = mkOption {
-                type = types.bool;
-                default = true;
-                description = "Whether the plugin is enabled in Herdr.";
-              };
+        types.submodule (_: {
+          options = {
+            id = mkOption {
+              type = types.str;
+              description = "Plugin id matching the herdr-plugin.toml manifest.";
             };
-          }
-        )
+            package = mkOption {
+              type = types.package;
+              description = "Package containing herdr-plugin.toml at its root.";
+            };
+            enabled = mkOption {
+              type = types.bool;
+              default = true;
+              description = "Whether the plugin is enabled in Herdr.";
+            };
+          };
+        })
       );
       default = [ ];
       example = literalExpression ''
@@ -223,7 +221,7 @@ in
     };
 
     settings = mkOption {
-      type = toml.type;
+      inherit (toml) type;
       default = {
         onboarding = false;
         theme.name = "gruvbox";

@@ -73,7 +73,7 @@ let
   };
 
   catsvimPackage = mkCatsvimPackage (neovimInput + "/nix/profiles/full.nix") (
-    { ... }:
+    _:
     mkMerge [
       (themeInfo cfg.theme)
       {
@@ -83,7 +83,7 @@ let
   );
 
   catsviPackage = mkCatsvimPackage (neovimInput + "/nix/profiles/minimal.nix") (
-    { ... }:
+    _:
     mkMerge [
       (themeInfo "gruvbox")
       {

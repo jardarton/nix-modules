@@ -1,4 +1,4 @@
-{ localFlake, ... }:
+_:
 {
   osConfig,
   pkgs,
@@ -93,7 +93,7 @@ in
 
     wayland.windowManager.hyprland = {
       enable = true;
-      package = cfg.package;
+      inherit (cfg) package;
       xwayland.enable = mkDefault true;
       systemd.enable = mkDefault (!osConfig.programs.hyprland.withUWSM); # to not intefere with withUwsm on programs.hyprland
       #https://wiki.hypr.land/Useful-Utilities/Systemd-start/

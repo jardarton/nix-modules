@@ -20,7 +20,7 @@ let
         type = types.bool;
         inherit default;
         example = true;
-        description = description;
+        inherit description;
       };
 
       package = mkOption {

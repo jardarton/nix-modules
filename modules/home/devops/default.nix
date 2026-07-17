@@ -23,8 +23,7 @@ in
 
     home.packages =
       with pkgs;
-      [ ]
-      ++ (
+      (
         if cfg.enableDocker then
           [
             docker

@@ -1,4 +1,4 @@
-{ localFlake, ... }:
+_:
 {
   pkgs,
   lib,
