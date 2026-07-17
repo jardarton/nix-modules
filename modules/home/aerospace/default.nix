@@ -1,10 +1,11 @@
 { localFlake, ... }:
-{ pkgs
-, lib
-, config
-, inputs
-, options
-, ...
+{
+  pkgs,
+  lib,
+  config,
+  inputs,
+  options,
+  ...
 }:
 with lib;
 let

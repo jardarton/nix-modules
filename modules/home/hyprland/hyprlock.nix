@@ -1,7 +1,8 @@
-{ pkgs
-, lib
-, config
-, ...
+{
+  pkgs,
+  lib,
+  config,
+  ...
 }:
 let
   cfg = config.modules.home.hypr;

@@ -1,9 +1,10 @@
 { localFlake, ... }:
-{ pkgs
-, config
-, lib
-, options
-, ...
+{
+  pkgs,
+  config,
+  lib,
+  options,
+  ...
 }:
 with lib;
 let
@@ -21,20 +22,22 @@ in
     };
   };
 
-  config = mkIf cfg.enable ({
-    programs.vscode = {
-      enable = true;
-      profiles = {
-        default = {
-          extensions = [
-            pkgs.vscode-extensions.bbenoist.nix
-            pkgs.vscode-extensions.vscodevim.vim
-          ];
+  config = mkIf cfg.enable (
+    {
+      programs.vscode = {
+        enable = true;
+        profiles = {
+          default = {
+            extensions = [
+              pkgs.vscode-extensions.bbenoist.nix
+              pkgs.vscode-extensions.vscodevim.vim
+            ];
+          };
         };
       };
-    };
-  }
-  // optionalAttrs stylix.hasStylix {
-    stylix.targets.vscode.profileNames = [ "default" ];
-  });
+    }
+    // optionalAttrs stylix.hasStylix {
+      stylix.targets.vscode.profileNames = [ "default" ];
+    }
+  );
 }

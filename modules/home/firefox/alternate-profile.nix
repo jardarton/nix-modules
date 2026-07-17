@@ -1,5 +1,6 @@
-{ firefox-addons
-, ...
+{
+  firefox-addons,
+  ...
 }:
 {
   id = 0;

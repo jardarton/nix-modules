@@ -70,11 +70,16 @@
       flake.flakeModule = ./modules;
 
       perSystem =
-        { config, system, pkgs, ... }:
+        {
+          config,
+          system,
+          pkgs,
+          ...
+        }:
         {
           imports = [ ./packages ];
-          formatter = pkgs.nixpkgs-fmt;
-          pre-commit.settings.hooks.nixpkgs-fmt.enable = true;
+          formatter = pkgs.nixfmt-tree;
+          pre-commit.settings.hooks.nixfmt.enable = true;
           devShells.default = pkgs.mkShell {
             inherit (config.pre-commit) shellHook;
             packages = config.pre-commit.settings.enabledPackages;

@@ -1,18 +1,19 @@
 { localFlake, withSystem, ... }:
-{ config
-, lib
-, pkgs
-, ...
+{
+  config,
+  lib,
+  pkgs,
+  ...
 }:
 with lib;
 let
   cfg = config.modules.home.ai;
   agentOptions =
-    { name
-    , packageName ? name
-    , default ? true
-    , description ? "install ${name}"
-    ,
+    {
+      name,
+      packageName ? name,
+      default ? true,
+      description ? "install ${name}",
     }:
     {
       enable = mkOption {
@@ -73,11 +74,13 @@ in
       let
         system = pkgs.stdenv.hostPlatform.system;
         playwrightBrowser =
-          if elem system [
-            "x86_64-linux"
-            "x86_64-darwin"
-            "aarch64-darwin"
-          ] then
+          if
+            elem system [
+              "x86_64-linux"
+              "x86_64-darwin"
+              "aarch64-darwin"
+            ]
+          then
             pkgs.google-chrome
           else
             pkgs.chromium;
@@ -93,11 +96,13 @@ in
         packageOr =
           agentCfg: defaultPackage: if agentCfg.package != null then agentCfg.package else defaultPackage;
         playwrightBrowser =
-          if elem system [
-            "x86_64-linux"
-            "x86_64-darwin"
-            "aarch64-darwin"
-          ] then
+          if
+            elem system [
+              "x86_64-linux"
+              "x86_64-darwin"
+              "aarch64-darwin"
+            ]
+          then
             pkgs.google-chrome
           else
             pkgs.chromium;

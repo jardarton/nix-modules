@@ -1,7 +1,8 @@
 { ... }:
-{ config
-, lib
-, ...
+{
+  config,
+  lib,
+  ...
 }:
 with lib;
 let

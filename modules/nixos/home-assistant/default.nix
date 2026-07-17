@@ -1,8 +1,9 @@
 { ... }:
-{ config
-, lib
-, pkgs
-, ...
+{
+  config,
+  lib,
+  pkgs,
+  ...
 }:
 
 let
@@ -137,7 +138,8 @@ in
         environment.TZ = "Europe/Berlin";
         extraOptions = [
           "--network=host"
-        ] ++ lib.optionals (cfg.zigbee2mqtt.adapter != null) [
+        ]
+        ++ lib.optionals (cfg.zigbee2mqtt.adapter != null) [
           "--device=${cfg.zigbee2mqtt.adapter}:/dev/ttyACM0"
         ];
       };
