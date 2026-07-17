@@ -70,9 +70,36 @@ Reusable NixOS and Home Manager modules packaged as a
 - `stylix`
 - `wifi`
 
-### Packages and utilities
+### Packages
 
-- `packages.cclip`
+Packages are exported under `packages.${system}`:
+
+- `cclip` (Linux only)
+- `firecrawl-cli`
+- `gondolin`
+- `kli`
+- `playwright-cli`
+- `stack`
+
+For example, build a package directly with:
+
+```sh
+nix build .#cclip
+```
+
+Or consume one from another flake:
+
+```nix
+{ inputs, pkgs, ... }:
+{
+  environment.systemPackages = [
+    inputs.nix-modules.packages.${pkgs.stdenv.hostPlatform.system}.gondolin
+  ];
+}
+```
+
+### Utilities
+
 - `utils/fix-nix-daemon-ca.sh`
 
 ## Use from another flake
