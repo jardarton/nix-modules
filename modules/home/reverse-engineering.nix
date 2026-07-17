@@ -1,11 +1,19 @@
 { localFlake, ... }:
-{ config
-, lib
-, pkgs
-, ...
+{
+  config,
+  lib,
+  pkgs,
+  ...
 }:
 let
-  inherit (lib) literalExpression mkEnableOption mkIf mkOption optionals types;
+  inherit (lib)
+    literalExpression
+    mkEnableOption
+    mkIf
+    mkOption
+    optionals
+    types
+    ;
   cfg = config.modules.home.reverse-engineering;
 
   corePackages = with pkgs; [
@@ -18,15 +26,21 @@ let
     yara
   ];
 
-  nativePackages = with pkgs; [
-    gdb
-    lldb
-    patchelf
-    radare2
-  ] ++ optionals pkgs.stdenv.isLinux (with pkgs; [
-    ltrace
-    strace
-  ]);
+  nativePackages =
+    with pkgs;
+    [
+      gdb
+      lldb
+      patchelf
+      radare2
+    ]
+    ++ optionals pkgs.stdenv.isLinux (
+      with pkgs;
+      [
+        ltrace
+        strace
+      ]
+    );
 
   androidPackages = with pkgs; [
     android-tools
@@ -72,7 +86,8 @@ in
   };
 
   config = mkIf cfg.enable {
-    home.packages = corePackages
+    home.packages =
+      corePackages
       ++ optionals cfg.native.enable nativePackages
       ++ optionals cfg.android.enable androidPackages
       ++ optionals cfg.firmware.enable firmwarePackages

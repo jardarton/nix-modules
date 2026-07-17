@@ -1,12 +1,12 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, fetchPnpmDeps
-, makeWrapper
-, nodejs_24
-, pnpm_10
-, pnpmConfigHook
-,
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  fetchPnpmDeps,
+  makeWrapper,
+  nodejs_24,
+  pnpm_10,
+  pnpmConfigHook,
 }:
 
 stdenv.mkDerivation (finalAttrs: {

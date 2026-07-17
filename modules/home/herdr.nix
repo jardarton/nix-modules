@@ -1,18 +1,19 @@
 { localFlake, withSystem, ... }:
-{ config
-, lib
-, pkgs
-, ...
+{
+  config,
+  lib,
+  pkgs,
+  ...
 }:
 let
   cfg = config.modules.home.herdr;
   toml = pkgs.formats.toml { };
   json = pkgs.formats.json { };
   mkHerdrPluginPackage =
-    { pluginId
-    , src
-    , rustPackage
-    ,
+    {
+      pluginId,
+      src,
+      rustPackage,
     }:
     pkgs.runCommand "herdr-plugin-${lib.replaceStrings [ "." ] [ "-" ] pluginId}" { } ''
       mkdir -p "$out/target/release"
@@ -65,51 +66,47 @@ let
       command = (settingsWithTheme.keys.command or [ ]) ++ jjWorkspaceKeybindCommands;
     };
   };
-  pluginRegistry = builtins.map
-    (
-      plugin:
-      let
-        manifest = builtins.fromTOML (builtins.readFile "${plugin.package}/herdr-plugin.toml");
-      in
-      {
-        plugin_id = plugin.id;
-        inherit (manifest)
-          name
-          version
-          min_herdr_version
-          ;
-        description = manifest.description or null;
-        manifest_path = "${plugin.package}/herdr-plugin.toml";
-        plugin_root = toString plugin.package;
-        enabled = plugin.enabled;
-        platforms = manifest.platforms or null;
-        build = manifest.build or [ ];
-        actions = manifest.actions or [ ];
-        events = manifest.events or [ ];
-        panes = manifest.panes or [ ];
-        link_handlers = manifest.link_handlers or [ ];
-        source.kind = "local";
-        warnings = [ ];
-      }
-    )
-    configuredPlugins;
+  pluginRegistry = builtins.map (
+    plugin:
+    let
+      manifest = builtins.fromTOML (builtins.readFile "${plugin.package}/herdr-plugin.toml");
+    in
+    {
+      plugin_id = plugin.id;
+      inherit (manifest)
+        name
+        version
+        min_herdr_version
+        ;
+      description = manifest.description or null;
+      manifest_path = "${plugin.package}/herdr-plugin.toml";
+      plugin_root = toString plugin.package;
+      enabled = plugin.enabled;
+      platforms = manifest.platforms or null;
+      build = manifest.build or [ ];
+      actions = manifest.actions or [ ];
+      events = manifest.events or [ ];
+      panes = manifest.panes or [ ];
+      link_handlers = manifest.link_handlers or [ ];
+      source.kind = "local";
+      warnings = [ ];
+    }
+  ) configuredPlugins;
   pluginConfigDirName =
     pluginId:
     let
       chars = lib.stringToCharacters pluginId;
-      mapped = builtins.map
-        (
-          ch:
-          if builtins.match "[a-z0-9._-]" ch != null then
-            ch
-          else
-            let
-              code = lib.toHexString (lib.strings.charToInt ch);
-              normalized = if lib.stringLength code == 1 then "0${code}" else code;
-            in
-            "%${lib.toUpper normalized}"
-        )
-        chars;
+      mapped = builtins.map (
+        ch:
+        if builtins.match "[a-z0-9._-]" ch != null then
+          ch
+        else
+          let
+            code = lib.toHexString (lib.strings.charToInt ch);
+            normalized = if lib.stringLength code == 1 then "0${code}" else code;
+          in
+          "%${lib.toUpper normalized}"
+      ) chars;
       component = lib.concatStrings mapped;
       stem = builtins.head (lib.splitString "." component);
       reserved = [
@@ -515,18 +512,16 @@ in
 
     home.activation.herdrPluginDirs = lib.hm.dag.entryAfter [ "writeBoundary" ] (
       lib.concatStringsSep "\n" (
-        builtins.map
-          (
-            plugin:
-            let
-              configDir = pluginConfigDirName plugin.id;
-            in
-            ''
-              mkdir -p "$HOME/.config/herdr/plugins/config/${configDir}"
-              mkdir -p "$HOME/.local/state/herdr/plugins/${configDir}"
-            ''
-          )
-          configuredPlugins
+        builtins.map (
+          plugin:
+          let
+            configDir = pluginConfigDirName plugin.id;
+          in
+          ''
+            mkdir -p "$HOME/.config/herdr/plugins/config/${configDir}"
+            mkdir -p "$HOME/.local/state/herdr/plugins/${configDir}"
+          ''
+        ) configuredPlugins
       )
     );
   };

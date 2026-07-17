@@ -1,16 +1,17 @@
-{ lib
-, stdenv
-, sqlite
-, wayland
-, wayland-scanner
-, fetchgit
-, meson
-, ninja
-, git
-, xxhash
-, cmake
-, pkg-config
-, ...
+{
+  lib,
+  stdenv,
+  sqlite,
+  wayland,
+  wayland-scanner,
+  fetchgit,
+  meson,
+  ninja,
+  git,
+  xxhash,
+  cmake,
+  pkg-config,
+  ...
 }:
 
 stdenv.mkDerivation rec {

@@ -1,7 +1,8 @@
 { localFlake, ... }:
-{ pkgs
-, config
-, ...
+{
+  pkgs,
+  config,
+  ...
 }:
 {
   environment.variables.EDITOR = "catsVim"; # "nvim";

@@ -1,4 +1,9 @@
-{ config, lib, options, ... }:
+{
+  config,
+  lib,
+  options,
+  ...
+}:
 let
   stylix = import ../lib/stylix.nix { inherit config options; };
 in

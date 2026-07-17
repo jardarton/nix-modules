@@ -1,5 +1,10 @@
 { localFlake, ... }:
-{ config, lib, options, ... }:
+{
+  config,
+  lib,
+  options,
+  ...
+}:
 with lib;
 let
   cfg = config.modules.home.fzf;
