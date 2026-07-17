@@ -52,7 +52,7 @@
   };
 
   outputs =
-    { flake-parts, ... }@inputs:
+    { self, flake-parts, ... }@inputs:
     flake-parts.lib.mkFlake { inherit inputs; } {
       systems = [
         "x86_64-linux"
@@ -84,6 +84,29 @@
             inherit (config.pre-commit) shellHook;
             packages = config.pre-commit.settings.enabledPackages;
           };
+          checks = pkgs.lib.mapAttrs' (
+            name: module:
+            let
+              activationPackage =
+                (inputs.home-manager.lib.homeManagerConfiguration {
+                  inherit pkgs;
+                  modules = [
+                    module
+                    {
+                      home = {
+                        username = "module-test";
+                        homeDirectory = "/home/module-test";
+                        stateVersion = "26.05";
+                      };
+                    }
+                  ];
+                }).activationPackage;
+              evaluated = builtins.addErrorContext "while evaluating homeModules.${name}: " activationPackage.drvPath;
+            in
+            pkgs.lib.nameValuePair "home-module-${name}" (
+              builtins.seq evaluated (pkgs.runCommand "check-home-module-${name}" { } "touch $out")
+            )
+          ) self.homeModules;
           _module.args.pkgs = import inputs.nixpkgs {
             inherit system;
             config.allowUnfree = true;
