@@ -10,12 +10,24 @@ with lib;
 let
   cfg = config.modules.home.firefox;
   stylix = import ../lib/stylix.nix { inherit config options; };
+  textfox = localFlake.inputs.textfox;
+  # Textfox reads its package output during evaluation without first realizing
+  # the derivation. Force drvPath so Nix registers it before reading the output.
+  textfoxModule = import "${textfox.outPath}/nix/modules/home-manager.nix" {
+    self.packages = mapAttrs (
+      _system: packages:
+      packages
+      // {
+        default = builtins.seq packages.default.drvPath packages.default;
+      }
+    ) textfox.packages;
+  };
 in
 {
 
   imports = [
     ./vimium.nix
-    localFlake.inputs.textfox.homeManagerModules.default
+    textfoxModule
   ];
 
   options.modules.home.firefox = {
