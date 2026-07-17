@@ -18,7 +18,7 @@ in
   options.modules.home.mango = {
     enable = mkOption {
       type = types.bool;
-      default = config.modules.nixos.mango.enable;
+      default = false;
       example = true;
       description = "enable mango config";
     };
