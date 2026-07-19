@@ -16,6 +16,7 @@ let
     COMPLETE=zsh ${lib.getExe pkgs.jujutsu} > "$out/share/zsh/site-functions/_jj"
   '';
   editor = if catsvimEnabled then "catsvim" else "nvim";
+  lsWithColor = if pkgs.stdenv.hostPlatform.isDarwin then "ls -G" else "ls --color";
 in
 {
 
@@ -147,7 +148,7 @@ in
 
           zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
           zstyle ':completion:*' menu no
-          zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls --color $realpath'
+          zstyle ':fzf-tab:complete:cd:*' fzf-preview '${lsWithColor} "$realpath"'
 
           path+=($HOME/.npm/bin)
           ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=3'
@@ -171,7 +172,7 @@ in
     programs.bash.enable = true;
 
     home.shellAliases = {
-      ls = "ls --color";
+      ls = lsWithColor;
       f = ''${editor} $(fzf --preview="bat --color=always {}")'';
     };
   };
