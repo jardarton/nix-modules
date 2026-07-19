@@ -8,7 +8,12 @@
 with lib;
 let
   cfg = config.modules.home.jujutsu;
+  zshEnabled = attrByPath [ "modules" "home" "zsh" "enable" ] false config;
   hunk = localFlake.inputs.hunk.packages.${pkgs.stdenv.hostPlatform.system}.default;
+  jjZshCompletion = pkgs.runCommand "jj-zsh-completion" { } ''
+    mkdir -p "$out/share/zsh/site-functions"
+    COMPLETE=zsh ${lib.getExe pkgs.jujutsu} > "$out/share/zsh/site-functions/_jj"
+  '';
 in
 {
   options.modules.home.jujutsu = {
@@ -114,9 +119,13 @@ in
       };
     };
 
-    home.packages = optionals cfg.jjStarship.enable [
-      cfg.jjStarship.package
-    ];
+    home.packages =
+      optionals cfg.jjStarship.enable [
+        cfg.jjStarship.package
+      ]
+      ++ optionals zshEnabled [
+        jjZshCompletion
+      ];
 
     home.shellAliases = {
       jj = lib.getExe pkgs.jujutsu;
