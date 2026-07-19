@@ -10,11 +10,6 @@ let
   cfg = config.modules.home.zsh;
   catsvimEnabled = attrByPath [ "modules" "home" "catsvim" "enable" ] false config;
   televisionEnabled = attrByPath [ "modules" "home" "television" "enable" ] false config;
-  jujutsuEnabled = attrByPath [ "modules" "home" "jujutsu" "enable" ] false config;
-  jjZshCompletion = pkgs.runCommand "jj-zsh-completion" { } ''
-    mkdir -p "$out/share/zsh/site-functions"
-    COMPLETE=zsh ${lib.getExe pkgs.jujutsu} > "$out/share/zsh/site-functions/_jj"
-  '';
   editor = if catsvimEnabled then "catsvim" else "nvim";
   lsWithColor = if pkgs.stdenv.hostPlatform.isDarwin then "ls -G" else "ls --color";
 in
@@ -40,9 +35,6 @@ in
       ]
       ++ lib.optionals pkgs.stdenv.hostPlatform.isLinux [
         wl-clipboard
-      ]
-      ++ lib.optionals jujutsuEnabled [
-        jjZshCompletion
       ];
 
     home.sessionPath = [
@@ -68,8 +60,8 @@ in
       dotDir = "${config.xdg.configHome}/zsh";
 
       history = {
-        append = true;
         expireDuplicatesFirst = true;
+        share = true;
         size = 10000;
       };
 
@@ -132,8 +124,6 @@ in
         ''
           ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE="20"
           ZSH_AUTOSUGGEST_USE_ASYNC=1
-
-          set -o inc_append_history
 
           export VISUAL="${editor}"
           export EDITOR="${editor}"
