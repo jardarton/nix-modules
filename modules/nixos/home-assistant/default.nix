@@ -14,7 +14,7 @@ let
 
     persistence true
     persistence_location /mosquitto/data/
-    autosave_interval 60
+    autosave_interval ${toString cfg.mosquitto.autosaveInterval}
 
     connection_messages false
     log_dest stdout
@@ -100,6 +100,12 @@ in
         default = true;
         example = false;
         description = "Whether the MQTT broker accepts unauthenticated clients. Safe by default with the loopback-only bind address.";
+      };
+      autosaveInterval = mkOption {
+        type = types.ints.positive;
+        default = 1800;
+        example = 300;
+        description = "Seconds between writes of the in-memory Mosquitto database to persistent storage.";
       };
     };
   };
