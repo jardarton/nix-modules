@@ -11,6 +11,10 @@ let
   catsvimEnabled = attrByPath [ "modules" "home" "catsvim" "enable" ] false config;
   televisionEnabled = attrByPath [ "modules" "home" "television" "enable" ] false config;
   jujutsuEnabled = attrByPath [ "modules" "home" "jujutsu" "enable" ] false config;
+  jjZshCompletion = pkgs.runCommand "jj-zsh-completion" { } ''
+    mkdir -p "$out/share/zsh/site-functions"
+    COMPLETE=zsh ${lib.getExe pkgs.jujutsu} > "$out/share/zsh/site-functions/_jj"
+  '';
   editor = if catsvimEnabled then "catsvim" else "nvim";
 in
 {
@@ -35,6 +39,9 @@ in
       ]
       ++ lib.optionals pkgs.stdenv.hostPlatform.isLinux [
         wl-clipboard
+      ]
+      ++ lib.optionals jujutsuEnabled [
+        jjZshCompletion
       ];
 
     home.sessionPath = [
@@ -133,10 +140,6 @@ in
           ${lib.optionalString televisionEnabled ''
             eval "$(tv init zsh)"
           ''}
-          ${lib.optionalString jujutsuEnabled ''
-            source <(COMPLETE=zsh jj)
-          ''}
-
           bindkey -M vicmd 'k' history-substring-search-up
           bindkey -M vicmd 'j' history-substring-search-down
           bindkey '^Y' autosuggest-accept
