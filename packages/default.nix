@@ -1,4 +1,9 @@
-{ lib, pkgs, ... }:
+{
+  inputs',
+  lib,
+  pkgs,
+  ...
+}:
 {
   packages = {
     stack = pkgs.callPackage ./stack { };
@@ -9,5 +14,9 @@
   }
   // lib.optionalAttrs pkgs.stdenv.isLinux {
     cclip = pkgs.callPackage ./cclip { };
+    mango = inputs'.mango.packages.mango.overrideAttrs (old: {
+      buildInputs = old.buildInputs ++ [ pkgs.libdrm ];
+      NIX_CFLAGS_COMPILE = "-I${pkgs.libdrm.dev}/include/libdrm";
+    });
   };
 }
