@@ -1,4 +1,4 @@
-_:
+{ localFlake, ... }:
 {
   config,
   lib,
@@ -46,6 +46,7 @@ let
     android-tools
     apktool
     jadx
+    localFlake.packages.${pkgs.system}.hbcdump
   ];
 
   firmwarePackages = with pkgs; [

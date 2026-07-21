@@ -9,6 +9,7 @@
     stack = pkgs.callPackage ./stack { };
     gondolin = pkgs.callPackage ./gondolin { };
     firecrawl-cli = pkgs.callPackage ./firecrawl-cli { };
+    hbcdump = pkgs.callPackage ./hbcdump { };
     kli = pkgs.callPackage ./kli { };
     playwright-cli = pkgs.callPackage ./playwright-cli { };
   }
