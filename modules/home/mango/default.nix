@@ -66,6 +66,7 @@ in
 
     wayland.windowManager.mango = {
       enable = true;
+      package = localFlake.packages.${pkgs.stdenv.hostPlatform.system}.mango;
       # Window effect
       settings = ''
         blur=${if cfg.blur then "1" else "0"}

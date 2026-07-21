@@ -24,7 +24,10 @@ in
   ];
 
   config = mkIf cfg.enable {
-    programs.mango.enable = true;
+    programs.mango = {
+      enable = true;
+      package = localFlake.packages.${pkgs.stdenv.hostPlatform.system}.mango;
+    };
 
     environment.systemPackages = [
       pkgs.wlr-randr
