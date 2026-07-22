@@ -41,7 +41,6 @@ in
             "reload_style_on_change": true,
             "modules-left": [
                 "ext/workspaces",
-                "dwl/window",
                 "cava"
             ],
             "modules-right": [
@@ -73,10 +72,6 @@ in
                     "active": "",
                     "default": ""
                 },
-            },
-            "dwl/window": {
-                "format": "[{layout}]  {title}",
-                "rotate": 90
             },
             "custom/notification": {
                 "tooltip": false,

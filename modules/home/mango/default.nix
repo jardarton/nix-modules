@@ -41,14 +41,17 @@ in
       default = "google-chrome-stable";
       example = "chromium";
     };
+    wallpaper = mkOption {
+      type = types.nullOr types.path;
+      default = null;
+      description = "Wallpaper displayed by swaybg.";
+    };
   };
 
   config = mkIf cfg.enable {
 
     programs.swaylock.enable = true;
     programs.foot.enable = true;
-    services.hyprpaper.enable = true;
-
     home = {
       sessionVariables = {
         NIXOS_OZONE_WL = "1";
@@ -303,6 +306,7 @@ in
         gesturebind=none,down,3,viewtoleft_have_client
 
         exec-once=waybar
+        ${optionalString (cfg.wallpaper != null) "exec-once=swaybg -i ${cfg.wallpaper} -m fill"}
       ''
       + cfg.extraSettings;
       autostart_sh = ''
