@@ -56,11 +56,14 @@ let
           description = "Remove jj workspace";
         }
       ];
+  settingsWithKittyGraphics = lib.recursiveUpdate cfg.settings {
+    experimental.kitty_graphics = cfg.kittyGraphics;
+  };
   settingsWithTheme =
     if cfg.theme == null then
-      cfg.settings
+      settingsWithKittyGraphics
     else
-      lib.recursiveUpdate cfg.settings { theme.name = cfg.theme; };
+      lib.recursiveUpdate settingsWithKittyGraphics { theme.name = cfg.theme; };
   effectiveSettings = settingsWithTheme // {
     keys = (settingsWithTheme.keys or { }) // {
       command = (settingsWithTheme.keys.command or [ ]) ++ jjWorkspaceKeybindCommands;
@@ -162,6 +165,12 @@ in
       default = null;
       example = "kanagawa";
       description = "Optional Herdr theme name override. When null, settings.theme is left untouched.";
+    };
+
+    kittyGraphics = mkOption {
+      type = types.bool;
+      default = false;
+      description = "Enable Herdr's experimental Kitty graphics renderer.";
     };
 
     enableJjWorkspacePlugin = mkOption {
