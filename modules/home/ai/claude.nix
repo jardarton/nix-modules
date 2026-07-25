@@ -1,4 +1,4 @@
-{ localFlake, ... }:
+_:
 {
   config,
   lib,
@@ -125,7 +125,7 @@ let
       source = lib.mkOption {
         type = lib.types.nullOr lib.types.path;
         default = null;
-        example = lib.literalExpression ''inputs.pi-agent-wrapped + "/skills/herdr"'';
+        example = lib.literalExpression ''inputs.some-skill-source + "/skills/herdr"'';
         description = ''
           Directory holding an already-written `SKILL.md`, linked in wholesale along
           with any scripts or references beside it. Use this to consume a skill authored
@@ -210,10 +210,6 @@ let
         )
       ) skill.files
   ) claudeCfg.skills;
-
-  # Interpolated rather than concatenated so this keeps working when a consumer points
-  # the input at its own pi-agent-wrapped flake via `follows`.
-  piSkillsRoot = "${localFlake.inputs.pi-agent-wrapped}/skills";
 
   settingsFile = json.generate "claude-settings.json" claudeCfg.settings;
 
@@ -355,45 +351,21 @@ in
       '';
     };
 
-    piSkills = lib.mkOption {
-      type = lib.types.listOf lib.types.str;
-      default = [ ];
-      example = [
-        "herdr"
-        "librarian"
-      ];
-      description = ''
-        Skills to install from the pi-agent-wrapped source tree, named by their directory
-        under its `skills/`. They are plain `SKILL.md` directories that Claude Code reads
-        unchanged, so each is shared verbatim with Pi rather than reimplemented. Available
-        at the pinned revision: `commit`, `github`, `herdr`, `librarian`, `session-reader`,
-        `tmux`.
-      '';
-    };
   };
 
   config = lib.mkIf (cfg.enable && claudeCfg.enable) {
-    assertions =
-      map (name: {
-        assertion = builtins.pathExists "${piSkillsRoot}/${name}";
-        message = "modules.home.ai.claude.piSkills: pi-agent-wrapped has no skill named ${name}.";
-      }) claudeCfg.piSkills
-      ++ lib.mapAttrsToList (skillName: skill: {
-        assertion =
-          if skill.source != null then
-            skill.description == null && skill.body == null && skill.files == { }
-          else
-            skill.description != null && skill.body != null;
-        message =
-          if skill.source != null then
-            "modules.home.ai.claude.skills.${skillName}: source is mutually exclusive with description, body, and files."
-          else
-            "modules.home.ai.claude.skills.${skillName}: set either source, or both description and body.";
-      }) claudeCfg.skills;
-
-    modules.home.ai.claude.skills = lib.genAttrs claudeCfg.piSkills (name: {
-      source = "${piSkillsRoot}/${name}";
-    });
+    assertions = lib.mapAttrsToList (skillName: skill: {
+      assertion =
+        if skill.source != null then
+          skill.description == null && skill.body == null && skill.files == { }
+        else
+          skill.description != null && skill.body != null;
+      message =
+        if skill.source != null then
+          "modules.home.ai.claude.skills.${skillName}: source is mutually exclusive with description, body, and files."
+        else
+          "modules.home.ai.claude.skills.${skillName}: set either source, or both description and body.";
+    }) claudeCfg.skills;
 
     home.packages = lib.mkIf (claudeCfg.dangerousAlias != null) [ dangerousWrapper ];
 
