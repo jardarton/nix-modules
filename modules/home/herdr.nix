@@ -330,7 +330,6 @@ in
           confirm_close = true;
           prompt_new_tab_name = true;
           show_agent_labels_on_pane_borders = true;
-          agent_panel_scope = "all";
           agent_panel_sort = "priority";
           toast = {
             delivery = "herdr";
