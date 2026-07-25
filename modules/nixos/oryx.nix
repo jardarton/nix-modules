@@ -1,6 +1,11 @@
 _: _:
 
 {
+  # Oryx's upstream rules use plugdev for access to ZSA keyboards. NixOS does
+  # not create that group by default; importing this module should make the
+  # rules valid, while individual hosts choose which users belong to it.
+  users.groups.plugdev = { };
+
   services.udev = {
     enable = true;
     extraRules = ''

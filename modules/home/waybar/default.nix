@@ -40,8 +40,7 @@ in
             "ipc": false,
             "reload_style_on_change": true,
             "modules-left": [
-                "ext/workspaces",
-                "cava"
+                "ext/workspaces"
             ],
             "modules-right": [
                 "tray",
@@ -236,30 +235,6 @@ in
                     "Paused": " ",
                     "Playing": " "
                 }
-            },
-            "cava": {
-                "framerate": 30,
-                "autosens": 0,
-                "sensitivity": 38,
-                "bars": 8,
-                "lower_cutoff_freq": 50,
-                "higher_cutoff_freq": 12000,
-                "method": "pulse",
-                "hide_on_silence": false,
-                "sleep_timer": 5,
-                "source": "auto",
-                "stereo": false,
-                "reverse": false,
-                "bar_delimiter": 0,
-                "monstercat": false,
-                "waves": false,
-                "noise_reduction": 0.77,
-                "input_delay": 0,
-                "format-icons" : ["▁", "▂", "▃", "▄", "▅", "▆", "▇", "█" ],
-                "actions": {
-                    "on-click-right": "mode"
-                },
-                "rotate": 90
             },
             "battery": {
                 "bat": "BAT0",

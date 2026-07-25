@@ -52,6 +52,21 @@ in
 
     programs.swaylock.enable = true;
     programs.foot.enable = true;
+    services.swayidle = {
+      enable = true;
+      timeouts = [
+        {
+          timeout = 300;
+          command = "${pkgs.procps}/bin/pgrep -x swaylock >/dev/null || ${pkgs.swaylock}/bin/swaylock -f";
+        }
+        {
+          timeout = 600;
+          command = "${pkgs.wlopm}/bin/wlopm --off '*'";
+          resumeCommand = "${pkgs.wlopm}/bin/wlopm --on '*'";
+        }
+      ];
+      events.before-sleep = "${pkgs.procps}/bin/pgrep -x swaylock >/dev/null || ${pkgs.swaylock}/bin/swaylock -f";
+    };
     home = {
       sessionVariables = {
         NIXOS_OZONE_WL = "1";
