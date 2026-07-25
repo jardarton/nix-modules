@@ -840,6 +840,22 @@
         "type": "github"
       }
     },
+    "pi-agent-wrapped": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1784919842,
+        "narHash": "sha256-TuuVsBtwN7VDkS4CJInl3O+2c+lFS4HgNtftPn+agMg=",
+        "owner": "jardarton",
+        "repo": "pi-agent-wrapped",
+        "rev": "b89ae7b217f07bbd8f3d24192968c058aed7fa5d",
+        "type": "github"
+      },
+      "original": {
+        "owner": "jardarton",
+        "repo": "pi-agent-wrapped",
+        "type": "github"
+      }
+    },
     "plugins-blink-indent": {
       "flake": false,
       "locked": {
@@ -1036,6 +1052,7 @@
         "mango": "mango",
         "nixCats": "nixCats",
         "nixpkgs": "nixpkgs_3",
+        "pi-agent-wrapped": "pi-agent-wrapped",
         "pre-commit-hooks": "pre-commit-hooks",
         "stylix": "stylix",
         "television": "television",

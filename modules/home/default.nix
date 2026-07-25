@@ -59,7 +59,7 @@ in
     screenshot = importApply ./screenshot.nix { localFlake = moduleFlake; };
     dstask = importApply ./dstask { localFlake = moduleFlake; };
     bun = importApply ./bun.nix { localFlake = moduleFlake; };
-    ai = importApply ./ai.nix {
+    ai = importApply ./ai {
       localFlake = moduleFlake;
       inherit withSystem;
     };
