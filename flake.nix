@@ -58,6 +58,11 @@
       url = "github:NathanFlurry/herdr-plugin-jj-workspace";
       flake = false;
     };
+    # Source-only: the skills live in ./skills and are not exposed as flake packages.
+    pi-agent-wrapped = {
+      url = "github:jardarton/pi-agent-wrapped";
+      flake = false;
+    };
     jj-starship = {
       url = "github:dmmulroy/jj-starship";
       inputs.nixpkgs.follows = "nixpkgs";

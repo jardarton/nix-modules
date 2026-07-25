@@ -33,6 +33,8 @@ let
 in
 {
 
+  imports = [ (import ./claude.nix { inherit localFlake; }) ];
+
   options.modules.home.ai = {
     enable = mkOption {
       type = types.bool;
