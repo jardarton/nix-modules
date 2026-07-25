@@ -6,6 +6,14 @@
   ...
 }:
 let
+  # The agent-facing `herdr` skill is not defined here. It lives in pi-agent-wrapped at
+  # `skills/herdr/SKILL.md` and is installed through
+  # `modules.home.ai.claude.piSkills = [ "herdr" ]` by consumers. That file is a copy of
+  # upstream's canonical `SKILL.md` (repo root of ogulcancelik/herdr, not `skills/`), so
+  # refresh it from upstream whenever the herdr input crosses a release that touches the
+  # CLI surface — v0.7.5 renamed `wait output`/`wait agent-status` to
+  # `pane wait-output`/`agent wait`, added the `agent start|prompt|send-keys` group, and
+  # changed public IDs to `w1`, `w1:t1`, `w1:p1`.
   cfg = config.modules.home.herdr;
   toml = pkgs.formats.toml { };
   json = pkgs.formats.json { };
