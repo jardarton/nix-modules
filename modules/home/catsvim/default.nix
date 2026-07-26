@@ -1,4 +1,4 @@
-{ localFlake, ... }:
+_:
 {
   pkgs,
   config,
@@ -11,7 +11,7 @@ let
   cfg = config.modules.home.catsvim;
   stylix = import ../lib/stylix.nix { inherit config options; };
 
-  neovimInput = localFlake.inputs.nixCats;
+  neovimInput = cfg.source;
   wrapperModules = neovimInput.inputs."nix-wrapper-modules";
   baseModule = modules.importApply "${neovimInput}/module.nix" neovimInput.inputs;
 
@@ -94,6 +94,16 @@ let
 in
 {
   options.modules.home.catsvim = {
+    source = mkOption {
+      type = types.raw;
+      example = literalExpression "inputs.neovim";
+      description = ''
+        The wrapped-Neovim flake to build catsvim from. Must expose
+        `module.nix` and `nix/profiles/`, and carry a `nix-wrapper-modules`
+        input. Required when `enable` or `catsvi` is set; this module
+        deliberately pins no Neovim source of its own.
+      '';
+    };
     enable = mkOption {
       type = types.bool;
       default = false;

@@ -18,10 +18,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.gnome-shell.url = "github:GNOME/gnome-shell/ef02db02bf0ff342734d525b5767814770d85b49";
     };
-    nixCats = {
-      url = "github:jardarton/neovim";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     textfox = {
       url = "github:adriankarlen/textfox";
       inputs.nixpkgs.follows = "nixpkgs";
