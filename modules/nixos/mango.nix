@@ -35,6 +35,10 @@ in
       pkgs.brightnessctl
     ];
 
+    # Home Manager's swaylock module only installs/configures the client; the
+    # matching PAM service must be declared by NixOS for password unlocks.
+    security.pam.services.swaylock = { };
+
     programs.xwayland.enable = mkDefault true;
     xdg.portal = {
       enable = mkDefault true;
