@@ -24,9 +24,9 @@ in
 
   config = lib.mkIf cfg.enable {
     home.packages = withSystem pkgs.stdenv.hostPlatform.system (
-      { system, config, ... }:
+      { system, ... }:
       [
-        config.packages.cclip
+        localFlake.packages.${system}.cclip
         localFlake.inputs.fsel.packages.${system}.default
       ]
     );
