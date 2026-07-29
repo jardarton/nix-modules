@@ -86,7 +86,7 @@ in
       enable = true;
       package = localFlake.packages.${pkgs.stdenv.hostPlatform.system}.mango;
       # Window effect
-      settings = ''
+      extraConfig = ''
         blur=${if cfg.blur then "1" else "0"}
         blur_layer=0
         blur_optimized=1
