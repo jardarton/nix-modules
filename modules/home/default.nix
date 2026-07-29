@@ -19,6 +19,7 @@ in
     dwm = importApply ./dwm { localFlake = moduleFlake; };
     waybar = importApply ./waybar { localFlake = moduleFlake; };
     media = importApply ./media.nix { localFlake = moduleFlake; };
+    presentation = importApply ./presentation.nix { localFlake = moduleFlake; };
     firefox = importApply ./firefox { localFlake = moduleFlake; };
     vscode = importApply ./vscode.nix { localFlake = moduleFlake; };
     btop = importApply ./btop.nix { localFlake = moduleFlake; };
