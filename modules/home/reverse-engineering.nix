@@ -46,7 +46,7 @@ let
     android-tools
     apktool
     jadx
-    localFlake.packages.${pkgs.system}.hbcdump
+    localFlake.packages.${pkgs.stdenv.hostPlatform.system}.hbcdump
   ];
 
   firmwarePackages = with pkgs; [

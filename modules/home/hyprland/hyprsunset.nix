@@ -7,27 +7,16 @@ with lib;
   services = {
     hyprsunset = mkIf cfg.hyprsunset {
       enable = true;
-      transitions = {
-        sunrise = {
-          calendar = "*-*-* 06:00:00";
-          requests = [
-            [
-              "temperature"
-              "2500"
-            ]
-          ];
-        };
-        sunset = {
-          calendar = "*-*-* 19:00:00";
-          requests = [
-            [
-              "temperature"
-              "6500"
-            ]
-            [ "gamma 100" ]
-          ];
-        };
-      };
+      settings.profile = [
+        {
+          time = "06:00";
+          identity = true;
+        }
+        {
+          time = "19:00";
+          temperature = 2500;
+        }
+      ];
     };
   };
 }
