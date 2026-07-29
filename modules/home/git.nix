@@ -1,4 +1,4 @@
-{ localFlake, withSystem, ... }:
+{ localFlake, ... }:
 {
   config,
   lib,
@@ -38,14 +38,14 @@ in
       gitCredentialHelper.enable = true;
     };
 
-    home.packages = withSystem pkgs.stdenv.hostPlatform.system (_: [
+    home.packages = [
       pkgs.git
       pkgs.gh
       pkgs.gh-dash
       pkgs.mergiraf
       pkgs.difftastic
       hunk
-    ]);
+    ];
 
     programs.lazygit = {
       enable = true;

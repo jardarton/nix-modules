@@ -1,8 +1,7 @@
-{ withSystem, ... }:
+_:
 {
   config,
   lib,
-  pkgs,
   ...
 }:
 let
@@ -89,7 +88,7 @@ in
     home.file.".config/television/cable/tmux-sessions.toml".text = tmuxSessionsChannelText;
     home.file.".config/television/cable/git-worktrees.toml".text = gitWorktreesChannelText;
 
-    programs.television = withSystem pkgs.stdenv.hostPlatform.system (_: {
+    programs.television = {
       enable = true;
       enableZshIntegration = true;
       settings = {
@@ -119,6 +118,6 @@ in
           mode = "execute";
         };
       };
-    });
+    };
   };
 }

@@ -1,4 +1,4 @@
-{ localFlake, withSystem, ... }:
+{ localFlake, ... }:
 {
   config,
   pkgs,
@@ -11,6 +11,7 @@ let
   cfg = config.modules.home.firefox;
   stylix = import ../lib/stylix.nix { inherit config options; };
   textfox = localFlake.inputs.textfox;
+  firefox-addons = localFlake.inputs.firefox-addons.packages.${pkgs.stdenv.hostPlatform.system};
   # Textfox reads its package output during evaluation without first realizing
   # the derivation. Force drvPath so Nix registers it before reading the output.
   textfoxModule = import "${textfox.outPath}/nix/modules/home-manager.nix" {
@@ -75,20 +76,11 @@ in
           };
         };
       };
-      programs.firefox = withSystem pkgs.stdenv.hostPlatform.system (
-        {
-          system,
-          ...
-        }:
-        let
-          firefox-addons = localFlake.inputs.firefox-addons.packages.${system};
-        in
-        {
-          enable = true;
-          profiles.${cfg.profile} = import ./${cfg.profile}-profile.nix { inherit firefox-addons pkgs; };
-          package = pkgs.firefox;
-        }
-      );
+      programs.firefox = {
+        enable = true;
+        profiles.${cfg.profile} = import ./${cfg.profile}-profile.nix { inherit firefox-addons pkgs; };
+        package = pkgs.firefox;
+      };
 
       xdg.mimeApps.defaultApplications = {
         "text/html" = [ "firefox.desktop" ];

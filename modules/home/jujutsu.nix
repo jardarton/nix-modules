@@ -1,4 +1,4 @@
-{ localFlake, withSystem, ... }:
+{ localFlake, ... }:
 {
   pkgs,
   lib,
@@ -59,10 +59,7 @@ in
 
       package = mkOption {
         type = types.package;
-        default = withSystem pkgs.stdenv.hostPlatform.system (
-          { system, ... }:
-          localFlake.inputs.jj-starship.packages.${system}.default
-        );
+        default = localFlake.inputs.jj-starship.packages.${pkgs.stdenv.hostPlatform.system}.default;
         defaultText = literalExpression "localFlake.inputs.jj-starship.packages.\${pkgs.stdenv.hostPlatform.system}.default";
         description = "jj-starship package to install.";
       };

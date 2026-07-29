@@ -1,4 +1,4 @@
-{ localFlake, withSystem, ... }:
+{ localFlake, ... }:
 {
   config,
   lib,
@@ -152,10 +152,7 @@ in
 
     package = mkOption {
       type = types.package;
-      default = withSystem pkgs.stdenv.hostPlatform.system (
-        { system, ... }:
-        localFlake.inputs.herdr.packages.${system}.default
-      );
+      default = localFlake.inputs.herdr.packages.${pkgs.stdenv.hostPlatform.system}.default;
       defaultText = literalExpression "localFlake.inputs.herdr.packages.\${pkgs.stdenv.hostPlatform.system}.default";
       description = "Herdr package to install.";
     };

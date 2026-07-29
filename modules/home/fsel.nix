@@ -1,4 +1,4 @@
-{ localFlake, withSystem, ... }:
+{ localFlake, ... }:
 {
   config,
   lib,
@@ -8,6 +8,7 @@
 
 let
   cfg = config.modules.home.fsel;
+  system = pkgs.stdenv.hostPlatform.system;
 in
 {
   options.modules.home.fsel = with lib; {
@@ -23,13 +24,10 @@ in
   ];
 
   config = lib.mkIf cfg.enable {
-    home.packages = withSystem pkgs.stdenv.hostPlatform.system (
-      { system, ... }:
-      [
-        localFlake.packages.${system}.cclip
-        localFlake.inputs.fsel.packages.${system}.default
-      ]
-    );
+    home.packages = [
+      localFlake.packages.${system}.cclip
+      localFlake.inputs.fsel.packages.${system}.default
+    ];
 
     home.file.".config/fsel/config.toml".text = ''
       # Colors
@@ -51,9 +49,9 @@ in
       confirm_first_launch = false       # Confirm before launching new apps with -p
     '';
 
-    home.file.".local/bin/dmenu".source = withSystem pkgs.stdenv.hostPlatform.system (
-      { system, ... }: "${localFlake.inputs.fsel.packages.${system}.default}/bin/fsel"
-    );
+    home.file.".local/bin/dmenu".source = "${
+      localFlake.inputs.fsel.packages.${system}.default
+    }/bin/fsel";
   };
 
 }
