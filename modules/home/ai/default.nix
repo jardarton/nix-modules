@@ -1,4 +1,4 @@
-{ localFlake, withSystem, ... }:
+{ localFlake, ... }:
 {
   config,
   lib,
@@ -91,9 +91,9 @@ in
         PLAYWRIGHT_MCP_EXECUTABLE_PATH = getExe playwrightBrowser;
       };
 
-    home.packages = withSystem pkgs.stdenv.hostPlatform.system (
-      { pkgs, system, ... }:
+    home.packages =
       let
+        system = pkgs.stdenv.hostPlatform.system;
         llmPackages = localFlake.inputs.llm-agents.packages.${system};
         packageOr =
           agentCfg: defaultPackage: if agentCfg.package != null then agentCfg.package else defaultPackage;
@@ -117,8 +117,7 @@ in
         (packageOr cfg.playwright-cli localFlake.packages.${system}.playwright-cli)
         playwrightBrowser
       ]
-      ++ optional cfg.agentBrowser llmPackages.agent-browser
-    );
+      ++ optional cfg.agentBrowser llmPackages.agent-browser;
 
   };
 }

@@ -2,7 +2,6 @@
   flake-parts-lib,
   self,
   inputs,
-  withSystem,
   ...
 }:
 let
@@ -20,24 +19,15 @@ in
     dwm = importApply ./dwm { localFlake = moduleFlake; };
     waybar = importApply ./waybar { localFlake = moduleFlake; };
     media = importApply ./media.nix { localFlake = moduleFlake; };
-    firefox = importApply ./firefox {
-      localFlake = moduleFlake;
-      inherit withSystem;
-    };
+    firefox = importApply ./firefox { localFlake = moduleFlake; };
     vscode = importApply ./vscode.nix { localFlake = moduleFlake; };
     btop = importApply ./btop.nix { localFlake = moduleFlake; };
     bat = importApply ./bat.nix { localFlake = moduleFlake; };
     zsh = importApply ./zsh.nix { localFlake = moduleFlake; };
     ghostty = importApply ./ghostty.nix { localFlake = moduleFlake; };
     zathura = importApply ./zathura.nix { localFlake = moduleFlake; };
-    git = importApply ./git.nix {
-      localFlake = moduleFlake;
-      inherit withSystem;
-    };
-    jujutsu = importApply ./jujutsu.nix {
-      localFlake = moduleFlake;
-      inherit withSystem;
-    };
+    git = importApply ./git.nix { localFlake = moduleFlake; };
+    jujutsu = importApply ./jujutsu.nix { localFlake = moduleFlake; };
     eza = importApply ./eza.nix { localFlake = moduleFlake; };
     kitty = importApply ./kitty.nix { localFlake = moduleFlake; };
     tmux = importApply ./tmux.nix { localFlake = moduleFlake; };
@@ -59,27 +49,12 @@ in
     screenshot = importApply ./screenshot.nix { localFlake = moduleFlake; };
     dstask = importApply ./dstask { localFlake = moduleFlake; };
     bun = importApply ./bun.nix { localFlake = moduleFlake; };
-    ai = importApply ./ai {
-      localFlake = moduleFlake;
-      inherit withSystem;
-    };
-    television = importApply ./television.nix {
-      localFlake = moduleFlake;
-      inherit withSystem;
-    };
-    fsel = importApply ./fsel.nix {
-      localFlake = moduleFlake;
-      inherit withSystem;
-    };
+    ai = importApply ./ai { localFlake = moduleFlake; };
+    television = importApply ./television.nix { localFlake = moduleFlake; };
+    fsel = importApply ./fsel.nix { localFlake = moduleFlake; };
     node = importApply ./node.nix { localFlake = moduleFlake; };
-    gondolin = importApply ./gondolin.nix {
-      localFlake = moduleFlake;
-      inherit withSystem;
-    };
+    gondolin = importApply ./gondolin.nix { localFlake = moduleFlake; };
     nh = importApply ./nh.nix { localFlake = moduleFlake; };
-    herdr = importApply ./herdr.nix {
-      localFlake = moduleFlake;
-      inherit withSystem;
-    };
+    herdr = importApply ./herdr.nix { localFlake = moduleFlake; };
   };
 }
