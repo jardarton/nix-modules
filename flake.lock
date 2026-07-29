@@ -129,21 +129,6 @@
         "type": "github"
       }
     },
-    "crane": {
-      "locked": {
-        "lastModified": 1775839657,
-        "narHash": "sha256-SPm9ck7jh3Un9nwPuMGbRU04UroFmOHjLP56T10MOeM=",
-        "owner": "ipetkov",
-        "repo": "crane",
-        "rev": "7cf72d978629469c4bd4206b95c402514c1f6000",
-        "type": "github"
-      },
-      "original": {
-        "owner": "ipetkov",
-        "repo": "crane",
-        "type": "github"
-      }
-    },
     "fenix": {
       "inputs": {
         "nixpkgs": [
@@ -691,7 +676,6 @@
         "nixpkgs": "nixpkgs_3",
         "pre-commit-hooks": "pre-commit-hooks",
         "stylix": "stylix",
-        "television": "television",
         "textfox": "textfox"
       }
     },
@@ -725,27 +709,6 @@
         "owner": "oxalica",
         "repo": "rust-overlay",
         "rev": "4cdea398dc491b082dccdce0fad1ed0b75fa3394",
-        "type": "github"
-      },
-      "original": {
-        "owner": "oxalica",
-        "repo": "rust-overlay",
-        "type": "github"
-      }
-    },
-    "rust-overlay_2": {
-      "inputs": {
-        "nixpkgs": [
-          "television",
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1776309239,
-        "narHash": "sha256-XzTecca59093jBsVAE4PVAMcJO+PAYHYHBPRnOR8iWs=",
-        "owner": "oxalica",
-        "repo": "rust-overlay",
-        "rev": "3717ee024da7b0a20744f12c39b41e27cbc12f2d",
         "type": "github"
       },
       "original": {
@@ -899,31 +862,6 @@
       "original": {
         "owner": "nix-systems",
         "repo": "default",
-        "type": "github"
-      }
-    },
-    "television": {
-      "inputs": {
-        "crane": "crane",
-        "flake-parts": [
-          "flake-parts"
-        ],
-        "nixpkgs": [
-          "nixpkgs"
-        ],
-        "rust-overlay": "rust-overlay_2"
-      },
-      "locked": {
-        "lastModified": 1784930594,
-        "narHash": "sha256-f6VwHsTWF0Cez3c8hi5vCsZuAjKZ7ZNZm57LpKlWHXQ=",
-        "owner": "alexpasmantier",
-        "repo": "television",
-        "rev": "3e74ba47c548bca350e3992c09d5311909152ebe",
-        "type": "github"
-      },
-      "original": {
-        "owner": "alexpasmantier",
-        "repo": "television",
         "type": "github"
       }
     },
