@@ -1,5 +1,3 @@
-_: _:
-
 {
   # Oryx's upstream rules use plugdev for access to ZSA keyboards. NixOS does
   # not create that group by default; importing this module should make the

@@ -1,4 +1,3 @@
-_:
 { pkgs, ... }:
 {
   environment.systemPackages = [
