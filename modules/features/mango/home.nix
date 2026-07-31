@@ -1,4 +1,3 @@
-{ localFlake, ... }:
 {
   config,
   pkgs,
@@ -10,16 +9,16 @@ let
   cfg = config.modules.home.mango;
 in
 {
-  imports = [
-    localFlake.inputs.mango.hmModules.mango
-  ];
-
   options.modules.home.mango = {
     enable = mkOption {
       type = types.bool;
       default = false;
       example = true;
       description = "enable mango config";
+    };
+    package = mkOption {
+      type = types.package;
+      description = "Mango package to use.";
     };
     mainmod = mkOption {
       type = types.str;
@@ -84,7 +83,7 @@ in
 
     wayland.windowManager.mango = {
       enable = true;
-      package = localFlake.packages.${pkgs.stdenv.hostPlatform.system}.mango;
+      inherit (cfg) package;
       # Window effect
       extraConfig = ''
         blur=${if cfg.blur then "1" else "0"}

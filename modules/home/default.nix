@@ -44,7 +44,6 @@ in
     direnv = importApply ./direnv.nix { localFlake = moduleFlake; };
     catsvim = importApply ./catsvim { localFlake = moduleFlake; };
     aerospace = importApply ./aerospace { localFlake = moduleFlake; };
-    mango = importApply ./mango { localFlake = moduleFlake; };
     bitwarden = importApply ./bitwarden.nix { localFlake = moduleFlake; };
     screenshot = importApply ./screenshot.nix { localFlake = moduleFlake; };
     dstask = importApply ./dstask { localFlake = moduleFlake; };
