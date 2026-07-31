@@ -15,7 +15,6 @@ in
   # modules. Subdirectories are reserved for lower-level modules and assets
   # imported by their owning feature.
   imports = featureModules ++ [
-    ./nixos
     ./home
   ];
 }
