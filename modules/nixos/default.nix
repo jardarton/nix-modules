@@ -13,7 +13,6 @@ in
     base-packages = importApply ./base-packages.nix { localFlake = moduleFlake; };
     laptop-base = importApply ./laptop-base.nix { localFlake = moduleFlake; };
     bluetooth = importApply ./bluetooth.nix;
-    stylix = importApply ./stylix.nix { localFlake = moduleFlake; };
     keyd = importApply ./keyd.nix { localFlake = moduleFlake; };
     kanata = importApply ./kanata { localFlake = moduleFlake; };
     fonts = importApply ./fonts.nix { localFlake = moduleFlake; };

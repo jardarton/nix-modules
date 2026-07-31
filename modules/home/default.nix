@@ -12,7 +12,6 @@ in
   flake.homeModules = {
 
     default = importApply ./base-home.nix { localFlake = moduleFlake; };
-    stylix = importApply ./stylix.nix { localFlake = moduleFlake; };
     xdg = importApply ./xdg { localFlake = moduleFlake; };
     hyprland = importApply ./hyprland { localFlake = moduleFlake; };
     devops = importApply ./devops { localFlake = moduleFlake; };
