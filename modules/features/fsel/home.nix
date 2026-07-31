@@ -1,32 +1,35 @@
-{ localFlake, ... }:
 {
   config,
   lib,
-  pkgs,
   ...
 }:
-
 let
   cfg = config.modules.home.fsel;
-  system = pkgs.stdenv.hostPlatform.system;
 in
 {
-  options.modules.home.fsel = with lib; {
-    enable = mkOption {
-      type = types.bool;
+  options.modules.home.fsel = {
+    enable = lib.mkOption {
+      type = lib.types.bool;
       default = true;
       example = true;
-      description = "enable fsel ";
+      description = "Whether to enable the Fsel application and clipboard launchers.";
+    };
+
+    package = lib.mkOption {
+      type = lib.types.package;
+      description = "Fsel package to install.";
+    };
+
+    cclipPackage = lib.mkOption {
+      type = lib.types.package;
+      description = "Cclip clipboard history package to install.";
     };
   };
 
-  imports = [
-  ];
-
   config = lib.mkIf cfg.enable {
     home.packages = [
-      localFlake.packages.${system}.cclip
-      localFlake.inputs.fsel.packages.${system}.default
+      cfg.cclipPackage
+      cfg.package
     ];
 
     home.file.".config/fsel/config.toml".text = ''
@@ -49,9 +52,7 @@ in
       confirm_first_launch = false       # Confirm before launching new apps with -p
     '';
 
-    home.file.".local/bin/dmenu".source = "${
-      localFlake.inputs.fsel.packages.${system}.default
-    }/bin/fsel";
+    home.file.".local/bin/dmenu".source = "${cfg.package}/bin/fsel";
   };
 
 }
