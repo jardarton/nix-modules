@@ -51,7 +51,6 @@ in
     television = importApply ./television.nix { localFlake = moduleFlake; };
     fsel = importApply ./fsel.nix { localFlake = moduleFlake; };
     node = importApply ./node.nix { localFlake = moduleFlake; };
-    gondolin = importApply ./gondolin.nix { localFlake = moduleFlake; };
     nh = importApply ./nh.nix { localFlake = moduleFlake; };
     herdr = importApply ./herdr.nix { localFlake = moduleFlake; };
   };
