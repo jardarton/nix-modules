@@ -14,7 +14,6 @@ in
     default = importApply ./base-home.nix { localFlake = moduleFlake; };
     xdg = importApply ./xdg { localFlake = moduleFlake; };
     hyprland = importApply ./hyprland { localFlake = moduleFlake; };
-    devops = importApply ./devops { localFlake = moduleFlake; };
     dwm = importApply ./dwm { localFlake = moduleFlake; };
     waybar = importApply ./waybar { localFlake = moduleFlake; };
     media = importApply ./media.nix { localFlake = moduleFlake; };
@@ -30,18 +29,14 @@ in
     i3 = importApply ./i3.nix { localFlake = moduleFlake; };
     sway = importApply ./sway.nix { localFlake = moduleFlake; };
     neovim = importApply ./neovim.nix { localFlake = moduleFlake; };
-    cli-tools = importApply ./cli-tools.nix { localFlake = moduleFlake; };
     reverse-engineering = importApply ./reverse-engineering.nix { localFlake = moduleFlake; };
-    direnv = importApply ./direnv.nix { localFlake = moduleFlake; };
     catsvim = importApply ./catsvim { localFlake = moduleFlake; };
     aerospace = importApply ./aerospace { localFlake = moduleFlake; };
     bitwarden = importApply ./bitwarden.nix { localFlake = moduleFlake; };
     screenshot = importApply ./screenshot.nix { localFlake = moduleFlake; };
     dstask = importApply ./dstask { localFlake = moduleFlake; };
-    bun = importApply ./bun.nix { localFlake = moduleFlake; };
     ai = importApply ./ai { localFlake = moduleFlake; };
     television = importApply ./television.nix { localFlake = moduleFlake; };
-    node = importApply ./node.nix { localFlake = moduleFlake; };
     nh = importApply ./nh.nix { localFlake = moduleFlake; };
     herdr = importApply ./herdr.nix { localFlake = moduleFlake; };
   };
