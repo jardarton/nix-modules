@@ -9,7 +9,7 @@ _:
 with lib;
 let
   cfg = config.modules.home.vscode;
-  stylix = import ./lib/stylix.nix { inherit config options; };
+  stylix = import ../features/stylix/lib.nix { inherit config options; };
 in
 {
 
