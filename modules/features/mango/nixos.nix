@@ -1,4 +1,3 @@
-{ localFlake }:
 {
   pkgs,
   config,
@@ -17,16 +16,16 @@ in
       example = true;
       description = "enable mango vm";
     };
+    package = mkOption {
+      type = types.package;
+      description = "Mango package to use.";
+    };
   };
-
-  imports = [
-    localFlake.inputs.mango.nixosModules.mango
-  ];
 
   config = mkIf cfg.enable {
     programs.mango = {
       enable = true;
-      package = localFlake.packages.${pkgs.stdenv.hostPlatform.system}.mango;
+      inherit (cfg) package;
     };
 
     environment.systemPackages = [

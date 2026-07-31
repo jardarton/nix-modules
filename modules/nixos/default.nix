@@ -16,7 +16,6 @@ in
     keyd = importApply ./keyd.nix { localFlake = moduleFlake; };
     kanata = importApply ./kanata { localFlake = moduleFlake; };
     fonts = importApply ./fonts.nix { localFlake = moduleFlake; };
-    mango = importApply ./mango.nix { localFlake = moduleFlake; };
     home-assistant = importApply ./home-assistant { localFlake = moduleFlake; };
     oryx = importApply ./oryx.nix { localFlake = moduleFlake; };
     wifi = importApply ./wifi.nix { localFlake = moduleFlake; };
