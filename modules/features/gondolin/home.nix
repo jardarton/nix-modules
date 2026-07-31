@@ -1,4 +1,3 @@
-{ localFlake, ... }:
 {
   config,
   lib,
@@ -106,8 +105,6 @@ in
 
     package = mkOption {
       type = types.package;
-      default = localFlake.packages.${pkgs.stdenv.hostPlatform.system}.gondolin;
-      defaultText = literalExpression "localFlake.packages.\${pkgs.stdenv.hostPlatform.system}.gondolin";
       description = "Gondolin package to install.";
     };
 
