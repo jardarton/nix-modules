@@ -12,7 +12,6 @@ in
   flake.nixosModules = {
     base-packages = importApply ./base-packages.nix { localFlake = moduleFlake; };
     laptop-base = importApply ./laptop-base.nix { localFlake = moduleFlake; };
-    bluetooth = importApply ./bluetooth.nix;
     keyd = importApply ./keyd.nix { localFlake = moduleFlake; };
     kanata = importApply ./kanata { localFlake = moduleFlake; };
     home-assistant = importApply ./home-assistant { localFlake = moduleFlake; };
