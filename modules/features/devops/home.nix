@@ -1,4 +1,3 @@
-{ localFlake, ... }:
 {
   lib,
   pkgs,
@@ -14,6 +13,11 @@ in
 {
 
   options.modules.home.devops = {
+    kliPackage = mkOption {
+      type = types.package;
+      description = "Kli package to install with the Kubernetes tools.";
+    };
+
     enableDocker = mkEnableOption "enable docker and related";
     enableK8sTools = mkEnableOption "enable k8s tools";
     enableLima = mkEnableOption "enable lima for macos";
@@ -42,7 +46,7 @@ in
             kubefetch
             kubeseal
             talosctl
-            localFlake.packages.${pkgs.stdenv.hostPlatform.system}.kli
+            cfg.kliPackage
           ]
         else
           [ ]
