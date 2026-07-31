@@ -21,17 +21,11 @@ in
     presentation = importApply ./presentation.nix { localFlake = moduleFlake; };
     firefox = importApply ./firefox { localFlake = moduleFlake; };
     vscode = importApply ./vscode.nix { localFlake = moduleFlake; };
-    btop = importApply ./btop.nix { localFlake = moduleFlake; };
-    bat = importApply ./bat.nix { localFlake = moduleFlake; };
     zsh = importApply ./zsh.nix { localFlake = moduleFlake; };
     ghostty = importApply ./ghostty.nix { localFlake = moduleFlake; };
-    zathura = importApply ./zathura.nix { localFlake = moduleFlake; };
-    eza = importApply ./eza.nix { localFlake = moduleFlake; };
-    kitty = importApply ./kitty.nix { localFlake = moduleFlake; };
     tmux = importApply ./tmux.nix { localFlake = moduleFlake; };
     yazi = importApply ./yazi.nix { localFlake = moduleFlake; };
     starship = importApply ./starship.nix { localFlake = moduleFlake; };
-    fzf = importApply ./fzf.nix { localFlake = moduleFlake; };
     taskwarrior = importApply ./taskwarrior.nix { localFlake = moduleFlake; };
     i3 = importApply ./i3.nix { localFlake = moduleFlake; };
     sway = importApply ./sway.nix { localFlake = moduleFlake; };

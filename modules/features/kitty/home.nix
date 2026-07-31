@@ -1,4 +1,3 @@
-_:
 {
   lib,
   config,
@@ -8,7 +7,7 @@ _:
 with lib;
 let
   cfg = config.modules.home.kitty;
-  stylix = import ./lib/stylix.nix { inherit config options; };
+  stylix = import ../stylix/lib.nix { inherit config options; };
 in
 {
 

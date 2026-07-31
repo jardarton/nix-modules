@@ -9,7 +9,7 @@
 with lib;
 let
   cfg = config.modules.home.firefox;
-  stylix = import ../lib/stylix.nix { inherit config options; };
+  stylix = import ../../features/stylix/lib.nix { inherit config options; };
   textfox = localFlake.inputs.textfox;
   firefox-addons = localFlake.inputs.firefox-addons.packages.${pkgs.stdenv.hostPlatform.system};
   # Textfox reads its package output during evaluation without first realizing

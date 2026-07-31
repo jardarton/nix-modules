@@ -1,4 +1,3 @@
-_:
 {
   config,
   lib,
@@ -9,7 +8,7 @@ with lib;
 let
   cfg = config.modules.home.fzf;
   televisionEnabled = attrByPath [ "modules" "home" "television" "enable" ] false config;
-  stylix = import ./lib/stylix.nix { inherit config options; };
+  stylix = import ../stylix/lib.nix { inherit config options; };
 in
 {
 
