@@ -26,8 +26,6 @@ in
     zsh = importApply ./zsh.nix { localFlake = moduleFlake; };
     ghostty = importApply ./ghostty.nix { localFlake = moduleFlake; };
     zathura = importApply ./zathura.nix { localFlake = moduleFlake; };
-    git = importApply ./git.nix { localFlake = moduleFlake; };
-    jujutsu = importApply ./jujutsu.nix { localFlake = moduleFlake; };
     eza = importApply ./eza.nix { localFlake = moduleFlake; };
     kitty = importApply ./kitty.nix { localFlake = moduleFlake; };
     tmux = importApply ./tmux.nix { localFlake = moduleFlake; };

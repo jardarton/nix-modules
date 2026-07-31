@@ -1,34 +1,35 @@
-{ localFlake, ... }:
 {
   config,
   lib,
   pkgs,
   ...
 }:
-with lib;
 let
   cfg = config.modules.home.git;
-  hunk = localFlake.inputs.hunk.packages.${pkgs.stdenv.hostPlatform.system}.default;
 in
 {
-
   options.modules.home.git = {
-    enable = mkOption {
-      type = types.bool;
+    enable = lib.mkOption {
+      type = lib.types.bool;
       default = true;
       example = true;
-      description = "enable git stuff";
+      description = "Whether to enable Git and related tools.";
+    };
+
+    hunkPackage = lib.mkOption {
+      type = lib.types.package;
+      description = "Hunk package used as the Git pager.";
     };
   };
 
-  config = mkIf cfg.enable {
+  config = lib.mkIf cfg.enable {
 
     programs.git = {
       attributes = [
         "* merge=mergiraf"
       ];
       settings = {
-        core.pager = "${hunk}/bin/hunk pager";
+        core.pager = "${cfg.hunkPackage}/bin/hunk pager";
         pull.rebase = true;
       };
     };
@@ -44,7 +45,7 @@ in
       pkgs.gh-dash
       pkgs.mergiraf
       pkgs.difftastic
-      hunk
+      cfg.hunkPackage
     ];
 
     programs.lazygit = {
@@ -61,7 +62,7 @@ in
       };
     };
     home.shellAliases = {
-      hunk = "${hunk}/bin/hunk";
+      hunk = "${cfg.hunkPackage}/bin/hunk";
       lg = "lazygit";
     };
   };
