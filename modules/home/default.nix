@@ -31,7 +31,6 @@ in
     eza = importApply ./eza.nix { localFlake = moduleFlake; };
     kitty = importApply ./kitty.nix { localFlake = moduleFlake; };
     tmux = importApply ./tmux.nix { localFlake = moduleFlake; };
-    fonts = importApply ./fonts.nix { localFlake = moduleFlake; };
     yazi = importApply ./yazi.nix { localFlake = moduleFlake; };
     starship = importApply ./starship.nix { localFlake = moduleFlake; };
     fzf = importApply ./fzf.nix { localFlake = moduleFlake; };
