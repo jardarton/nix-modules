@@ -49,7 +49,6 @@ in
     bun = importApply ./bun.nix { localFlake = moduleFlake; };
     ai = importApply ./ai { localFlake = moduleFlake; };
     television = importApply ./television.nix { localFlake = moduleFlake; };
-    fsel = importApply ./fsel.nix { localFlake = moduleFlake; };
     node = importApply ./node.nix { localFlake = moduleFlake; };
     nh = importApply ./nh.nix { localFlake = moduleFlake; };
     herdr = importApply ./herdr.nix { localFlake = moduleFlake; };
