@@ -1,4 +1,3 @@
-{ localFlake, ... }:
 {
   config,
   pkgs,
@@ -9,27 +8,11 @@
 with lib;
 let
   cfg = config.modules.home.firefox;
-  stylix = import ../../features/stylix/lib.nix { inherit config options; };
-  textfox = localFlake.inputs.textfox;
-  firefox-addons = localFlake.inputs.firefox-addons.packages.${pkgs.stdenv.hostPlatform.system};
-  # Textfox reads its package output during evaluation without first realizing
-  # the derivation. Force drvPath so Nix registers it before reading the output.
-  textfoxModule = import "${textfox.outPath}/nix/modules/home-manager.nix" {
-    self.packages = mapAttrs (
-      _system: packages:
-      packages
-      // {
-        default = builtins.seq packages.default.drvPath packages.default;
-      }
-    ) textfox.packages;
-  };
+  stylix = import ../stylix/lib.nix { inherit config options; };
 in
 {
 
-  imports = [
-    ./vimium.nix
-    textfoxModule
-  ];
+  imports = [ ./vimium.nix ];
 
   options.modules.home.firefox = {
     enable = mkOption {
@@ -43,6 +26,10 @@ in
       default = "default";
       example = "default";
       description = "which profile";
+    };
+    addons = mkOption {
+      type = types.attrsOf types.package;
+      description = "Firefox add-on packages available to profile definitions.";
     };
   };
 
@@ -78,7 +65,10 @@ in
       };
       programs.firefox = {
         enable = true;
-        profiles.${cfg.profile} = import ./${cfg.profile}-profile.nix { inherit firefox-addons pkgs; };
+        profiles.${cfg.profile} = import ./${cfg.profile}-profile.nix {
+          firefox-addons = cfg.addons;
+          inherit pkgs;
+        };
         package = pkgs.firefox;
       };
 

@@ -1,4 +1,3 @@
-{ localFlake, ... }:
 {
   config,
   lib,
@@ -33,7 +32,7 @@ let
 in
 {
 
-  imports = [ (import ./claude.nix { inherit localFlake; }) ];
+  imports = [ ./claude.nix ];
 
   options.modules.home.ai = {
     enable = mkOption {
@@ -48,6 +47,12 @@ in
       default = false;
       example = true;
       description = "install the agent-browser package";
+    };
+
+    defaultPackages = mkOption {
+      type = types.attrsOf types.package;
+      internal = true;
+      description = "Default AI tool packages supplied by the feature module.";
     };
 
     claude = agentOptions {
@@ -94,7 +99,6 @@ in
     home.packages =
       let
         system = pkgs.stdenv.hostPlatform.system;
-        llmPackages = localFlake.inputs.llm-agents.packages.${system};
         packageOr =
           agentCfg: defaultPackage: if agentCfg.package != null then agentCfg.package else defaultPackage;
         playwrightBrowser =
@@ -109,15 +113,15 @@ in
           else
             pkgs.chromium;
       in
-      optional cfg.claude.enable (packageOr cfg.claude llmPackages.claude-code)
-      ++ optional cfg.codex.enable (packageOr cfg.codex pkgs.codex)
-      ++ optional cfg.opencode.enable (packageOr cfg.opencode llmPackages.opencode)
-      ++ optional cfg.copilot-cli.enable (packageOr cfg.copilot-cli llmPackages.copilot-cli)
+      optional cfg.claude.enable (packageOr cfg.claude cfg.defaultPackages.claude)
+      ++ optional cfg.codex.enable (packageOr cfg.codex cfg.defaultPackages.codex)
+      ++ optional cfg.opencode.enable (packageOr cfg.opencode cfg.defaultPackages.opencode)
+      ++ optional cfg.copilot-cli.enable (packageOr cfg.copilot-cli cfg.defaultPackages.copilot-cli)
       ++ optionals cfg.playwright-cli.enable [
-        (packageOr cfg.playwright-cli localFlake.packages.${system}.playwright-cli)
+        (packageOr cfg.playwright-cli cfg.defaultPackages.playwright-cli)
         playwrightBrowser
       ]
-      ++ optional cfg.agentBrowser llmPackages.agent-browser;
+      ++ optional cfg.agentBrowser cfg.defaultPackages.agent-browser;
 
   };
 }

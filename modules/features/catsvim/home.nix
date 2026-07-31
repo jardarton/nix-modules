@@ -1,4 +1,3 @@
-_:
 {
   pkgs,
   config,
@@ -9,7 +8,7 @@ _:
 with lib;
 let
   cfg = config.modules.home.catsvim;
-  stylix = import ../../features/stylix/lib.nix { inherit config options; };
+  stylix = import ../stylix/lib.nix { inherit config options; };
 
   neovimInput = cfg.source;
   wrapperModules = neovimInput.inputs."nix-wrapper-modules";

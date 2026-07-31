@@ -1,4 +1,3 @@
-{ localFlake, ... }:
 {
   config,
   lib,
@@ -9,33 +8,9 @@ let
   cfg = config.modules.home.herdr;
   toml = pkgs.formats.toml { };
   json = pkgs.formats.json { };
-  mkHerdrPluginPackage =
-    {
-      pluginId,
-      src,
-      rustPackage,
-    }:
-    pkgs.runCommand "herdr-plugin-${lib.replaceStrings [ "." ] [ "-" ] pluginId}" { } ''
-      mkdir -p "$out/target/release"
-      cp ${src}/herdr-plugin.toml "$out/herdr-plugin.toml"
-      cp ${rustPackage}/bin/${rustPackage.meta.mainProgram or rustPackage.pname} "$out/target/release/${
-        rustPackage.meta.mainProgram or rustPackage.pname
-      }"
-    '';
-  defaultJjWorkspaceRustPackage = pkgs.rustPlatform.buildRustPackage {
-    pname = "jj-workspace";
-    version = "0.1.0";
-    src = localFlake.inputs.herdr-plugin-jj-workspace;
-    cargoLock.lockFile = localFlake.inputs.herdr-plugin-jj-workspace + "/Cargo.lock";
-    meta.mainProgram = "jj-workspace";
-  };
   defaultJjWorkspacePlugin = {
     id = "nathanflurry.jj-workspace";
-    package = mkHerdrPluginPackage {
-      pluginId = "nathanflurry.jj-workspace";
-      src = localFlake.inputs.herdr-plugin-jj-workspace;
-      rustPackage = defaultJjWorkspaceRustPackage;
-    };
+    package = cfg.jjWorkspacePluginPackage;
     enabled = true;
   };
   configuredPlugins =
@@ -152,9 +127,13 @@ in
 
     package = mkOption {
       type = types.package;
-      default = localFlake.inputs.herdr.packages.${pkgs.stdenv.hostPlatform.system}.default;
-      defaultText = literalExpression "localFlake.inputs.herdr.packages.\${pkgs.stdenv.hostPlatform.system}.default";
+      defaultText = literalExpression "inputs.herdr.packages.\${pkgs.stdenv.hostPlatform.system}.default";
       description = "Herdr package to install.";
+    };
+
+    jjWorkspacePluginPackage = mkOption {
+      type = types.package;
+      description = "Bundled jj-workspace plugin package.";
     };
 
     theme = mkOption {
