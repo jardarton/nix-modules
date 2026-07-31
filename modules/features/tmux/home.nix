@@ -1,4 +1,3 @@
-_:
 {
   pkgs,
   lib,
@@ -11,7 +10,7 @@ let
   cfg = config.modules.home.tmux;
   televisionEnabled = attrByPath [ "modules" "home" "television" "enable" ] false config;
   televisionCableDir = "$HOME/.config/television/cable";
-  stylix = import ../features/stylix/lib.nix { inherit config options; };
+  stylix = import ../stylix/lib.nix { inherit config options; };
 in
 {
 

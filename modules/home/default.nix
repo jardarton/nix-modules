@@ -17,11 +17,6 @@ in
     presentation = importApply ./presentation.nix { localFlake = moduleFlake; };
     firefox = importApply ./firefox { localFlake = moduleFlake; };
     vscode = importApply ./vscode.nix { localFlake = moduleFlake; };
-    zsh = importApply ./zsh.nix { localFlake = moduleFlake; };
-    ghostty = importApply ./ghostty.nix { localFlake = moduleFlake; };
-    tmux = importApply ./tmux.nix { localFlake = moduleFlake; };
-    yazi = importApply ./yazi.nix { localFlake = moduleFlake; };
-    starship = importApply ./starship.nix { localFlake = moduleFlake; };
     taskwarrior = importApply ./taskwarrior.nix { localFlake = moduleFlake; };
     neovim = importApply ./neovim.nix { localFlake = moduleFlake; };
     reverse-engineering = importApply ./reverse-engineering.nix { localFlake = moduleFlake; };
