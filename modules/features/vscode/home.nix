@@ -1,4 +1,3 @@
-_:
 {
   pkgs,
   config,
@@ -9,7 +8,7 @@ _:
 with lib;
 let
   cfg = config.modules.home.vscode;
-  stylix = import ../features/stylix/lib.nix { inherit config options; };
+  stylix = import ../stylix/lib.nix { inherit config options; };
 in
 {
 
