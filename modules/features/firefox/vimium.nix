@@ -5,7 +5,7 @@
   ...
 }:
 let
-  stylix = import ../../features/stylix/lib.nix { inherit config options; };
+  stylix = import ../stylix/lib.nix { inherit config options; };
 in
 lib.mkIf config.modules.home.firefox.enable {
   home.file."vimium-config-nix.json".text = ''

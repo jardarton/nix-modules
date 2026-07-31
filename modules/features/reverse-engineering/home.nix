@@ -1,4 +1,3 @@
-{ localFlake, ... }:
 {
   config,
   lib,
@@ -46,7 +45,7 @@ let
     android-tools
     apktool
     jadx
-    localFlake.packages.${pkgs.stdenv.hostPlatform.system}.hbcdump
+    cfg.hbcdumpPackage
   ];
 
   firmwarePackages = with pkgs; [
@@ -76,6 +75,11 @@ in
       type = types.bool;
       default = false;
       description = "Install firmware inspection and extraction tools.";
+    };
+
+    hbcdumpPackage = mkOption {
+      type = types.package;
+      description = "hbcdump package to use for Android analysis.";
     };
 
     extraPackages = mkOption {
