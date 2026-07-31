@@ -13,9 +13,6 @@ in
 
     default = importApply ./base-home.nix { localFlake = moduleFlake; };
     xdg = importApply ./xdg { localFlake = moduleFlake; };
-    hyprland = importApply ./hyprland { localFlake = moduleFlake; };
-    dwm = importApply ./dwm { localFlake = moduleFlake; };
-    waybar = importApply ./waybar { localFlake = moduleFlake; };
     media = importApply ./media.nix { localFlake = moduleFlake; };
     presentation = importApply ./presentation.nix { localFlake = moduleFlake; };
     firefox = importApply ./firefox { localFlake = moduleFlake; };
@@ -26,8 +23,6 @@ in
     yazi = importApply ./yazi.nix { localFlake = moduleFlake; };
     starship = importApply ./starship.nix { localFlake = moduleFlake; };
     taskwarrior = importApply ./taskwarrior.nix { localFlake = moduleFlake; };
-    i3 = importApply ./i3.nix { localFlake = moduleFlake; };
-    sway = importApply ./sway.nix { localFlake = moduleFlake; };
     neovim = importApply ./neovim.nix { localFlake = moduleFlake; };
     reverse-engineering = importApply ./reverse-engineering.nix { localFlake = moduleFlake; };
     catsvim = importApply ./catsvim { localFlake = moduleFlake; };

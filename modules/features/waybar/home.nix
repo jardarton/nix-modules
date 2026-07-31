@@ -1,4 +1,3 @@
-_:
 {
   config,
   lib,
@@ -8,7 +7,7 @@ _:
 with lib;
 let
   cfg = config.modules.home.waybar;
-  stylix = import ../../features/stylix/lib.nix { inherit config options; };
+  stylix = import ../stylix/lib.nix { inherit config options; };
   color = stylix.withHashtag "base07";
   border-color = stylix.withHashtag "base04";
   background-color = stylix.withHashtag "base02";
