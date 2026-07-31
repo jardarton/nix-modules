@@ -1,15 +1,12 @@
-{ localFlake, ... }:
 {
   pkgs,
   lib,
   config,
   ...
 }:
-with lib;
 let
   cfg = config.modules.home.jujutsu;
-  zshEnabled = attrByPath [ "modules" "home" "zsh" "enable" ] false config;
-  hunk = localFlake.inputs.hunk.packages.${pkgs.stdenv.hostPlatform.system}.default;
+  zshEnabled = lib.attrByPath [ "modules" "home" "zsh" "enable" ] false config;
   jjZshCompletion = pkgs.runCommand "jj-zsh-completion" { } ''
     mkdir -p "$out/share/zsh/site-functions"
     COMPLETE=zsh ${lib.getExe pkgs.jujutsu} > "$out/share/zsh/site-functions/_jj"
@@ -17,31 +14,36 @@ let
 in
 {
   options.modules.home.jujutsu = {
-    enable = mkOption {
-      type = types.bool;
+    enable = lib.mkOption {
+      type = lib.types.bool;
       default = false;
       example = true;
       description = "enable jujutsu";
     };
 
-    userName = mkOption {
-      type = types.nullOr types.str;
+    hunkPackage = lib.mkOption {
+      type = lib.types.package;
+      description = "Hunk package used as the Jujutsu pager.";
+    };
+
+    userName = lib.mkOption {
+      type = lib.types.nullOr lib.types.str;
       default = null;
       example = "Jane Doe";
       description = "Name to use for jujutsu commits.";
     };
 
-    userEmail = mkOption {
-      type = types.nullOr types.str;
+    userEmail = lib.mkOption {
+      type = lib.types.nullOr lib.types.str;
       default = null;
       example = "jane@example.com";
       description = "Email to use for jujutsu commits.";
     };
 
-    settings = mkOption {
-      type = types.attrs;
+    settings = lib.mkOption {
+      type = lib.types.attrs;
       default = { };
-      example = literalExpression ''
+      example = lib.literalExpression ''
         {
           ui.default-command = "log";
         }
@@ -50,37 +52,35 @@ in
     };
 
     jjStarship = {
-      enable = mkOption {
-        type = types.bool;
+      enable = lib.mkOption {
+        type = lib.types.bool;
         default = true;
         example = false;
         description = "Install jj-starship and configure Starship integration.";
       };
 
-      package = mkOption {
-        type = types.package;
-        default = localFlake.inputs.jj-starship.packages.${pkgs.stdenv.hostPlatform.system}.default;
-        defaultText = literalExpression "localFlake.inputs.jj-starship.packages.\${pkgs.stdenv.hostPlatform.system}.default";
+      package = lib.mkOption {
+        type = lib.types.package;
         description = "jj-starship package to install.";
       };
     };
   };
 
-  config = mkIf cfg.enable {
+  config = lib.mkIf cfg.enable {
     programs.jujutsu = {
       enable = true;
       package = pkgs.jujutsu;
-      settings = mkMerge [
-        (mkIf (cfg.userName != null || cfg.userEmail != null) {
-          user = mkMerge [
-            (mkIf (cfg.userName != null) { name = cfg.userName; })
-            (mkIf (cfg.userEmail != null) { email = cfg.userEmail; })
+      settings = lib.mkMerge [
+        (lib.mkIf (cfg.userName != null || cfg.userEmail != null) {
+          user = lib.mkMerge [
+            (lib.mkIf (cfg.userName != null) { name = cfg.userName; })
+            (lib.mkIf (cfg.userEmail != null) { email = cfg.userEmail; })
           ];
         })
         {
           ui.default-command = "log";
           ui.pager = [
-            "${hunk}/bin/hunk"
+            "${cfg.hunkPackage}/bin/hunk"
             "pager"
           ];
           ui.diff-formatter = ":git";
@@ -89,7 +89,7 @@ in
       ];
     };
 
-    programs.starship.settings = mkIf cfg.jjStarship.enable {
+    programs.starship.settings = lib.mkIf cfg.jjStarship.enable {
       custom.jj = {
         when = "jj-starship detect";
         shell = [ "jj-starship" ];
@@ -117,10 +117,10 @@ in
     };
 
     home.packages =
-      optionals cfg.jjStarship.enable [
+      lib.optionals cfg.jjStarship.enable [
         cfg.jjStarship.package
       ]
-      ++ optionals zshEnabled [
+      ++ lib.optionals zshEnabled [
         jjZshCompletion
       ];
 
