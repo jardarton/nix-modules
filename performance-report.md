@@ -26,9 +26,9 @@ Following the same nixpkgs revision does not guarantee reuse of the same evaluat
 
 Hunk is a concrete example: its flake builds a per-system attrset in a way that can force nixpkgs evaluation for systems other than the one being consumed.
 
-An experiment packaging Hunk directly with the consumer's `pkgs.callPackage` saved approximately another **0.7 seconds** in a paired `padden` benchmark. The resulting derivation differs because it uses the current consumer nixpkgs, so this deserves package build and behavior validation before adoption.
+An experiment packaging Hunk directly with the consumer's `pkgs.callPackage` saved approximately another **0.7 seconds** in a paired `padden` benchmark. The version-control feature now applies this approach: it contributes `packages.hunk` using the importing flake's package set and supplies that package to the Git and Jujutsu modules through `moduleWithSystem`.
 
-The longer-term dendritic solution is to have imported feature modules contribute their package definitions to the consuming flake using its package set. Module defaults can then reference packages from the current flake instead of forcing a second evaluation of `nix-modules` or an upstream package flake.
+The same dendritic approach can be applied incrementally to other features that still consume eager upstream package outputs. Imported feature modules should contribute package definitions using the consuming flake's package set, then reference those packages from lower-level module defaults instead of forcing a second evaluation of `nix-modules` or an upstream package flake.
 
 ### 2. Reduce the cost of exhaustive Home Manager checks
 
@@ -74,6 +74,6 @@ The complete `nix-modules` source is only approximately 504 KiB in the Nix store
 
 ## Suggested order of work
 
-1. Refactor package contributions toward consumer-owned package sets as part of the dendritic migration.
+1. Continue refactoring package contributions toward consumer-owned package sets as part of the dendritic migration.
 2. Redesign exhaustive Home Manager checks if maintainer evaluation time remains a concern.
 3. Address Textfox IFD separately as an evaluation-reliability improvement.
