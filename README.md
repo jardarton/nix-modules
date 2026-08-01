@@ -77,6 +77,7 @@ Packages are exported under `packages.${system}`:
 - `cclip` (Linux only)
 - `firecrawl-cli`
 - `gondolin`
+- `hunk`
 - `kli`
 - `playwright-cli`
 - `stack`
