@@ -26,9 +26,9 @@ Following the same nixpkgs revision does not guarantee reuse of the same evaluat
 
 Hunk is a concrete example: its flake builds a per-system attrset in a way that can force nixpkgs evaluation for systems other than the one being consumed.
 
-An experiment packaging Hunk directly with the consumer's `pkgs.callPackage` saved approximately another **0.7 seconds** in a paired `padden` benchmark. The version-control feature now applies this approach: it contributes `packages.hunk` using the importing flake's package set and supplies that package to the Git and Jujutsu modules through `moduleWithSystem`.
+An initial experiment packaging Hunk directly with the consumer's `pkgs.callPackage` appeared to save approximately **0.7 seconds**. A follow-up benchmark after adoption did not reproduce a reliable evaluation improvement: four alternating before/after `padden` pairs with the evaluation cache disabled averaged **34.80 seconds before** and **35.18 seconds after**, while individual paired differences ranged from **2.52 seconds faster** to **2.31 seconds slower**. The expected effect is therefore smaller than the observed run-to-run noise.
 
-The same dendritic approach can be applied incrementally to other features that still consume eager upstream package outputs. Imported feature modules should contribute package definitions using the consuming flake's package set, then reference those packages from lower-level module defaults instead of forcing a second evaluation of `nix-modules` or an upstream package flake.
+The version-control feature retains the approach for architectural reasons: it contributes `packages.hunk` using the importing flake's package set and supplies that package to the Git and Jujutsu modules through `moduleWithSystem`. The same dendritic pattern can be applied incrementally to other features that still consume eager upstream package outputs, but package ownership alone should not be assumed to produce a measurable evaluation improvement without a workload-specific benchmark.
 
 ### 2. Reduce the cost of exhaustive Home Manager checks
 
@@ -52,11 +52,18 @@ Any change should retain coverage for module option errors and package evaluatio
 
 ## Secondary observations
 
-### Textfox uses import from derivation
+### Standalone checks no longer require import from derivation
 
-The Firefox/Textfox integration reads generated files from a package output during module evaluation. This causes import-from-derivation behavior and leads Nix to omit related checks when IFD is unavailable.
+The Firefox integration now supplies Textfox's source tree directly to the upstream Home Manager module instead of making it read the equivalent package output during evaluation. Textfox's package only copies `chrome` and `user.js`; the source files were verified to match the built package output.
 
-Removing Textfox did not measurably improve an already-warm `padden` evaluation, but avoiding IFD would still improve cold-evaluation behavior, reliability, and compatibility with evaluators that prohibit IFD. A proper fix likely requires generating the configuration without reading a derivation output during evaluation or changing the upstream Textfox interface.
+Fixing Textfox exposed a second IFD in the Stylix check: Stylix parsed a theme from the `pkgs.base16-schemes` package output during evaluation. The shared Stylix module now reads the theme from Stylix's pinned `tinted-schemes` source input instead. The configured `kanagawa.yaml` at the two pinned revisions was verified to be identical.
+
+The complete standalone check now succeeds even when IFD is explicitly prohibited:
+
+```console
+nix flake check --no-build --option eval-cache false \
+  --option allow-import-from-derivation false
+```
 
 ### Share the pre-commit input in `nixconfig`
 
@@ -76,4 +83,4 @@ The complete `nix-modules` source is only approximately 504 KiB in the Nix store
 
 1. Continue refactoring package contributions toward consumer-owned package sets as part of the dendritic migration.
 2. Redesign exhaustive Home Manager checks if maintainer evaluation time remains a concern.
-3. Address Textfox IFD separately as an evaluation-reliability improvement.
+3. Keep standalone checks IFD-free as upstream module interfaces evolve.

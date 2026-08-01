@@ -9,13 +9,9 @@ let
   moduleFlake = inputs.nix-modules or self;
   textfox = moduleFlake.inputs.textfox;
   textfoxModule = import "${textfox.outPath}/nix/modules/home-manager.nix" {
-    self.packages = lib.mapAttrs (
-      _system: packages:
-      packages
-      // {
-        default = builtins.seq packages.default.drvPath packages.default;
-      }
-    ) textfox.packages;
+    self.packages = lib.mapAttrs (_system: _packages: {
+      default = textfox.outPath;
+    }) textfox.packages;
   };
 in
 {
