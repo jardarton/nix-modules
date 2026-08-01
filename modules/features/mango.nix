@@ -1,6 +1,7 @@
 {
   config,
   inputs,
+  moduleWithSystem,
   self,
   ...
 }:
@@ -13,26 +14,26 @@ let
       implementation,
       optionPath,
     }:
-    {
-      config,
-      lib,
-      pkgs,
-      ...
-    }:
-    let
-      cfg = lib.getAttrFromPath optionPath config;
-      mangoPackage = moduleFlake.packages.${pkgs.stdenv.hostPlatform.system}.mango;
-    in
-    {
-      imports = [
-        externalModule
-        implementation
-      ];
+    moduleWithSystem (
+      { config, ... }:
+      let
+        perSystemConfig = config;
+      in
+      { config, lib, ... }:
+      let
+        cfg = lib.getAttrFromPath optionPath config;
+      in
+      {
+        imports = [
+          externalModule
+          implementation
+        ];
 
-      config = lib.mkIf cfg.enable (
-        lib.setAttrByPath (optionPath ++ [ "package" ]) (lib.mkDefault mangoPackage)
-      );
-    };
+        config = lib.mkIf cfg.enable (
+          lib.setAttrByPath (optionPath ++ [ "package" ]) (lib.mkDefault perSystemConfig.packages.mango)
+        );
+      }
+    );
 in
 {
   reusableModules = {
@@ -64,7 +65,6 @@ in
 
   perSystem =
     {
-      inputs',
       lib,
       pkgs,
       system,
@@ -73,10 +73,10 @@ in
     {
       packages = lib.optionalAttrs pkgs.stdenv.isLinux {
         mango =
-          if inputs ? nix-modules then
-            moduleFlake.packages.${system}.mango
-          else
-            inputs'.mango.packages.mango.overrideAttrs (old: {
+          (pkgs.callPackage "${moduleFlake.inputs.mango}/nix" {
+            scenefx = moduleFlake.inputs.mango.inputs.scenefx.packages.${system}.default;
+          }).overrideAttrs
+            (old: {
               buildInputs = old.buildInputs ++ [ pkgs.libdrm ];
               NIX_CFLAGS_COMPILE = "-I${pkgs.libdrm.dev}/include/libdrm";
             });

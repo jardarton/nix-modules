@@ -1,40 +1,24 @@
 {
   config,
-  inputs,
-  self,
+  moduleWithSystem,
   ...
 }:
-let
-  moduleFlake = inputs.nix-modules or self;
-in
 {
-  reusableModules.home.reverse-engineering =
-    {
-      lib,
-      pkgs,
-      ...
-    }:
+  reusableModules.home.reverse-engineering = moduleWithSystem (
+    { config, ... }:
+    { lib, ... }:
     {
       imports = [ ./reverse-engineering/home.nix ];
 
-      modules.home.reverse-engineering.hbcdumpPackage =
-        lib.mkDefault
-          moduleFlake.packages.${pkgs.stdenv.hostPlatform.system}.hbcdump;
-    };
+      modules.home.reverse-engineering.hbcdumpPackage = lib.mkDefault config.packages.hbcdump;
+    }
+  );
 
   flake.homeModules.reverse-engineering = config.reusableModules.home.reverse-engineering;
 
   perSystem =
+    { pkgs, ... }:
     {
-      pkgs,
-      system,
-      ...
-    }:
-    {
-      packages.hbcdump =
-        if inputs ? nix-modules then
-          moduleFlake.packages.${system}.hbcdump
-        else
-          pkgs.callPackage ./reverse-engineering/hbcdump.pkg.nix { };
+      packages.hbcdump = pkgs.callPackage ./reverse-engineering/hbcdump.pkg.nix { };
     };
 }

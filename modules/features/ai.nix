@@ -1,6 +1,7 @@
 {
   config,
   inputs,
+  moduleWithSystem,
   self,
   ...
 }:
@@ -8,12 +9,9 @@ let
   moduleFlake = inputs.nix-modules or self;
 in
 {
-  reusableModules.home.ai =
-    {
-      lib,
-      pkgs,
-      ...
-    }:
+  reusableModules.home.ai = moduleWithSystem (
+    { config, ... }:
+    { lib, pkgs, ... }:
     let
       system = pkgs.stdenv.hostPlatform.system;
       llmPackages = moduleFlake.inputs.llm-agents.packages.${system};
@@ -25,23 +23,16 @@ in
         inherit (llmPackages) agent-browser copilot-cli opencode;
         inherit (pkgs) codex;
         claude = llmPackages.claude-code;
-        playwright-cli = moduleFlake.packages.${system}.playwright-cli;
+        playwright-cli = config.packages.playwright-cli;
       };
-    };
+    }
+  );
 
   flake.homeModules.ai = config.reusableModules.home.ai;
 
   perSystem =
+    { pkgs, ... }:
     {
-      pkgs,
-      system,
-      ...
-    }:
-    {
-      packages.playwright-cli =
-        if inputs ? nix-modules then
-          moduleFlake.packages.${system}.playwright-cli
-        else
-          pkgs.callPackage ./ai/playwright-cli.pkg.nix { };
+      packages.playwright-cli = pkgs.callPackage ./ai/playwright-cli.pkg.nix { };
     };
 }
