@@ -6,6 +6,7 @@
 }:
 let
   moduleFlake = inputs.nix-modules or self;
+  tintedSchemes = moduleFlake.inputs.stylix.inputs.tinted-schemes;
 
   mkStylixModule =
     {
@@ -62,7 +63,7 @@ let
           stylix = {
             enable = true;
             image = mkDefault cfg.wallpaper;
-            base16Scheme = mkDefault "${pkgs.base16-schemes}/share/themes/${cfg.theme}.yaml";
+            base16Scheme = mkDefault "${tintedSchemes}/base16/${cfg.theme}.yaml";
             polarity = mkDefault "dark";
             opacity = {
               applications = 1.0;
