@@ -28,7 +28,9 @@ Hunk is a concrete example: its flake builds a per-system attrset in a way that 
 
 An initial experiment packaging Hunk directly with the consumer's `pkgs.callPackage` appeared to save approximately **0.7 seconds**. A follow-up benchmark after adoption did not reproduce a reliable evaluation improvement: four alternating before/after `padden` pairs with the evaluation cache disabled averaged **34.80 seconds before** and **35.18 seconds after**, while individual paired differences ranged from **2.52 seconds faster** to **2.31 seconds slower**. The expected effect is therefore smaller than the observed run-to-run noise.
 
-The version-control feature retains the approach for architectural reasons: it contributes `packages.hunk` using the importing flake's package set and supplies that package to the Git and Jujutsu modules through `moduleWithSystem`. The same dendritic pattern can be applied incrementally to other features that still consume eager upstream package outputs, but package ownership alone should not be assumed to produce a measurable evaluation improvement without a workload-specific benchmark.
+The version-control feature retains the approach for architectural reasons: it contributes `packages.hunk` using the importing flake's package set and supplies that package to the Git and Jujutsu modules through `moduleWithSystem`. The AI, DevOps, Fsel, Gondolin, Mango, and reverse-engineering features now use the same pattern for their package contributions and module defaults. This removes consumer-flake aliases back to `nix-modules` package outputs and consolidates Kli with its owning DevOps feature.
+
+The pattern can be applied incrementally to packages that still come from eager upstream flake outputs, but package ownership alone should not be assumed to produce a measurable evaluation improvement without a workload-specific benchmark.
 
 ### 2. Reduce the cost of exhaustive Home Manager checks
 

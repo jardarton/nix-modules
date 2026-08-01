@@ -1,40 +1,24 @@
 {
   config,
-  inputs,
-  self,
+  moduleWithSystem,
   ...
 }:
-let
-  moduleFlake = inputs.nix-modules or self;
-in
 {
-  reusableModules.home.gondolin =
-    {
-      lib,
-      pkgs,
-      ...
-    }:
+  reusableModules.home.gondolin = moduleWithSystem (
+    { config, ... }:
+    { lib, ... }:
     {
       imports = [ ./gondolin/home.nix ];
 
-      modules.home.gondolin.package =
-        lib.mkDefault
-          moduleFlake.packages.${pkgs.stdenv.hostPlatform.system}.gondolin;
-    };
+      modules.home.gondolin.package = lib.mkDefault config.packages.gondolin;
+    }
+  );
 
   flake.homeModules.gondolin = config.reusableModules.home.gondolin;
 
   perSystem =
+    { pkgs, ... }:
     {
-      pkgs,
-      system,
-      ...
-    }:
-    {
-      packages.gondolin =
-        if inputs ? nix-modules then
-          moduleFlake.packages.${system}.gondolin
-        else
-          pkgs.callPackage ./gondolin/package.pkg.nix { };
+      packages.gondolin = pkgs.callPackage ./gondolin/package.pkg.nix { };
     };
 }
