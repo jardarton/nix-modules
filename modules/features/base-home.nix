@@ -1,5 +1,3 @@
-{ config, ... }:
 {
-  reusableModules.home.default = ./base-home/home.nix;
-  flake.homeModules.default = config.reusableModules.home.default;
+  flake.modules.homeManager.default = ./base-home/home.nix;
 }

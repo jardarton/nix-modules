@@ -69,12 +69,12 @@ in
       vtsls
       yaml-language-server
       #zls
-      taplo-lsp
+      taplo
       tailwindcss-language-server
       marksman
       lua-language-server
       gopls
-      dockerfile-language-server-nodejs
+      dockerfile-language-server
       bash-language-server
       #astro-language-server
       ansible-language-server

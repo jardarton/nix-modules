@@ -1,15 +1,13 @@
 {
   config,
-  inputs,
   moduleWithSystem,
-  self,
   ...
 }:
 let
-  moduleFlake = inputs.nix-modules or self;
+  moduleFlake = config.nixModules.sourceFlake;
 in
 {
-  reusableModules.home.fsel = moduleWithSystem (
+  flake.modules.homeManager.fsel = moduleWithSystem (
     { config, ... }:
     { lib, pkgs, ... }:
     let
@@ -18,14 +16,17 @@ in
     {
       imports = [ ./fsel/home.nix ];
 
-      modules.home.fsel = {
-        package = lib.mkDefault moduleFlake.inputs.fsel.packages.${system}.default;
-        cclipPackage = lib.mkDefault config.packages.cclip;
-      };
+      config = lib.mkMerge [
+        { modules.home.fsel.enable = lib.mkDefault pkgs.stdenv.isLinux; }
+        (lib.mkIf pkgs.stdenv.isLinux {
+          modules.home.fsel = {
+            package = lib.mkDefault moduleFlake.inputs.fsel.packages.${system}.default;
+            cclipPackage = lib.mkDefault config.packages.cclip;
+          };
+        })
+      ];
     }
   );
-
-  flake.homeModules.fsel = config.reusableModules.home.fsel;
 
   perSystem =
     { lib, pkgs, ... }:

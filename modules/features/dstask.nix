@@ -1,5 +1,3 @@
-{ config, ... }:
 {
-  reusableModules.home.dstask = ./dstask/home.nix;
-  flake.homeModules.dstask = config.reusableModules.home.dstask;
+  flake.modules.homeManager.dstask = ./dstask/home.nix;
 }

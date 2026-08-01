@@ -1,11 +1,9 @@
 {
   config,
-  inputs,
-  self,
   ...
 }:
 let
-  moduleFlake = inputs.nix-modules or self;
+  moduleFlake = config.nixModules.sourceFlake;
   tintedSchemes = moduleFlake.inputs.stylix.inputs.tinted-schemes;
 
   mkStylixModule =
@@ -95,8 +93,8 @@ let
     };
 in
 {
-  reusableModules = {
-    home.stylix = mkStylixModule {
+  flake.modules = {
+    homeManager.stylix = mkStylixModule {
       description = "Whether to enable Stylix for the whole home configuration.";
       extraConfig.stylix.targets.gnome.enable = false;
       stylixModule = moduleFlake.inputs.stylix.homeModules.stylix;
@@ -108,8 +106,4 @@ in
     };
   };
 
-  flake = {
-    homeModules.stylix = config.reusableModules.home.stylix;
-    nixosModules.stylix = config.reusableModules.nixos.stylix;
-  };
 }

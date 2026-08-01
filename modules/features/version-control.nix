@@ -1,15 +1,13 @@
 {
   config,
-  inputs,
   moduleWithSystem,
-  self,
   ...
 }:
 let
-  moduleFlake = inputs.nix-modules or self;
+  moduleFlake = config.nixModules.sourceFlake;
 in
 {
-  reusableModules.home = {
+  flake.modules.homeManager = {
     git = moduleWithSystem (
       { config, ... }:
       { lib, ... }:
@@ -27,6 +25,7 @@ in
         imports = [ ./version-control/jujutsu.nix ];
 
         modules.home.jujutsu = {
+          enable = lib.mkDefault true;
           hunkPackage = lib.mkDefault config.packages.hunk;
           jjStarship.package =
             lib.mkDefault
@@ -34,11 +33,6 @@ in
         };
       }
     );
-  };
-
-  flake.homeModules = {
-    git = config.reusableModules.home.git;
-    jujutsu = config.reusableModules.home.jujutsu;
   };
 
   perSystem =

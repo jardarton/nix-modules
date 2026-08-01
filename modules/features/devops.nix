@@ -1,10 +1,9 @@
 {
-  config,
   moduleWithSystem,
   ...
 }:
 {
-  reusableModules.home.devops = moduleWithSystem (
+  flake.modules.homeManager.devops = moduleWithSystem (
     { config, ... }:
     { lib, ... }:
     {
@@ -13,8 +12,6 @@
       modules.home.devops.kliPackage = lib.mkDefault config.packages.kli;
     }
   );
-
-  flake.homeModules.devops = config.reusableModules.home.devops;
 
   perSystem =
     { pkgs, ... }:

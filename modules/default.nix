@@ -1,3 +1,4 @@
+{ inputs, ... }:
 let
   featureDir = ./features;
   featureModules = builtins.map (name: featureDir + "/${name}") (
@@ -14,5 +15,5 @@ in
   # Files directly below features/ are automatically discovered flake-parts
   # modules. Subdirectories are reserved for lower-level modules and assets
   # imported by their owning feature.
-  imports = featureModules;
+  imports = [ inputs.flake-parts.flakeModules.modules ] ++ featureModules;
 }

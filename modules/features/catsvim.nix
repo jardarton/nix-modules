@@ -1,5 +1,3 @@
-{ config, ... }:
 {
-  reusableModules.home.catsvim = ./catsvim/home.nix;
-  flake.homeModules.catsvim = config.reusableModules.home.catsvim;
+  flake.modules.homeManager.catsvim = ./catsvim/home.nix;
 }

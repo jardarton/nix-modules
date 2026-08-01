@@ -1,5 +1,12 @@
-{ config, ... }:
 {
-  reusableModules.home.sway = ./sway/home.nix;
-  flake.homeModules.sway = config.reusableModules.home.sway;
+  flake.modules.homeManager.sway =
+    {
+      lib,
+      pkgs,
+      ...
+    }:
+    {
+      imports = [ ./sway/home.nix ];
+      modules.home.sway.enable = lib.mkDefault pkgs.stdenv.isLinux;
+    };
 }

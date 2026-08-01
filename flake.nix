@@ -61,6 +61,21 @@
 
   outputs =
     { self, flake-parts, ... }@inputs:
+    let
+      flakeModule =
+        { lib, ... }:
+        {
+          imports = [
+            inputs.flake-parts.flakeModules.modules
+            inputs.home-manager.flakeModules.home-manager
+            ./modules
+          ];
+
+          # Capture this flake so imported features never depend on the name a
+          # consumer assigned to the input.
+          nixModules.sourceFlake = lib.mkDefault self;
+        };
+    in
     flake-parts.lib.mkFlake { inherit inputs; } {
       systems = [
         "x86_64-linux"
@@ -70,70 +85,11 @@
 
       imports = [
         inputs.flake-parts.flakeModules.flakeModules
-        inputs.home-manager.flakeModules.home-manager
-        inputs.pre-commit-hooks.flakeModule
-        ./modules
+        ./modules/repository/development.nix
+        ./modules/repository/module-checks.nix
+        flakeModule
       ];
 
-      flake.flakeModule = ./modules;
-
-      perSystem =
-        {
-          config,
-          system,
-          pkgs,
-          ...
-        }:
-        {
-          formatter = pkgs.nixfmt-tree;
-          pre-commit.settings.hooks = {
-            nixfmt.enable = true;
-            statix = {
-              enable = true;
-              settings.config = toString (
-                pkgs.writeText "statix.toml" ''
-                  disabled = ["repeated_keys"]
-                  ignore = [".direnv"]
-                ''
-              );
-            };
-            deadnix.enable = true;
-          };
-          devShells.default = pkgs.mkShell {
-            inherit (config.pre-commit) shellHook;
-            packages = config.pre-commit.settings.enabledPackages;
-          };
-          checks = pkgs.lib.mapAttrs' (
-            name: module:
-            let
-              inherit
-                (
-                  (inputs.home-manager.lib.homeManagerConfiguration {
-                    inherit pkgs;
-                    modules = [
-                      module
-                      {
-                        home = {
-                          username = "module-test";
-                          homeDirectory = "/home/module-test";
-                          stateVersion = "26.05";
-                        };
-                      }
-                    ];
-                  })
-                )
-                activationPackage
-                ;
-              evaluated = builtins.addErrorContext "while evaluating homeModules.${name}: " activationPackage.drvPath;
-            in
-            pkgs.lib.nameValuePair "home-module-${name}" (
-              builtins.seq evaluated (pkgs.runCommand "check-home-module-${name}" { } "touch $out")
-            )
-          ) self.homeModules;
-          _module.args.pkgs = import inputs.nixpkgs {
-            inherit system;
-            config.allowUnfree = true;
-          };
-        };
+      flake.flakeModule = flakeModule;
     };
 }

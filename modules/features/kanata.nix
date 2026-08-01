@@ -1,5 +1,7 @@
-{ config, ... }:
+{ lib, ... }:
 {
-  reusableModules.nixos.kanata = ./kanata/nixos.nix;
-  flake.nixosModules.kanata = config.reusableModules.nixos.kanata;
+  flake.modules.nixos.kanata = {
+    imports = [ ./kanata/nixos.nix ];
+    modules.nixos.kanata.enable = lib.mkDefault true;
+  };
 }

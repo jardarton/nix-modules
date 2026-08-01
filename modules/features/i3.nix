@@ -1,5 +1,12 @@
-{ config, ... }:
 {
-  reusableModules.home.i3 = ./i3/home.nix;
-  flake.homeModules.i3 = config.reusableModules.home.i3;
+  flake.modules.homeManager.i3 =
+    {
+      lib,
+      pkgs,
+      ...
+    }:
+    {
+      imports = [ ./i3/home.nix ];
+      modules.home.i3.enable = lib.mkDefault pkgs.stdenv.isLinux;
+    };
 }

@@ -1,20 +1,20 @@
 {
-  config,
   moduleWithSystem,
   ...
 }:
 {
-  reusableModules.home.reverse-engineering = moduleWithSystem (
+  flake.modules.homeManager.reverse-engineering = moduleWithSystem (
     { config, ... }:
     { lib, ... }:
     {
       imports = [ ./reverse-engineering/home.nix ];
 
-      modules.home.reverse-engineering.hbcdumpPackage = lib.mkDefault config.packages.hbcdump;
+      modules.home.reverse-engineering = {
+        enable = lib.mkDefault true;
+        hbcdumpPackage = lib.mkDefault config.packages.hbcdump;
+      };
     }
   );
-
-  flake.homeModules.reverse-engineering = config.reusableModules.home.reverse-engineering;
 
   perSystem =
     { pkgs, ... }:

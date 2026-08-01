@@ -1,5 +1,12 @@
-{ config, ... }:
 {
-  reusableModules.home.zathura = ./zathura/home.nix;
-  flake.homeModules.zathura = config.reusableModules.home.zathura;
+  flake.modules.homeManager.zathura =
+    {
+      lib,
+      pkgs,
+      ...
+    }:
+    {
+      imports = [ ./zathura/home.nix ];
+      modules.home.zathura.enable = lib.mkDefault pkgs.stdenv.isLinux;
+    };
 }

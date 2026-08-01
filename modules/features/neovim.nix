@@ -1,5 +1,7 @@
-{ config, ... }:
+{ lib, ... }:
 {
-  reusableModules.home.neovim = ./neovim/home.nix;
-  flake.homeModules.neovim = config.reusableModules.home.neovim;
+  flake.modules.homeManager.neovim = {
+    imports = [ ./neovim/home.nix ];
+    modules.home.neovim.enable = lib.mkDefault true;
+  };
 }

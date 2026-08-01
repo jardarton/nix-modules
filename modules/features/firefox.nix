@@ -1,12 +1,10 @@
 {
   config,
-  inputs,
   lib,
-  self,
   ...
 }:
 let
-  moduleFlake = inputs.nix-modules or self;
+  moduleFlake = config.nixModules.sourceFlake;
   textfox = moduleFlake.inputs.textfox;
   textfoxModule = import "${textfox.outPath}/nix/modules/home-manager.nix" {
     self.packages = lib.mapAttrs (_system: _packages: {
@@ -15,7 +13,7 @@ let
   };
 in
 {
-  reusableModules.home.firefox =
+  flake.modules.homeManager.firefox =
     {
       lib,
       pkgs,
@@ -31,6 +29,4 @@ in
         lib.mkDefault
           moduleFlake.inputs.firefox-addons.packages.${pkgs.stdenv.hostPlatform.system};
     };
-
-  flake.homeModules.firefox = config.reusableModules.home.firefox;
 }

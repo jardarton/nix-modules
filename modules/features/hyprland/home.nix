@@ -8,6 +8,8 @@
 with lib;
 let
   cfg = config.modules.home.hypr;
+  osUsesUWSM =
+    osConfig != null && osConfig.programs ? hyprland && osConfig.programs.hyprland.withUWSM;
 in
 {
 
@@ -94,7 +96,7 @@ in
       enable = true;
       inherit (cfg) package;
       xwayland.enable = mkDefault true;
-      systemd.enable = mkDefault (!osConfig.programs.hyprland.withUWSM); # to not intefere with withUwsm on programs.hyprland
+      systemd.enable = mkDefault (!osUsesUWSM); # Do not interfere with NixOS programs.hyprland.withUWSM.
       #https://wiki.hypr.land/Useful-Utilities/Systemd-start/
     };
 

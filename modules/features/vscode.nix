@@ -1,5 +1,7 @@
-{ config, ... }:
+{ lib, ... }:
 {
-  reusableModules.home.vscode = ./vscode/home.nix;
-  flake.homeModules.vscode = config.reusableModules.home.vscode;
+  flake.modules.homeManager.vscode = {
+    imports = [ ./vscode/home.nix ];
+    modules.home.vscode.enable = lib.mkDefault true;
+  };
 }

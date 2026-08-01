@@ -1,5 +1,12 @@
-{ config, ... }:
 {
-  reusableModules.home.ghostty = ./ghostty/home.nix;
-  flake.homeModules.ghostty = config.reusableModules.home.ghostty;
+  flake.modules.homeManager.ghostty =
+    {
+      lib,
+      pkgs,
+      ...
+    }:
+    {
+      imports = [ ./ghostty/home.nix ];
+      modules.home.ghostty.enable = lib.mkDefault pkgs.stdenv.isLinux;
+    };
 }
