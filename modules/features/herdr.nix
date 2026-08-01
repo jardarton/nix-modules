@@ -1,14 +1,12 @@
 {
   config,
-  inputs,
-  self,
   ...
 }:
 let
-  moduleFlake = inputs.nix-modules or self;
+  moduleFlake = config.nixModules.sourceFlake;
 in
 {
-  reusableModules.home.herdr =
+  flake.modules.homeManager.herdr =
     {
       lib,
       pkgs,
@@ -18,6 +16,7 @@ in
       imports = [ ./herdr/home.nix ];
 
       modules.home.herdr = {
+        enable = lib.mkDefault true;
         package =
           lib.mkDefault
             moduleFlake.inputs.herdr.packages.${pkgs.stdenv.hostPlatform.system}.default;
@@ -26,8 +25,7 @@ in
             src = moduleFlake.inputs.herdr-plugin-jj-workspace;
           }
         );
+        jjWorkspacePluginManifestFile = lib.mkDefault "${moduleFlake.inputs.herdr-plugin-jj-workspace}/herdr-plugin.toml";
       };
     };
-
-  flake.homeModules.herdr = config.reusableModules.home.herdr;
 }

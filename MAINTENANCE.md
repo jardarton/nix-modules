@@ -6,7 +6,7 @@ Recurring maintenance tasks for this repository.
 
 **Frequency:** Monthly, and promptly for relevant security releases.
 
-The default images in `modules/nixos/home-assistant/default.nix` are pinned to multi-platform manifest digests. Resolve the current upstream tags and replace the corresponding digests:
+The default images in `modules/features/home-assistant/nixos.nix` are pinned to multi-platform manifest digests. Resolve the current upstream tags and replace the corresponding digests:
 
 ```sh
 docker buildx imagetools inspect ghcr.io/home-assistant/home-assistant:stable

@@ -1,5 +1,3 @@
-{ config, ... }:
 {
-  reusableModules.home.yazi = ./yazi/home.nix;
-  flake.homeModules.yazi = config.reusableModules.home.yazi;
+  flake.modules.homeManager.yazi = ./yazi/home.nix;
 }

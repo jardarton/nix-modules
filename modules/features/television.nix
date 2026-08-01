@@ -1,5 +1,7 @@
-{ config, ... }:
+{ lib, ... }:
 {
-  reusableModules.home.television = ./television/home.nix;
-  flake.homeModules.television = config.reusableModules.home.television;
+  flake.modules.homeManager.television = {
+    imports = [ ./television/home.nix ];
+    modules.home.television.enable = lib.mkDefault true;
+  };
 }

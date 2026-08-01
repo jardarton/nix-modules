@@ -1,5 +1,7 @@
-{ config, ... }:
+{ lib, ... }:
 {
-  reusableModules.nixos.laptop-base = ./laptop-base/nixos.nix;
-  flake.nixosModules.laptop-base = config.reusableModules.nixos.laptop-base;
+  flake.modules.nixos.laptop-base = {
+    imports = [ ./laptop-base/nixos.nix ];
+    modules.nixos.laptop-base.enable = lib.mkDefault true;
+  };
 }

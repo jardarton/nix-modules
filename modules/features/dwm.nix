@@ -1,5 +1,12 @@
-{ config, ... }:
 {
-  reusableModules.home.dwm = ./dwm/home.nix;
-  flake.homeModules.dwm = config.reusableModules.home.dwm;
+  flake.modules.homeManager.dwm =
+    {
+      lib,
+      pkgs,
+      ...
+    }:
+    {
+      imports = [ ./dwm/home.nix ];
+      modules.home.dwm.enable = lib.mkDefault pkgs.stdenv.isLinux;
+    };
 }

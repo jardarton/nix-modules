@@ -1,18 +1,19 @@
 # ❄️ nix-modules
 
-Reusable NixOS and Home Manager modules packaged as a
-  flake.This
-  repository
-  is
-  the
-  public
-  module layer: shared defaults, application modules, desktop wiring, packages, and small utilities. It intentionally does not contain host composition, secrets, private network layout, users, SSH keys, or machine-specific state. Those belong in the consuming configuration repo.
+Reusable NixOS and Home Manager modules, packages, and development tooling.
 
-## What is included
+This repository is the public module layer. It contains shared defaults,
+application modules, desktop wiring, packages, and small utilities. Host
+composition, secrets, private network layout, users, SSH keys, and
+machine-specific state belong in the consuming configuration repository.
+
+## Outputs
 
 ### Home Manager modules
 
-- `default` / `base-home`
+Home Manager modules are exported under `homeModules` and
+`modules.homeManager`:
+
 - `aerospace`
 - `ai`
 - `bat`
@@ -21,6 +22,7 @@ Reusable NixOS and Home Manager modules packaged as a
 - `bun`
 - `catsvim`
 - `cli-tools`
+- `default`
 - `devops`
 - `direnv`
 - `dstask`
@@ -32,6 +34,7 @@ Reusable NixOS and Home Manager modules packaged as a
 - `fzf`
 - `ghostty`
 - `git`
+- `gondolin`
 - `herdr`
 - `hyprland`
 - `i3`
@@ -40,7 +43,9 @@ Reusable NixOS and Home Manager modules packaged as a
 - `mango`
 - `media`
 - `neovim`
+- `nh`
 - `node`
+- `presentation`
 - `reverse-engineering`
 - `screenshot`
 - `starship`
@@ -57,6 +62,8 @@ Reusable NixOS and Home Manager modules packaged as a
 - `zsh`
 
 ### NixOS modules
+
+NixOS modules are exported under `nixosModules` and `modules.nixos`:
 
 - `base-packages`
 - `bluetooth`
@@ -77,12 +84,15 @@ Packages are exported under `packages.${system}`:
 - `cclip` (Linux only)
 - `firecrawl-cli`
 - `gondolin`
+- `hbcdump`
 - `hunk`
 - `kli`
+- `mango` (Linux only)
+- `ntn`
 - `playwright-cli`
 - `stack`
 
-For example, build a package directly with:
+Build a package directly:
 
 ```sh
 nix build .#cclip
@@ -105,39 +115,59 @@ Or consume one from another flake:
 
 ## Use from another flake
 
-Add this repository as an input:
+Add the repository as an input:
 
 ```nix
 {
-inputs = {
-nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-home-manager.url = "github:nix-community/home-manager";
-nix-modules.url = "github:USER/nix-modules";
-};
+  inputs = {
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    home-manager.url = "github:nix-community/home-manager";
+    nix-modules.url = "github:USER/nix-modules";
+  };
 }
 ```
 
-For local development before publishing, use a path input:
+For unpublished local development, use a path input:
 
 ```nix
-nix-modules.url = "path:/home/jdr/nix-modules";
+nix-modules.url = "path:/path/to/nix-modules";
 ```
 
-## Import modules directly
+## Import individual modules
+
+### Module activation
+
+Importing a public leaf module enables its primary behavior by default on
+supported platforms. Consumers can still disable it explicitly or conditionally;
+ordinary definitions override
+the module's `lib.mkDefault` activation:
+
+```nix
+{
+  imports = [ inputs.nix-modules.homeModules.television ];
+  modules.home.television.enable = isDesktop;
+}
+```
+
+Optional subfeatures remain opt-in. Collection and support modules without one
+primary behavior also expose explicit capability switches. Catsvim is a special
+case: importing it does not choose `catsvim` or `catsvi`, because the consumer
+must provide a wrapped-Neovim source and select the desired profile.
+
+Importing `flakeModules.default` only registers the public module collections and
+packages in a flake-parts consumer; it does not activate every Home Manager or
+NixOS module in a host configuration.
 
 ### NixOS
 
 ```nix
+{ inputs, ... }:
 {
-inputs,
-...
-}:
-{
-imports = [
-inputs.nix-modules.nixosModules.base-packages
-inputs.nix-modules.nixosModules.bluetooth
-inputs.nix-modules.nixosModules.fonts
-];
+  imports = [
+    inputs.nix-modules.nixosModules.base-packages
+    inputs.nix-modules.nixosModules.bluetooth
+    inputs.nix-modules.nixosModules.fonts
+  ];
 }
 ```
 
@@ -145,44 +175,44 @@ inputs.nix-modules.nixosModules.fonts
 
 ```nix
 {
-inputs,
-...
+  inputs,
+  pkgs,
+  ...
 }:
 {
-imports = [
-inputs.nix-modules.homeModules.default
-inputs.nix-modules.homeModules.git
-inputs.nix-modules.homeModules.firefox
-inputs.nix-modules.homeModules.zsh
-];
+  imports = [
+    inputs.nix-modules.homeModules.default
+    inputs.nix-modules.homeModules.git
+    inputs.nix-modules.homeModules.firefox
+    inputs.nix-modules.homeModules.reverse-engineering
+    inputs.nix-modules.homeModules.zsh
+  ];
 
-modules.home.firefox = {
-enable = true;
-profile = "default";
-};
+  modules.home.firefox.profile = "default";
 
-modules.home.reverse-engineering = {
-enable = true;
-android.enable = true;
-extraPackages = with pkgs; [ ghidra ];
-};
+  # The imported parent feature is active; optional tool groups remain opt-in.
+  modules.home.reverse-engineering = {
+    android.enable = true;
+    extraPackages = [ pkgs.ghidra ];
+  };
 }
 ```
 
-## Import the whole module set with flake-parts
+## Import the complete flake-parts module
 
-If your consuming repository also uses `flake-parts`, import the module tree and let it expose the module collections:
+A consumer using flake-parts can import the complete feature collection:
 
 ```nix
+{ inputs, ... }:
 {
-inputs,
-...
-}:
-{
-imports = [
-"${inputs.nix-modules}/modules"
-];
+  imports = [ inputs.nix-modules.flakeModules.default ];
 }
 ```
 
-This makes the exported `homeModules`, `nixosModules`, and packages available to the consuming flake while keeping this repository as the owner of module-specific inputs.
+The exported flake module captures its owning flake, so it works regardless of
+the consumer-side input name. It contributes class-aware collections under
+`flake.modules.homeManager` and `flake.modules.nixos`, while preserving the
+established `homeModules`, `nixosModules`, and package outputs.
+
+Directly importing `"${inputs.nix-modules}/modules"` remains supported for
+compatibility.

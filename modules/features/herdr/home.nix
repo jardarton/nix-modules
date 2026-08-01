@@ -11,6 +11,7 @@ let
   defaultJjWorkspacePlugin = {
     id = "nathanflurry.jj-workspace";
     package = cfg.jjWorkspacePluginPackage;
+    manifestFile = cfg.jjWorkspacePluginManifestFile;
     enabled = true;
   };
   configuredPlugins =
@@ -47,7 +48,9 @@ let
   pluginRegistry = builtins.map (
     plugin:
     let
-      manifest = builtins.fromTOML (builtins.readFile "${plugin.package}/herdr-plugin.toml");
+      manifestPath =
+        if plugin.manifestFile == null then "${plugin.package}/herdr-plugin.toml" else plugin.manifestFile;
+      manifest = builtins.fromTOML (builtins.readFile manifestPath);
     in
     {
       plugin_id = plugin.id;
@@ -136,6 +139,15 @@ in
       description = "Bundled jj-workspace plugin package.";
     };
 
+    jjWorkspacePluginManifestFile = mkOption {
+      type = types.path;
+      description = ''
+        Source manifest for the bundled jj-workspace plugin. Keeping this
+        separate from the built package avoids import from derivation during
+        module evaluation.
+      '';
+    };
+
     theme = mkOption {
       type = types.nullOr types.str;
       default = null;
@@ -166,6 +178,14 @@ in
             package = mkOption {
               type = types.package;
               description = "Package containing herdr-plugin.toml at its root.";
+            };
+            manifestFile = mkOption {
+              type = types.nullOr types.path;
+              default = null;
+              description = ''
+                Optional source herdr-plugin.toml. Supplying it avoids reading
+                the plugin package output during module evaluation.
+              '';
             };
             enabled = mkOption {
               type = types.bool;

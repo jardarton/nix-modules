@@ -1,5 +1,12 @@
-{ config, ... }:
 {
-  reusableModules.home.xdg = ./xdg/home.nix;
-  flake.homeModules.xdg = config.reusableModules.home.xdg;
+  flake.modules.homeManager.xdg =
+    {
+      lib,
+      pkgs,
+      ...
+    }:
+    {
+      imports = [ ./xdg/home.nix ];
+      modules.home.xdg.enable = lib.mkDefault pkgs.stdenv.isLinux;
+    };
 }

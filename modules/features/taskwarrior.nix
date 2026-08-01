@@ -1,5 +1,7 @@
-{ config, ... }:
+{ lib, ... }:
 {
-  reusableModules.home.taskwarrior = ./taskwarrior/home.nix;
-  flake.homeModules.taskwarrior = config.reusableModules.home.taskwarrior;
+  flake.modules.homeManager.taskwarrior = {
+    imports = [ ./taskwarrior/home.nix ];
+    modules.home.taskwarrior.enable = lib.mkDefault true;
+  };
 }

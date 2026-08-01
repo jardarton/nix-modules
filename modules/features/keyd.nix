@@ -1,5 +1,7 @@
-{ config, ... }:
+{ lib, ... }:
 {
-  reusableModules.nixos.keyd = ./keyd/nixos.nix;
-  flake.nixosModules.keyd = config.reusableModules.nixos.keyd;
+  flake.modules.nixos.keyd = {
+    imports = [ ./keyd/nixos.nix ];
+    modules.nixos.keyd.enable = lib.mkDefault true;
+  };
 }

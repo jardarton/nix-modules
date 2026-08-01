@@ -1,5 +1,12 @@
-{ config, ... }:
 {
-  reusableModules.home.waybar = ./waybar/home.nix;
-  flake.homeModules.waybar = config.reusableModules.home.waybar;
+  flake.modules.homeManager.waybar =
+    {
+      lib,
+      pkgs,
+      ...
+    }:
+    {
+      imports = [ ./waybar/home.nix ];
+      modules.home.waybar.enable = lib.mkDefault pkgs.stdenv.isLinux;
+    };
 }

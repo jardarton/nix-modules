@@ -1,5 +1,3 @@
-{ config, ... }:
 {
-  reusableModules.home.direnv = ./direnv/home.nix;
-  flake.homeModules.direnv = config.reusableModules.home.direnv;
+  flake.modules.homeManager.direnv = ./direnv/home.nix;
 }

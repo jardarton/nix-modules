@@ -1,15 +1,13 @@
 {
   config,
-  inputs,
   moduleWithSystem,
-  self,
   ...
 }:
 let
-  moduleFlake = inputs.nix-modules or self;
+  moduleFlake = config.nixModules.sourceFlake;
 in
 {
-  reusableModules.home.ai = moduleWithSystem (
+  flake.modules.homeManager.ai = moduleWithSystem (
     { config, ... }:
     { lib, pkgs, ... }:
     let
@@ -27,8 +25,6 @@ in
       };
     }
   );
-
-  flake.homeModules.ai = config.reusableModules.home.ai;
 
   perSystem =
     { pkgs, ... }:

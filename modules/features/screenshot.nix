@@ -1,5 +1,12 @@
-{ config, ... }:
 {
-  reusableModules.home.screenshot = ./screenshot/home.nix;
-  flake.homeModules.screenshot = config.reusableModules.home.screenshot;
+  flake.modules.homeManager.screenshot =
+    {
+      lib,
+      pkgs,
+      ...
+    }:
+    {
+      imports = [ ./screenshot/home.nix ];
+      modules.home.screenshot.enable = lib.mkDefault pkgs.stdenv.isLinux;
+    };
 }

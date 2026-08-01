@@ -1,12 +1,10 @@
 {
   config,
-  inputs,
   moduleWithSystem,
-  self,
   ...
 }:
 let
-  moduleFlake = inputs.nix-modules or self;
+  moduleFlake = config.nixModules.sourceFlake;
 
   mkMangoModule =
     {
@@ -19,7 +17,12 @@ let
       let
         perSystemConfig = config;
       in
-      { config, lib, ... }:
+      {
+        config,
+        lib,
+        pkgs,
+        ...
+      }:
       let
         cfg = lib.getAttrFromPath optionPath config;
       in
@@ -29,15 +32,18 @@ let
           implementation
         ];
 
-        config = lib.mkIf cfg.enable (
-          lib.setAttrByPath (optionPath ++ [ "package" ]) (lib.mkDefault perSystemConfig.packages.mango)
-        );
+        config = lib.mkMerge [
+          (lib.setAttrByPath (optionPath ++ [ "enable" ]) (lib.mkDefault pkgs.stdenv.isLinux))
+          (lib.mkIf cfg.enable (
+            lib.setAttrByPath (optionPath ++ [ "package" ]) (lib.mkDefault perSystemConfig.packages.mango)
+          ))
+        ];
       }
     );
 in
 {
-  reusableModules = {
-    home.mango = mkMangoModule {
+  flake.modules = {
+    homeManager.mango = mkMangoModule {
       externalModule = moduleFlake.inputs.mango.hmModules.mango;
       implementation = ./mango/home.nix;
       optionPath = [
@@ -56,11 +62,6 @@ in
         "mango"
       ];
     };
-  };
-
-  flake = {
-    homeModules.mango = config.reusableModules.home.mango;
-    nixosModules.mango = config.reusableModules.nixos.mango;
   };
 
   perSystem =

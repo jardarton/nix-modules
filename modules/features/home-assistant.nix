@@ -1,5 +1,7 @@
-{ config, ... }:
+{ lib, ... }:
 {
-  reusableModules.nixos.home-assistant = ./home-assistant/nixos.nix;
-  flake.nixosModules.home-assistant = config.reusableModules.nixos.home-assistant;
+  flake.modules.nixos.home-assistant = {
+    imports = [ ./home-assistant/nixos.nix ];
+    modules.nixos.home-assistant.enable = lib.mkDefault true;
+  };
 }

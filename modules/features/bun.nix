@@ -1,5 +1,3 @@
-{ config, ... }:
 {
-  reusableModules.home.bun = ./bun/home.nix;
-  flake.homeModules.bun = config.reusableModules.home.bun;
+  flake.modules.homeManager.bun = ./bun/home.nix;
 }

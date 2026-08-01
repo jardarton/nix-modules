@@ -1,5 +1,3 @@
-{ config, ... }:
 {
-  reusableModules.home.eza = ./eza/home.nix;
-  flake.homeModules.eza = config.reusableModules.home.eza;
+  flake.modules.homeManager.eza = ./eza/home.nix;
 }

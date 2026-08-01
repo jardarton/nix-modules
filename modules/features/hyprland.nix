@@ -1,5 +1,12 @@
-{ config, ... }:
 {
-  reusableModules.home.hyprland = ./hyprland/home.nix;
-  flake.homeModules.hyprland = config.reusableModules.home.hyprland;
+  flake.modules.homeManager.hyprland =
+    {
+      lib,
+      pkgs,
+      ...
+    }:
+    {
+      imports = [ ./hyprland/home.nix ];
+      modules.home.hypr.enable = lib.mkDefault pkgs.stdenv.isLinux;
+    };
 }

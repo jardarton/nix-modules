@@ -1,5 +1,12 @@
-{ config, ... }:
 {
-  reusableModules.home.media = ./media/home.nix;
-  flake.homeModules.media = config.reusableModules.home.media;
+  flake.modules.homeManager.media =
+    {
+      lib,
+      pkgs,
+      ...
+    }:
+    {
+      imports = [ ./media/home.nix ];
+      modules.home.media.enable = lib.mkDefault pkgs.stdenv.isLinux;
+    };
 }

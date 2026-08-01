@@ -1,20 +1,21 @@
 {
-  config,
   moduleWithSystem,
   ...
 }:
 {
-  reusableModules.home.gondolin = moduleWithSystem (
+  flake.modules.homeManager.gondolin = moduleWithSystem (
     { config, ... }:
-    { lib, ... }:
+    { lib, pkgs, ... }:
     {
       imports = [ ./gondolin/home.nix ];
 
-      modules.home.gondolin.package = lib.mkDefault config.packages.gondolin;
+      modules.home.gondolin = {
+        enable = lib.mkDefault true;
+        package = lib.mkDefault config.packages.gondolin;
+        binaryCache.enable = lib.mkDefault pkgs.stdenv.isLinux;
+      };
     }
   );
-
-  flake.homeModules.gondolin = config.reusableModules.home.gondolin;
 
   perSystem =
     { pkgs, ... }:
