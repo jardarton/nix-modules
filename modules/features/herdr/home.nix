@@ -45,6 +45,7 @@ let
       command = (settingsWithTheme.keys.command or [ ]) ++ jjWorkspaceKeybindCommands;
     };
   };
+  herdrBin = lib.getExe' cfg.package "herdr";
   pluginRegistry = builtins.map (
     plugin:
     let
@@ -123,6 +124,15 @@ let
       "%${component}"
     else
       component;
+  configFileSource = toml.generate "herdr-config.toml" effectiveSettings;
+  pluginsFileSource = json.generate "herdr-plugins.json" pluginRegistry;
+  # Everything the running server would have to restart to pick up. A rebuild
+  # that leaves all of these unchanged must not disturb running sessions.
+  activationStamp = lib.concatStringsSep "\n" (
+    [ (toString cfg.package) ]
+    ++ lib.optional (effectiveSettings != { }) (toString configFileSource)
+    ++ lib.optional (configuredPlugins != [ ]) (toString pluginsFileSource)
+  );
 in
 {
   options.modules.home.herdr = with lib; {
@@ -159,6 +169,39 @@ in
       type = types.bool;
       default = false;
       description = "Enable Herdr's experimental Kitty graphics renderer.";
+    };
+
+    sshAutoStart = mkOption {
+      type = types.bool;
+      default = false;
+      description = ''
+        Replace interactive SSH logins with a Herdr session. The zsh startup
+        files run `exec herdr` when the shell has an SSH TTY, is not already
+        inside Herdr, and `HERDR_DISABLE_AUTO_START` is empty.
+      '';
+    };
+
+    stopServerOnActivation = mkOption {
+      type = types.bool;
+      default = cfg.sshAutoStart;
+      defaultText = literalExpression "config.modules.home.herdr.sshAutoStart";
+      description = ''
+        Stop the running Herdr server during Home Manager activation when the
+        Herdr package, the generated configuration, or the plugin registry
+        changed. Activations that leave those unchanged keep running sessions.
+
+        The stop is deferred by {option}`stopServerDelaySeconds`, because it
+        also kills the shell that started the rebuild.
+      '';
+    };
+
+    stopServerDelaySeconds = mkOption {
+      type = types.ints.positive;
+      default = 10;
+      description = ''
+        Delay between the end of the activation and the deferred
+        `herdr server stop`.
+      '';
     };
 
     enableJjWorkspacePlugin = mkOption {
@@ -505,12 +548,61 @@ in
     };
 
     xdg.configFile."herdr/config.toml" = lib.mkIf (effectiveSettings != { }) {
-      source = toml.generate "herdr-config.toml" effectiveSettings;
+      source = configFileSource;
     };
 
     xdg.configFile."herdr/plugins.json" = lib.mkIf (configuredPlugins != [ ]) {
-      source = json.generate "herdr-plugins.json" pluginRegistry;
+      source = pluginsFileSource;
     };
+
+    # Ordered behind lib.mkAfter, because `exec` ends the startup files and
+    # every other fragment must run before it.
+    programs.zsh.initContent = lib.mkIf cfg.sshAutoStart (
+      lib.mkOrder 2000 ''
+        if [[ -n "$SSH_TTY" && -z "$HERDR_ENV" && -z "$HERDR_DISABLE_AUTO_START" ]]; then
+          exec ${herdrBin}
+        fi
+      ''
+    );
+
+    home.activation.herdrStopStaleServer = lib.mkIf cfg.stopServerOnActivation (
+      lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+        herdrStampFile="${config.xdg.stateHome}/herdr/nix-activation-stamp"
+        herdrStamp=${lib.escapeShellArg activationStamp}
+
+        herdrScheduleServerStop() {
+          # The stop is deferred, because the rebuild frequently runs in a pane
+          # of the server that is stopped here.
+          local runtimeDir="''${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
+
+          if [[ -S "$runtimeDir/bus" ]] && XDG_RUNTIME_DIR="$runtimeDir" \
+            ${pkgs.systemd}/bin/systemd-run --user --collect --quiet \
+              --on-active=${toString cfg.stopServerDelaySeconds} \
+              --description="Stop the stale Herdr server after a Home Manager activation" \
+              -- ${pkgs.bash}/bin/bash -c '${herdrBin} server stop || true'
+          then
+            return 0
+          fi
+
+          # No user systemd manager, for example a deploy without an open
+          # session. Detach from the activation unit instead.
+          ${pkgs.util-linux}/bin/setsid --fork ${pkgs.bash}/bin/bash -c \
+            'sleep ${toString cfg.stopServerDelaySeconds}; ${herdrBin} server stop || true' \
+            </dev/null >/dev/null 2>&1 || true
+        }
+
+        if [[ "$(cat "$herdrStampFile" 2>/dev/null || true)" != "$herdrStamp" ]]; then
+          if [[ -v DRY_RUN ]]; then
+            echo "Would stop the running Herdr server in ${toString cfg.stopServerDelaySeconds} seconds"
+          else
+            verboseEcho "Herdr changed, stopping the running server in ${toString cfg.stopServerDelaySeconds} seconds"
+            herdrScheduleServerStop
+            mkdir -p "$(dirname "$herdrStampFile")"
+            printf '%s\n' "$herdrStamp" > "$herdrStampFile"
+          fi
+        fi
+      ''
+    );
 
     home.activation.herdrPluginDirs = lib.hm.dag.entryAfter [ "writeBoundary" ] (
       lib.concatStringsSep "\n" (
