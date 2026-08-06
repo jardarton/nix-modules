@@ -1,11 +1,16 @@
 {
-  pkgs,
   config,
   lib,
   ...
 }:
-with lib;
 let
+  inherit (lib)
+    mkDefault
+    mkIf
+    mkOption
+    types
+    ;
+
   cfg = config.modules.nixos.mango;
 in
 {
@@ -14,11 +19,12 @@ in
       type = types.bool;
       default = false;
       example = true;
-      description = "enable mango vm";
+      description = "Whether to enable Mango system integration.";
     };
+
     package = mkOption {
       type = types.package;
-      description = "Mango package to use.";
+      description = "The Mango package used for the compositor session.";
     };
   };
 
@@ -28,33 +34,16 @@ in
       inherit (cfg) package;
     };
 
-    environment.systemPackages = [
-      pkgs.wlr-randr
-      pkgs.pamixer
-      pkgs.brightnessctl
-    ];
-
-    # Home Manager's swaylock module only installs/configures the client; the
-    # matching PAM service must be declared by NixOS for password unlocks.
+    # Home Manager installs and configures the swaylock client separately.
+    # NixOS must provide the matching PAM service for password unlocks.
     security.pam.services.swaylock = { };
 
+    # Mango's NixOS module supplies the session entry and portal packages.
+    # Keep these integration choices overrideable by consumers.
     programs.xwayland.enable = mkDefault true;
     xdg.portal = {
       enable = mkDefault true;
-      wlr.enable = true;
-      extraPortals = [
-        pkgs.xdg-desktop-portal-wlr
-        pkgs.xdg-desktop-portal-gtk
-      ];
-      config = {
-        mango = {
-          default = [
-            "gtk"
-          ];
-          "org.freedesktop.impl.portal.FileChooser" = [ "gtk" ];
-        };
-      };
-      config.common.default = [ "wlr" ];
+      wlr.enable = mkDefault true;
       xdgOpenUsePortal = mkDefault true;
     };
   };
