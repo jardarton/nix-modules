@@ -89,6 +89,7 @@
 
         server = [
           "base-packages"
+          "disk-monitor"
           "home-assistant"
           "stylix"
         ];
