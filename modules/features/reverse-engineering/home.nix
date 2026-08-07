@@ -44,6 +44,7 @@ let
   androidPackages = with pkgs; [
     android-tools
     apktool
+    frida-tools
     jadx
     cfg.hbcdumpPackage
   ];
