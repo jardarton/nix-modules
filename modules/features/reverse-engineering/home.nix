@@ -41,8 +41,31 @@ let
       ]
     );
 
+  coreExtraPackages = with pkgs; [
+    capa
+    checksec
+    cutter
+    elfutils
+    lief
+    rizin
+  ];
+
+  dynamicAnalysisPackages = with pkgs; [
+    capstone
+    gef
+    keystone
+    python3Packages.angr
+    unicorn
+  ];
+
+  networkAnalysisPackages = with pkgs; [
+    mitmproxy
+    wireshark
+  ];
+
   androidPackages = with pkgs; [
     android-tools
+    androguard
     apktool
     frida-tools
     jadx
@@ -52,7 +75,10 @@ let
   firmwarePackages = with pkgs; [
     binwalk
     dtc
+    jefferson
+    mtdutils
     squashfsTools
+    ubi_reader
     ubootTools
   ];
 in
@@ -65,6 +91,12 @@ in
       default = true;
       description = "Install native binary analysis and debugging tools.";
     };
+
+    coreExtras.enable = mkEnableOption "additional core reverse-engineering tools";
+
+    dynamicAnalysis.enable = mkEnableOption "dynamic binary analysis tools";
+
+    networkAnalysis.enable = mkEnableOption "network traffic analysis tools";
 
     android.enable = mkOption {
       type = types.bool;
@@ -95,6 +127,9 @@ in
     home.packages =
       corePackages
       ++ optionals cfg.native.enable nativePackages
+      ++ optionals cfg.coreExtras.enable coreExtraPackages
+      ++ optionals cfg.dynamicAnalysis.enable dynamicAnalysisPackages
+      ++ optionals cfg.networkAnalysis.enable networkAnalysisPackages
       ++ optionals cfg.android.enable androidPackages
       ++ optionals cfg.firmware.enable firmwarePackages
       ++ cfg.extraPackages;
