@@ -90,6 +90,8 @@ Packages are exported under `packages.${system}`:
 - `mango` (Linux only)
 - `ntn`
 - `playwright-cli`
+- `spimdisasm` (provides the upstream MIPS disassembly CLI programs)
+- `splat64` (provides the `splat` executable with MIPS support)
 - `stack`
 
 Build a package directly:

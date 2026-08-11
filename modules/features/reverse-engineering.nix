@@ -18,7 +18,14 @@
 
   perSystem =
     { pkgs, ... }:
+    let
+      spimdisasm = pkgs.callPackage ./reverse-engineering/spimdisasm.pkg.nix { };
+    in
     {
-      packages.hbcdump = pkgs.callPackage ./reverse-engineering/hbcdump.pkg.nix { };
+      packages = {
+        hbcdump = pkgs.callPackage ./reverse-engineering/hbcdump.pkg.nix { };
+        inherit spimdisasm;
+        splat64 = pkgs.callPackage ./reverse-engineering/splat64.pkg.nix { inherit spimdisasm; };
+      };
     };
 }
