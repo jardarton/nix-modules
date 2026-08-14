@@ -1,6 +1,7 @@
 {
   config,
   lib,
+  options,
   pkgs,
   ...
 }:
@@ -14,8 +15,16 @@ let
     manifestFile = cfg.jjWorkspacePluginManifestFile;
     enabled = true;
   };
+  defaultWorktrunkPlugin = {
+    id = "worktrunk";
+    package = cfg.worktrunkPluginPackage;
+    manifestFile = cfg.worktrunkPluginManifestFile;
+    enabled = true;
+  };
   configuredPlugins =
-    lib.optional cfg.enableJjWorkspacePlugin defaultJjWorkspacePlugin ++ cfg.plugins;
+    lib.optional cfg.enableJjWorkspacePlugin defaultJjWorkspacePlugin
+    ++ lib.optional cfg.enableWorktrunkPlugin defaultWorktrunkPlugin
+    ++ cfg.plugins;
   jjWorkspaceKeybindCommands =
     lib.optionals (cfg.enableJjWorkspacePlugin && cfg.pluginKeybinds.jjWorkspace.enable)
       [
@@ -32,6 +41,28 @@ let
           description = "Remove jj workspace";
         }
       ];
+  worktrunkKeybindCommands =
+    lib.optionals (cfg.enableWorktrunkPlugin && cfg.pluginKeybinds.worktrunk.enable)
+      [
+        {
+          key = cfg.pluginKeybinds.worktrunk.open;
+          type = "plugin_action";
+          command = "worktrunk.open";
+          description = "Worktree: switch / create from default branch";
+        }
+        {
+          key = cfg.pluginKeybinds.worktrunk.openCurrent;
+          type = "plugin_action";
+          command = "worktrunk.open-current";
+          description = "Worktree: switch / create from current branch";
+        }
+        {
+          key = cfg.pluginKeybinds.worktrunk.remove;
+          type = "plugin_action";
+          command = "worktrunk.remove";
+          description = "Worktree: remove";
+        }
+      ];
   settingsWithKittyGraphics = lib.recursiveUpdate cfg.settings {
     experimental.kitty_graphics = cfg.kittyGraphics;
   };
@@ -42,7 +73,8 @@ let
       lib.recursiveUpdate settingsWithKittyGraphics { theme.name = cfg.theme; };
   effectiveSettings = settingsWithTheme // {
     keys = (settingsWithTheme.keys or { }) // {
-      command = (settingsWithTheme.keys.command or [ ]) ++ jjWorkspaceKeybindCommands;
+      command =
+        (settingsWithTheme.keys.command or [ ]) ++ jjWorkspaceKeybindCommands ++ worktrunkKeybindCommands;
     };
   };
   herdrBin = lib.getExe' cfg.package "herdr";
@@ -158,6 +190,16 @@ in
       '';
     };
 
+    worktrunkPluginPackage = mkOption {
+      type = types.package;
+      description = "Bundled Herdr Worktrunk plugin package.";
+    };
+
+    worktrunkPluginManifestFile = mkOption {
+      type = types.path;
+      description = "Source manifest for the bundled Herdr Worktrunk plugin.";
+    };
+
     theme = mkOption {
       type = types.nullOr types.str;
       default = null;
@@ -208,6 +250,16 @@ in
       type = types.bool;
       default = true;
       description = "Enable the bundled NathanFlurry jj workspace Herdr plugin.";
+    };
+
+    enableWorktrunkPlugin = mkOption {
+      type = types.bool;
+      default =
+        lib.hasAttrByPath [ "modules" "home" "git" "worktrunk" "enable" ] options
+        && config.modules.home.git.enable
+        && config.modules.home.git.worktrunk.enable;
+      defaultText = literalExpression "config.modules.home.git.enable && config.modules.home.git.worktrunk.enable";
+      description = "Enable the Worktrunk plugin when Git's Worktrunk integration is enabled.";
     };
 
     plugins = mkOption {
@@ -265,6 +317,29 @@ in
         type = types.str;
         default = "prefix+shift+j";
         description = "Keybind for removing the current jj workspace.";
+      };
+    };
+
+    pluginKeybinds.worktrunk = {
+      enable = mkOption {
+        type = types.bool;
+        default = true;
+        description = "Add default keybinds for the bundled Worktrunk plugin.";
+      };
+      open = mkOption {
+        type = types.str;
+        default = "prefix+shift+g";
+        description = "Keybind for switching or creating a worktree from the default branch.";
+      };
+      openCurrent = mkOption {
+        type = types.str;
+        default = "prefix+shift+c";
+        description = "Keybind for switching or creating a worktree from the current branch.";
+      };
+      remove = mkOption {
+        type = types.str;
+        default = "prefix+shift+d";
+        description = "Keybind for removing a worktree.";
       };
     };
 
