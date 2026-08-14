@@ -425,6 +425,22 @@
         "type": "github"
       }
     },
+    "herdr-worktrunk": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1784875428,
+        "narHash": "sha256-+G4EzlQisIr8SQ1NwDfzV/27iOiC3r/2nkxjcV/aU/k=",
+        "owner": "devashish2203",
+        "repo": "herdr-worktrunk",
+        "rev": "a3107ca566bafcd463bc138007a0c01051970784",
+        "type": "github"
+      },
+      "original": {
+        "owner": "devashish2203",
+        "repo": "herdr-worktrunk",
+        "type": "github"
+      }
+    },
     "home-manager": {
       "inputs": {
         "nixpkgs": [
@@ -673,6 +689,7 @@
         "fsel": "fsel",
         "herdr": "herdr",
         "herdr-plugin-jj-workspace": "herdr-plugin-jj-workspace",
+        "herdr-worktrunk": "herdr-worktrunk",
         "home-manager": "home-manager",
         "hunk": "hunk",
         "jj-starship": "jj-starship",

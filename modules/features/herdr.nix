@@ -26,6 +26,12 @@ in
           }
         );
         jjWorkspacePluginManifestFile = lib.mkDefault "${moduleFlake.inputs.herdr-plugin-jj-workspace}/herdr-plugin.toml";
+        worktrunkPluginPackage = lib.mkDefault (
+          pkgs.callPackage ./herdr/worktrunk-plugin.pkg.nix {
+            src = moduleFlake.inputs.herdr-worktrunk;
+          }
+        );
+        worktrunkPluginManifestFile = lib.mkDefault "${moduleFlake.inputs.herdr-worktrunk}/herdr-plugin.toml";
       };
     };
 }
