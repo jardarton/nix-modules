@@ -10,11 +10,16 @@ in
   flake.modules.homeManager = {
     git = moduleWithSystem (
       { config, ... }:
-      { lib, ... }:
+      { lib, pkgs, ... }:
       {
         imports = [ ./version-control/git.nix ];
 
-        modules.home.git.hunkPackage = lib.mkDefault config.packages.hunk;
+        modules.home.git = {
+          hunkPackage = lib.mkDefault config.packages.hunk;
+          worktrunk.package =
+            lib.mkDefault
+              moduleFlake.inputs.worktrunk.packages.${pkgs.stdenv.hostPlatform.system}.default;
+        };
       }
     );
 
