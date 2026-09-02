@@ -31,10 +31,14 @@
       inputs.flake-parts.follows = "flake-parts";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    naersk = {
+      url = "github:nix-community/naersk";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     fsel = {
       url = "github:Mjoyufull/fsel";
+      inputs.naersk.follows = "naersk";
       inputs.nixpkgs.follows = "nixpkgs";
-      inputs.naersk.inputs.nixpkgs.follows = "nixpkgs";
     };
     llm-agents = {
       url = "github:numtide/llm-agents.nix";
