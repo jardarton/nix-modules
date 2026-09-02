@@ -80,7 +80,6 @@ let
     # Overview and focus behavior
     hotarea_size = 10;
     enable_hotarea = 1;
-    ov_tab_mode = 0;
     overviewgappi = 5;
     overviewgappo = 30;
     no_border_when_single = 0;
