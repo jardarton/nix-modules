@@ -19,8 +19,8 @@ in
 
       modules.home.ai.defaultPackages = lib.mapAttrs (_: lib.mkDefault) {
         inherit (llmPackages) agent-browser copilot-cli opencode;
-        inherit (pkgs) codex;
         claude = llmPackages.claude-code;
+        codex = config.packages.codex;
         playwright-cli = config.packages.playwright-cli;
       };
     }
@@ -29,6 +29,9 @@ in
   perSystem =
     { pkgs, ... }:
     {
-      packages.playwright-cli = pkgs.callPackage ./ai/playwright-cli.pkg.nix { };
+      packages = {
+        codex = pkgs.callPackage ./ai/codex.pkg.nix { };
+        playwright-cli = pkgs.callPackage ./ai/playwright-cli.pkg.nix { };
+      };
     };
 }

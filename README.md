@@ -82,6 +82,7 @@ NixOS modules are exported under `nixosModules` and `modules.nixos`:
 Packages are exported under `packages.${system}`:
 
 - `cclip` (Linux only)
+- `codex`
 - `firecrawl-cli`
 - `gondolin`
 - `hbcdump`
