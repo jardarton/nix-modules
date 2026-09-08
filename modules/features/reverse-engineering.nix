@@ -12,6 +12,7 @@
       modules.home.reverse-engineering = {
         enable = lib.mkDefault true;
         hbcdumpPackage = lib.mkDefault config.packages.hbcdump;
+        mitmproxyPackage = lib.mkDefault config.packages.mitmproxy;
       };
     }
   );
@@ -20,5 +21,6 @@
     { pkgs, ... }:
     {
       packages.hbcdump = pkgs.callPackage ./reverse-engineering/hbcdump.pkg.nix { };
+      packages.mitmproxy = pkgs.callPackage ./reverse-engineering/mitmproxy.pkg.nix { };
     };
 }
