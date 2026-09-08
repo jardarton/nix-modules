@@ -59,7 +59,7 @@ let
   ];
 
   networkAnalysisPackages = with pkgs; [
-    mitmproxy
+    cfg.mitmproxyPackage
     wireshark
   ];
 
@@ -108,6 +108,11 @@ in
       type = types.bool;
       default = false;
       description = "Install firmware inspection and extraction tools.";
+    };
+
+    mitmproxyPackage = mkOption {
+      type = types.package;
+      description = "Mitmproxy package to use for network analysis.";
     };
 
     hbcdumpPackage = mkOption {
