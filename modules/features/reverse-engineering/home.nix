@@ -54,7 +54,7 @@ let
     capstone
     gef
     keystone
-    python3Packages.angr
+    cfg.angrPackage
     unicorn
   ];
 
@@ -108,6 +108,11 @@ in
       type = types.bool;
       default = false;
       description = "Install firmware inspection and extraction tools.";
+    };
+
+    angrPackage = mkOption {
+      type = types.package;
+      description = "Version-aligned angr package to use for dynamic analysis.";
     };
 
     mitmproxyPackage = mkOption {
