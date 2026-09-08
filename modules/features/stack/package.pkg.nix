@@ -10,13 +10,13 @@
 
 buildNpmPackage rec {
   pname = "stack";
-  version = "0.4.2";
+  version = "0.4.6";
 
   src = fetchFromGitHub {
     owner = "kitlangton";
     repo = "stack";
-    rev = "7c4227689ed91ee63c5770c3f9943a0253a35a35";
-    hash = "sha256-kgkmSE03/6dFh1w1QqaW78ObKSwaDv9THZ+mrzbzc4k=";
+    rev = "cc918c499481993692c9859a4b61a91e4912a19c";
+    hash = "sha256-v3KassEhOG9BkHxOOWsWBkYcdvy0Cw891pbda/TWzIE=";
   };
 
   postPatch = ''
