@@ -13,8 +13,12 @@ let
     meta.mainProgram = "jj-workspace";
   };
 in
-runCommand "herdr-plugin-nathanflurry-jj-workspace" { } ''
-  mkdir -p "$out/target/release"
-  cp ${src}/herdr-plugin.toml "$out/herdr-plugin.toml"
-  cp ${lib.getExe rustPackage} "$out/target/release/jj-workspace"
-''
+runCommand "herdr-plugin-nathanflurry-jj-workspace"
+  {
+    passthru.manifestFile = src + "/herdr-plugin.toml";
+  }
+  ''
+    mkdir -p "$out/target/release"
+    cp ${src}/herdr-plugin.toml "$out/herdr-plugin.toml"
+    cp ${lib.getExe rustPackage} "$out/target/release/jj-workspace"
+  ''
