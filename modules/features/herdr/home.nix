@@ -23,7 +23,26 @@ let
   configuredPlugins =
     lib.optional cfg.plugins.jjWorkspace.enable defaultJjWorkspacePlugin
     ++ lib.optional cfg.plugins.worktrunk.enable defaultWorktrunkPlugin
+    ++ lib.optional cfg.plugins.nvim.enable {
+      id = "chmarax.herdr-nvim";
+      inherit (cfg.plugins.nvim) package manifestFile;
+      enabled = true;
+    }
     ++ cfg.extraPlugins;
+  nvimKeybindCommands = lib.optionals (cfg.plugins.nvim.enable && cfg.plugins.nvim.keybinds.enable) [
+    {
+      key = cfg.plugins.nvim.keybinds.toggle;
+      type = "plugin_action";
+      command = "chmarax.herdr-nvim.toggle";
+      description = "Toggle Neovim sidebar";
+    }
+    {
+      key = cfg.plugins.nvim.keybinds.pickFile;
+      type = "plugin_action";
+      command = "chmarax.herdr-nvim.pick-file";
+      description = "Open file from agent output in Neovim";
+    }
+  ];
   jjWorkspaceKeybindCommands =
     lib.optionals (cfg.plugins.jjWorkspace.enable && cfg.plugins.jjWorkspace.keybinds.enable)
       [
@@ -73,7 +92,10 @@ let
   effectiveSettings = settingsWithTheme // {
     keys = (settingsWithTheme.keys or { }) // {
       command =
-        (settingsWithTheme.keys.command or [ ]) ++ jjWorkspaceKeybindCommands ++ worktrunkKeybindCommands;
+        (settingsWithTheme.keys.command or [ ])
+        ++ jjWorkspaceKeybindCommands
+        ++ worktrunkKeybindCommands
+        ++ nvimKeybindCommands;
     };
   };
   herdrBin = lib.getExe' cfg.package "herdr";
@@ -259,6 +281,47 @@ in
     };
 
     plugins.worktrunk.enable = mkEnableOption "the bundled Herdr Worktrunk plugin";
+
+    plugins.nvim = {
+      enable = mkEnableOption "the bundled Herdr Neovim sidebar and file picker";
+      package = mkOption {
+        type = types.package;
+        description = "Herdr Neovim plugin package, including its sidebar Lua runtime.";
+      };
+      manifestFile = mkOption {
+        type = types.nullOr types.path;
+        default = cfg.plugins.nvim.package.manifestFile or null;
+        defaultText = literalExpression "config.modules.home.herdr.plugins.nvim.package.manifestFile or null";
+        description = "Source manifest for the Neovim plugin; avoids import from derivation.";
+      };
+      settings = mkOption {
+        inherit (toml) type;
+        default = { };
+        example.sidebar.position = "left";
+        description = ''
+          Settings written to herdr-nvim/config.toml. An empty set leaves the
+          file unmanaged. Requires Neovim >= 0.10 on PATH, or set
+          sidebar.nvim_bin to your wrapped Neovim executable.
+        '';
+      };
+      keybinds = {
+        enable = mkOption {
+          type = types.bool;
+          default = true;
+          description = "Add keybindings for the Neovim sidebar and file picker.";
+        };
+        toggle = mkOption {
+          type = types.str;
+          default = "prefix+e";
+          description = "Keybind for toggling the Neovim sidebar.";
+        };
+        pickFile = mkOption {
+          type = types.str;
+          default = "prefix+shift+e";
+          description = "Keybind for opening the Neovim file picker.";
+        };
+      };
+    };
 
     extraPlugins = mkOption {
       type = types.listOf (
@@ -496,6 +559,12 @@ in
       lib.mkIf (cfg.plugins.worktrunk.enable && cfg.plugins.worktrunk.settings != { })
         {
           source = toml.generate "herdr-worktrunk-config.toml" cfg.plugins.worktrunk.settings;
+        };
+
+    xdg.configFile."herdr-nvim/config.toml" =
+      lib.mkIf (cfg.plugins.nvim.enable && cfg.plugins.nvim.settings != { })
+        {
+          source = toml.generate "herdr-nvim-config.toml" cfg.plugins.nvim.settings;
         };
 
     home.packages = [

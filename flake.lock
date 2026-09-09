@@ -411,6 +411,22 @@
         "type": "github"
       }
     },
+    "herdr-nvim": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1788469271,
+        "narHash": "sha256-NAwzjZ4Ms7gDcFooCPLMZW0vrlq/Fq+XvVxUUamA4RI=",
+        "owner": "ChmaraX",
+        "repo": "herdr-nvim",
+        "rev": "e652ebf7b3d6713992e68a30aec588822e69fae5",
+        "type": "github"
+      },
+      "original": {
+        "owner": "ChmaraX",
+        "repo": "herdr-nvim",
+        "type": "github"
+      }
+    },
     "herdr-plugin-jj-workspace": {
       "flake": false,
       "locked": {
@@ -690,6 +706,7 @@
         "flake-parts": "flake-parts",
         "fsel": "fsel",
         "herdr": "herdr",
+        "herdr-nvim": "herdr-nvim",
         "herdr-plugin-jj-workspace": "herdr-plugin-jj-workspace",
         "herdr-worktrunk": "herdr-worktrunk",
         "home-manager": "home-manager",

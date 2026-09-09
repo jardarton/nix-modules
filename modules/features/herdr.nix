@@ -22,6 +22,7 @@ in
             moduleFlake.inputs.herdr.packages.${pkgs.stdenv.hostPlatform.system}.default;
         plugins.jjWorkspace.package = lib.mkDefault config.packages.herdr-plugin-jj-workspace;
         plugins.worktrunk.package = lib.mkDefault config.packages.herdr-plugin-worktrunk;
+        plugins.nvim.package = lib.mkDefault config.packages.herdr-plugin-nvim;
       };
     }
   );
@@ -47,6 +48,19 @@ in
           ];
         };
       disabled = mkHome { plugins.jjWorkspace.enable = false; };
+      nvimEnabled = mkHome {
+        plugins.jjWorkspace.enable = false;
+        plugins.nvim = {
+          enable = true;
+          settings.sidebar.position = "left";
+          keybinds.pickFile = "prefix+f";
+        };
+      };
+      nvimNoKeys = mkHome {
+        plugins.jjWorkspace.enable = false;
+        plugins.nvim.enable = true;
+        plugins.nvim.keybinds.enable = false;
+      };
       enabled = mkHome {
         plugins.jjWorkspace.enable = false;
         plugins.worktrunk = {
@@ -101,6 +115,8 @@ in
     in
     {
       checks.herdr-plugins =
+        assert !disabled.config.modules.home.herdr.plugins.nvim.enable;
+        assert !(disabled.config.xdg.configFile ? "herdr-nvim/config.toml");
         assert !disabled.config.modules.home.herdr.plugins.worktrunk.enable;
         assert !(disabled.config.xdg.configFile ? "herdr/plugins.json");
         assert !(disabled.config.xdg.configFile ? "herdr/plugins/config/worktrunk/config.toml");
@@ -131,7 +147,27 @@ in
           touch "$out"
         '';
 
+      checks.herdr-nvim = pkgs.runCommand "check-herdr-nvim" { nativeBuildInputs = [ pkgs.jq ]; } ''
+        jq -e 'length == 1 and .[0].plugin_id == "chmarax.herdr-nvim" and .[0].enabled and (.[0].link_handlers | length == 2)' \
+          ${nvimEnabled.config.xdg.configFile."herdr/plugins.json".source}
+        grep -F 'prefix+e' ${nvimEnabled.config.xdg.configFile."herdr/config.toml".source}
+        grep -F 'prefix+f' ${nvimEnabled.config.xdg.configFile."herdr/config.toml".source}
+        grep -F 'left' ${nvimEnabled.config.xdg.configFile."herdr-nvim/config.toml".source}
+        if grep -F 'chmarax.herdr-nvim' ${nvimNoKeys.config.xdg.configFile."herdr/config.toml".source}; then
+          echo "Disabled Neovim keybindings are still present" >&2
+          exit 1
+        fi
+        test -x ${self.packages.${pkgs.stdenv.hostPlatform.system}.herdr-plugin-nvim}/bin/herdr-nvim
+        test -f ${
+          self.packages.${pkgs.stdenv.hostPlatform.system}.herdr-plugin-nvim
+        }/lua/herdr-nvim/init.lua
+        touch "$out"
+      '';
+
       packages = {
+        herdr-plugin-nvim = pkgs.callPackage ./herdr/nvim-plugin.pkg.nix {
+          src = moduleFlake.inputs.herdr-nvim;
+        };
         herdr-plugin-jj-workspace = pkgs.callPackage ./herdr/jj-workspace-plugin.pkg.nix {
           src = moduleFlake.inputs.herdr-plugin-jj-workspace;
         };

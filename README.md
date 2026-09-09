@@ -89,6 +89,7 @@ Packages are exported under `packages.${system}`:
 - `hbcdump`
 - `herdr-plugin-jj-workspace`
 - `herdr-plugin-worktrunk`
+- `herdr-plugin-nvim`
 - `hunk`
 - `kli`
 - `mango` (Linux only)
@@ -121,6 +122,12 @@ The Herdr module packages and registers bundled plugins declaratively:
 modules.home.herdr = {
   enable = true;
   plugins.jjWorkspace.enable = false; # defaults to true
+  plugins.nvim = {
+    enable = true; # defaults to false
+    keybinds.toggle = "prefix+e";
+    keybinds.pickFile = "prefix+shift+e";
+    settings.sidebar.position = "right";
+  };
   plugins.worktrunk = {
     enable = true; # defaults to false, independent of Git's Worktrunk integration
     keybinds.open = "prefix+shift+g";
@@ -139,6 +146,15 @@ Package overrides use the package's `manifestFile` passthru when available;
 otherwise the manifest is read from the built package (which requires IFD).
 An explicit source `manifestFile` avoids that build during evaluation.
 Install/configure the Worktrunk CLI separately using `modules.home.git.worktrunk`.
+
+The Neovim plugin requires Herdr >= 0.7.4 and Neovim >= 0.10. It uses `nvim`
+from PATH; set `plugins.nvim.settings.sidebar.nvim_bin` to select a wrapped
+executable, and `sidebar.nvim_env` for environment overrides such as
+`[ "NVIM_APPNAME=myapp" ]`. Settings go to `~/.config/herdr-nvim/config.toml`;
+an empty set leaves that file unmanaged. The sidebar injects the bundled Lua
+annotation plugin automatically; ordinary Neovim sessions need the Neovim-side
+plugin installed separately. The picker binding avoids the existing `prefix+o`
+sessionizer binding.
 
 Third-party plugins can be registered with `modules.home.herdr.extraPlugins`,
 a list of records with `id`, `package`, optional `manifestFile` (defaults to
