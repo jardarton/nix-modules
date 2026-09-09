@@ -411,6 +411,22 @@
         "type": "github"
       }
     },
+    "herdr-navigator": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1787673222,
+        "narHash": "sha256-/akGTke/uo89VKpCaxz8nkXWsEgKJCmBNfAUlDfj8NM=",
+        "owner": "thanhdat77",
+        "repo": "herdr-navigator",
+        "rev": "9bdf30f03f53730e6232377a3fca3bdc6ed9f3ca",
+        "type": "github"
+      },
+      "original": {
+        "owner": "thanhdat77",
+        "repo": "herdr-navigator",
+        "type": "github"
+      }
+    },
     "herdr-nvim": {
       "flake": false,
       "locked": {
@@ -706,6 +722,7 @@
         "flake-parts": "flake-parts",
         "fsel": "fsel",
         "herdr": "herdr",
+        "herdr-navigator": "herdr-navigator",
         "herdr-nvim": "herdr-nvim",
         "herdr-plugin-jj-workspace": "herdr-plugin-jj-workspace",
         "herdr-worktrunk": "herdr-worktrunk",

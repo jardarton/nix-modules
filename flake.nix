@@ -65,6 +65,10 @@
       url = "github:ChmaraX/herdr-nvim";
       flake = false;
     };
+    herdr-navigator = {
+      url = "github:thanhdat77/herdr-navigator";
+      flake = false;
+    };
     jj-starship = {
       url = "github:dmmulroy/jj-starship";
       inputs.nixpkgs.follows = "nixpkgs";

@@ -90,6 +90,7 @@ Packages are exported under `packages.${system}`:
 - `herdr-plugin-jj-workspace`
 - `herdr-plugin-worktrunk`
 - `herdr-plugin-nvim`
+- `herdr-plugin-navigator`
 - `hunk`
 - `kli`
 - `mango` (Linux only)
@@ -122,6 +123,13 @@ The Herdr module packages and registers bundled plugins declaratively:
 modules.home.herdr = {
   enable = true;
   plugins.jjWorkspace.enable = false; # defaults to true
+  plugins.navigator = {
+    enable = true; # defaults to false
+    keybinds.open = "prefix+tab";
+    keybinds.openSide = "prefix+shift+tab";
+    keybinds.jumpBack = "prefix+shift+a";
+    settings.picker.vim_mode = true;
+  };
   plugins.nvim = {
     enable = true; # defaults to false
     keybinds.toggle = "prefix+e";
@@ -155,6 +163,15 @@ an empty set leaves that file unmanaged. The sidebar injects the bundled Lua
 annotation plugin automatically; ordinary Neovim sessions need the Neovim-side
 plugin installed separately. The picker binding avoids the existing `prefix+o`
 sessionizer binding.
+
+Navigator requires Herdr >= 0.7.3. Its settings are written to
+`~/.config/herdr/plugins/config/herdr-navigator/config.toml`. Update checks
+default to false because Nix manages the package; this can be overridden with
+`plugins.navigator.settings.picker.check_updates`. Navigator keybindings replace
+the default `prefix+tab` workspace-fzf binding with Navigator and bind
+`prefix+shift+a` to previous workspace, keeping `prefix+a` for last pane.
+Disabling Navigator or its keybindings restores the old picker binding. Zoxide and Herdr Plus are
+optional integrations and are not installed by this plugin.
 
 Third-party plugins can be registered with `modules.home.herdr.extraPlugins`,
 a list of records with `id`, `package`, optional `manifestFile` (defaults to
