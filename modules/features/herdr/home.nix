@@ -1,7 +1,6 @@
 {
   config,
   lib,
-  options,
   pkgs,
   ...
 }:
@@ -11,53 +10,53 @@ let
   json = pkgs.formats.json { };
   defaultJjWorkspacePlugin = {
     id = "nathanflurry.jj-workspace";
-    package = cfg.jjWorkspacePluginPackage;
-    manifestFile = cfg.jjWorkspacePluginManifestFile;
+    package = cfg.plugins.jjWorkspace.package;
+    manifestFile = cfg.plugins.jjWorkspace.manifestFile;
     enabled = true;
   };
   defaultWorktrunkPlugin = {
     id = "worktrunk";
-    package = cfg.worktrunkPluginPackage;
-    manifestFile = cfg.worktrunkPluginManifestFile;
+    package = cfg.plugins.worktrunk.package;
+    manifestFile = cfg.plugins.worktrunk.manifestFile;
     enabled = true;
   };
   configuredPlugins =
-    lib.optional cfg.enableJjWorkspacePlugin defaultJjWorkspacePlugin
-    ++ lib.optional cfg.enableWorktrunkPlugin defaultWorktrunkPlugin
-    ++ cfg.plugins;
+    lib.optional cfg.plugins.jjWorkspace.enable defaultJjWorkspacePlugin
+    ++ lib.optional cfg.plugins.worktrunk.enable defaultWorktrunkPlugin
+    ++ cfg.extraPlugins;
   jjWorkspaceKeybindCommands =
-    lib.optionals (cfg.enableJjWorkspacePlugin && cfg.pluginKeybinds.jjWorkspace.enable)
+    lib.optionals (cfg.plugins.jjWorkspace.enable && cfg.plugins.jjWorkspace.keybinds.enable)
       [
         {
-          key = cfg.pluginKeybinds.jjWorkspace.new;
+          key = cfg.plugins.jjWorkspace.keybinds.new;
           type = "pane";
           command = "herdr plugin action invoke nathanflurry.jj-workspace.new";
           description = "New jj workspace";
         }
         {
-          key = cfg.pluginKeybinds.jjWorkspace.remove;
+          key = cfg.plugins.jjWorkspace.keybinds.remove;
           type = "pane";
           command = "herdr plugin action invoke nathanflurry.jj-workspace.remove";
           description = "Remove jj workspace";
         }
       ];
   worktrunkKeybindCommands =
-    lib.optionals (cfg.enableWorktrunkPlugin && cfg.pluginKeybinds.worktrunk.enable)
+    lib.optionals (cfg.plugins.worktrunk.enable && cfg.plugins.worktrunk.keybinds.enable)
       [
         {
-          key = cfg.pluginKeybinds.worktrunk.open;
+          key = cfg.plugins.worktrunk.keybinds.open;
           type = "plugin_action";
           command = "worktrunk.open";
           description = "Worktree: switch / create from default branch";
         }
         {
-          key = cfg.pluginKeybinds.worktrunk.openCurrent;
+          key = cfg.plugins.worktrunk.keybinds.openCurrent;
           type = "plugin_action";
           command = "worktrunk.open-current";
           description = "Worktree: switch / create from current branch";
         }
         {
-          key = cfg.pluginKeybinds.worktrunk.remove;
+          key = cfg.plugins.worktrunk.keybinds.remove;
           type = "plugin_action";
           command = "worktrunk.remove";
           description = "Worktree: remove";
@@ -85,6 +84,9 @@ let
         if plugin.manifestFile == null then "${plugin.package}/herdr-plugin.toml" else plugin.manifestFile;
       manifest = builtins.fromTOML (builtins.readFile manifestPath);
     in
+    assert lib.assertMsg (
+      manifest.id == plugin.id
+    ) "Herdr plugin '${plugin.id}' does not match manifest id '${manifest.id}'.";
     {
       plugin_id = plugin.id;
       inherit (manifest)
@@ -176,13 +178,15 @@ in
       description = "Herdr package to install.";
     };
 
-    jjWorkspacePluginPackage = mkOption {
+    plugins.jjWorkspace.package = mkOption {
       type = types.package;
       description = "Bundled jj-workspace plugin package.";
     };
 
-    jjWorkspacePluginManifestFile = mkOption {
-      type = types.path;
+    plugins.jjWorkspace.manifestFile = mkOption {
+      type = types.nullOr types.path;
+      default = cfg.plugins.jjWorkspace.package.manifestFile or null;
+      defaultText = literalExpression "config.modules.home.herdr.plugins.jjWorkspace.package.manifestFile or null";
       description = ''
         Source manifest for the bundled jj-workspace plugin. Keeping this
         separate from the built package avoids import from derivation during
@@ -190,14 +194,16 @@ in
       '';
     };
 
-    worktrunkPluginPackage = mkOption {
+    plugins.worktrunk.package = mkOption {
       type = types.package;
       description = "Bundled Herdr Worktrunk plugin package.";
     };
 
-    worktrunkPluginManifestFile = mkOption {
-      type = types.path;
-      description = "Source manifest for the bundled Herdr Worktrunk plugin.";
+    plugins.worktrunk.manifestFile = mkOption {
+      type = types.nullOr types.path;
+      default = cfg.plugins.worktrunk.package.manifestFile or null;
+      defaultText = literalExpression "config.modules.home.herdr.plugins.worktrunk.package.manifestFile or null";
+      description = "Source manifest for the Worktrunk plugin. Null reads the manifest from the package output.";
     };
 
     theme = mkOption {
@@ -246,49 +252,44 @@ in
       '';
     };
 
-    enableJjWorkspacePlugin = mkOption {
+    plugins.jjWorkspace.enable = mkOption {
       type = types.bool;
       default = true;
       description = "Enable the bundled NathanFlurry jj workspace Herdr plugin.";
     };
 
-    enableWorktrunkPlugin = mkOption {
-      type = types.bool;
-      default =
-        lib.hasAttrByPath [ "modules" "home" "git" "worktrunk" "enable" ] options
-        && config.modules.home.git.enable
-        && config.modules.home.git.worktrunk.enable;
-      defaultText = literalExpression "config.modules.home.git.enable && config.modules.home.git.worktrunk.enable";
-      description = "Enable the Worktrunk plugin when Git's Worktrunk integration is enabled.";
-    };
+    plugins.worktrunk.enable = mkEnableOption "the bundled Herdr Worktrunk plugin";
 
-    plugins = mkOption {
+    extraPlugins = mkOption {
       type = types.listOf (
-        types.submodule (_: {
-          options = {
-            id = mkOption {
-              type = types.str;
-              description = "Plugin id matching the herdr-plugin.toml manifest.";
+        types.submodule (
+          { config, ... }: {
+            options = {
+              id = mkOption {
+                type = types.str;
+                description = "Plugin id matching the herdr-plugin.toml manifest.";
+              };
+              package = mkOption {
+                type = types.package;
+                description = "Package containing herdr-plugin.toml at its root.";
+              };
+              manifestFile = mkOption {
+                type = types.nullOr types.path;
+                default = config.package.manifestFile or null;
+                defaultText = literalExpression "package.manifestFile or null";
+                description = ''
+                  Optional source herdr-plugin.toml. Supplying it avoids reading
+                  the plugin package output during module evaluation.
+                '';
+              };
+              enabled = mkOption {
+                type = types.bool;
+                default = true;
+                description = "Whether the plugin is enabled in Herdr.";
+              };
             };
-            package = mkOption {
-              type = types.package;
-              description = "Package containing herdr-plugin.toml at its root.";
-            };
-            manifestFile = mkOption {
-              type = types.nullOr types.path;
-              default = null;
-              description = ''
-                Optional source herdr-plugin.toml. Supplying it avoids reading
-                the plugin package output during module evaluation.
-              '';
-            };
-            enabled = mkOption {
-              type = types.bool;
-              default = true;
-              description = "Whether the plugin is enabled in Herdr.";
-            };
-          };
-        })
+          }
+        )
       );
       default = [ ];
       example = literalExpression ''
@@ -302,7 +303,7 @@ in
       description = "Declarative Herdr plugins registered via ~/.config/herdr/plugins.json.";
     };
 
-    pluginKeybinds.jjWorkspace = {
+    plugins.jjWorkspace.keybinds = {
       enable = mkOption {
         type = types.bool;
         default = true;
@@ -320,7 +321,22 @@ in
       };
     };
 
-    pluginKeybinds.worktrunk = {
+    plugins.worktrunk.settings = mkOption {
+      inherit (toml) type;
+      default = { };
+      example = {
+        open_mode = "workspace";
+        picker_placement = "popup";
+        show_remote_branches = true;
+      };
+      description = ''
+        Worktrunk plugin settings written to its managed config.toml.
+        An empty set leaves the file unmanaged. These settings are read by
+        the plugin on each invocation; no server restart is needed.
+      '';
+    };
+
+    plugins.worktrunk.keybinds = {
       enable = mkOption {
         type = types.bool;
         default = true;
@@ -338,7 +354,7 @@ in
       };
       remove = mkOption {
         type = types.str;
-        default = "prefix+shift+d";
+        default = "prefix+shift+x";
         description = "Keybind for removing a worktree.";
       };
     };
@@ -468,6 +484,20 @@ in
   };
 
   config = lib.mkIf cfg.enable {
+    assertions = [
+      {
+        assertion =
+          lib.length (lib.unique (map (plugin: plugin.id) configuredPlugins)) == lib.length configuredPlugins;
+        message = "Herdr plugin IDs must be unique across bundled plugins and extraPlugins.";
+      }
+    ];
+
+    xdg.configFile."herdr/plugins/config/worktrunk/config.toml" =
+      lib.mkIf (cfg.plugins.worktrunk.enable && cfg.plugins.worktrunk.settings != { })
+        {
+          source = toml.generate "herdr-worktrunk-config.toml" cfg.plugins.worktrunk.settings;
+        };
+
     home.packages = [
       cfg.package
       pkgs.fd

@@ -87,6 +87,8 @@ Packages are exported under `packages.${system}`:
 - `firecrawl-cli`
 - `gondolin`
 - `hbcdump`
+- `herdr-plugin-jj-workspace`
+- `herdr-plugin-worktrunk`
 - `hunk`
 - `kli`
 - `mango` (Linux only)
@@ -110,6 +112,51 @@ Or consume one from another flake:
   ];
 }
 ```
+
+### Herdr plugins
+
+The Herdr module packages and registers bundled plugins declaratively:
+
+```nix
+modules.home.herdr = {
+  enable = true;
+  plugins.jjWorkspace.enable = false; # defaults to true
+  plugins.worktrunk = {
+    enable = true; # defaults to false, independent of Git's Worktrunk integration
+    keybinds.open = "prefix+shift+g";
+    keybinds.remove = "prefix+shift+x"; # default; distinct from detach
+    settings = {
+      picker_placement = "popup";
+      show_remote_branches = true;
+    };
+  };
+};
+```
+
+Each bundled plugin exposes `enable`, `package`, `manifestFile`, and
+`keybinds` options. Set `keybinds.enable = false` to omit its default bindings.
+Package overrides use the package's `manifestFile` passthru when available;
+otherwise the manifest is read from the built package (which requires IFD).
+An explicit source `manifestFile` avoids that build during evaluation.
+Install/configure the Worktrunk CLI separately using `modules.home.git.worktrunk`.
+
+Third-party plugins can be registered with `modules.home.herdr.extraPlugins`,
+a list of records with `id`, `package`, optional `manifestFile` (defaults to
+`package.manifestFile or null`), and `enabled` (defaults to true). IDs must be
+unique and match the corresponding manifests.
+
+Worktrunk's `settings` are serialized to its managed `config.toml`; an empty
+set leaves that file unmanaged. The plugin reads settings on each invocation.
+
+Migration from the previous API:
+
+- `enableWorktrunkPlugin` → `plugins.worktrunk.enable` (now defaults to false)
+- `enableJjWorkspacePlugin` → `plugins.jjWorkspace.enable`
+- `worktrunkPluginPackage` / `jjWorkspacePluginPackage` → `plugins.<name>.package`
+- `worktrunkPluginManifestFile` / `jjWorkspacePluginManifestFile` → `plugins.<name>.manifestFile`
+- `pluginKeybinds.<name>` → `plugins.<name>.keybinds`
+- The old `plugins` list → `extraPlugins`
+- Worktrunk's default remove binding is now `prefix+shift+x`, avoiding detach
 
 ### Utilities
 
