@@ -23,6 +23,7 @@ in
         plugins.jjWorkspace.package = lib.mkDefault config.packages.herdr-plugin-jj-workspace;
         plugins.worktrunk.package = lib.mkDefault config.packages.herdr-plugin-worktrunk;
         plugins.nvim.package = lib.mkDefault config.packages.herdr-plugin-nvim;
+        plugins.navigator.package = lib.mkDefault config.packages.herdr-plugin-navigator;
       };
     }
   );
@@ -48,6 +49,26 @@ in
           ];
         };
       disabled = mkHome { plugins.jjWorkspace.enable = false; };
+      navigatorEnabled = mkHome {
+        plugins.jjWorkspace.enable = false;
+        plugins.navigator = {
+          enable = true;
+          settings.picker.vim_mode = true;
+        };
+      };
+      navigatorPackage = self.packages.${pkgs.stdenv.hostPlatform.system}.herdr-plugin-navigator;
+      navigatorOverride = navigatorPackage.overrideAttrs (_: {
+        pname = "herdr-navigator-override";
+      });
+      navigatorNoKeys = mkHome {
+        plugins.jjWorkspace.enable = false;
+        plugins.navigator = {
+          enable = true;
+          package = navigatorOverride;
+          keybinds.enable = false;
+          settings.picker.check_updates = true;
+        };
+      };
       nvimEnabled = mkHome {
         plugins.jjWorkspace.enable = false;
         plugins.nvim = {
@@ -115,6 +136,8 @@ in
     in
     {
       checks.herdr-plugins =
+        assert !disabled.config.modules.home.herdr.plugins.navigator.enable;
+        assert !(disabled.config.xdg.configFile ? "herdr/plugins/config/herdr-navigator/config.toml");
         assert !disabled.config.modules.home.herdr.plugins.nvim.enable;
         assert !(disabled.config.xdg.configFile ? "herdr-nvim/config.toml");
         assert !disabled.config.modules.home.herdr.plugins.worktrunk.enable;
@@ -164,7 +187,52 @@ in
         touch "$out"
       '';
 
+      checks.herdr-navigator =
+        assert navigatorNoKeys.config.modules.home.herdr.plugins.navigator.package == navigatorOverride;
+        assert
+          navigatorNoKeys.config.modules.home.herdr.plugins.navigator.manifestFile
+          == navigatorOverride.manifestFile;
+        pkgs.runCommand "check-herdr-navigator" { nativeBuildInputs = [ pkgs.jq ]; } ''
+          jq -e 'length == 1 and .[0].plugin_id == "herdr-navigator" and .[0].enabled and (.[0].actions | length == 3) and (.[0].panes | length == 2)' \
+            ${navigatorEnabled.config.xdg.configFile."herdr/plugins.json".source}
+          grep -F 'prefix+tab' ${navigatorEnabled.config.xdg.configFile."herdr/config.toml".source}
+          grep -F 'prefix+shift+tab' ${navigatorEnabled.config.xdg.configFile."herdr/config.toml".source}
+          grep -F 'prefix+shift+a' ${navigatorEnabled.config.xdg.configFile."herdr/config.toml".source}
+          grep -F 'last_pane = "prefix+a"' ${
+            navigatorEnabled.config.xdg.configFile."herdr/config.toml".source
+          }
+          if grep -F 'herdr-workspace-fzf' ${
+            navigatorEnabled.config.xdg.configFile."herdr/config.toml".source
+          }; then
+            echo "Old workspace picker binding is still present" >&2
+            exit 1
+          fi
+          grep -F 'last_pane = "prefix+a"' ${navigatorNoKeys.config.xdg.configFile."herdr/config.toml".source}
+          grep -F 'herdr-workspace-fzf' ${navigatorNoKeys.config.xdg.configFile."herdr/config.toml".source}
+          grep -F 'vim_mode = true' ${
+            navigatorEnabled.config.xdg.configFile."herdr/plugins/config/herdr-navigator/config.toml".source
+          }
+          grep -F 'check_updates = false' ${
+            navigatorEnabled.config.xdg.configFile."herdr/plugins/config/herdr-navigator/config.toml".source
+          }
+          grep -F 'check_updates = true' ${
+            navigatorNoKeys.config.xdg.configFile."herdr/plugins/config/herdr-navigator/config.toml".source
+          }
+          if grep -F 'herdr-navigator.' ${
+            navigatorNoKeys.config.xdg.configFile."herdr/config.toml".source
+          }; then
+            echo "Disabled Navigator keybindings are still present" >&2
+            exit 1
+          fi
+          test -x ${navigatorPackage}/target/release/herdr-navigator
+          cmp ${navigatorPackage}/herdr-plugin.toml ${navigatorPackage.manifestFile}
+          touch "$out"
+        '';
+
       packages = {
+        herdr-plugin-navigator = pkgs.callPackage ./herdr/navigator-plugin.pkg.nix {
+          src = moduleFlake.inputs.herdr-navigator;
+        };
         herdr-plugin-nvim = pkgs.callPackage ./herdr/nvim-plugin.pkg.nix {
           src = moduleFlake.inputs.herdr-nvim;
         };

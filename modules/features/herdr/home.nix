@@ -6,6 +6,7 @@
 }:
 let
   cfg = config.modules.home.herdr;
+  navigatorKeysEnabled = cfg.plugins.navigator.enable && cfg.plugins.navigator.keybinds.enable;
   toml = pkgs.formats.toml { };
   json = pkgs.formats.json { };
   defaultJjWorkspacePlugin = {
@@ -28,7 +29,34 @@ let
       inherit (cfg.plugins.nvim) package manifestFile;
       enabled = true;
     }
+    ++ lib.optional cfg.plugins.navigator.enable {
+      id = "herdr-navigator";
+      inherit (cfg.plugins.navigator) package manifestFile;
+      enabled = true;
+    }
     ++ cfg.extraPlugins;
+  navigatorKeybindCommands =
+    lib.optionals (cfg.plugins.navigator.enable && cfg.plugins.navigator.keybinds.enable)
+      [
+        {
+          key = cfg.plugins.navigator.keybinds.open;
+          type = "plugin_action";
+          command = "herdr-navigator.open";
+          description = "Jump to anything in Herdr";
+        }
+        {
+          key = cfg.plugins.navigator.keybinds.openSide;
+          type = "plugin_action";
+          command = "herdr-navigator.open-side";
+          description = "Toggle Navigator side pane";
+        }
+        {
+          key = cfg.plugins.navigator.keybinds.jumpBack;
+          type = "plugin_action";
+          command = "herdr-navigator.jump-back";
+          description = "Jump to previous workspace";
+        }
+      ];
   nvimKeybindCommands = lib.optionals (cfg.plugins.nvim.enable && cfg.plugins.nvim.keybinds.enable) [
     {
       key = cfg.plugins.nvim.keybinds.toggle;
@@ -95,7 +123,8 @@ let
         (settingsWithTheme.keys.command or [ ])
         ++ jjWorkspaceKeybindCommands
         ++ worktrunkKeybindCommands
-        ++ nvimKeybindCommands;
+        ++ nvimKeybindCommands
+        ++ navigatorKeybindCommands;
     };
   };
   herdrBin = lib.getExe' cfg.package "herdr";
@@ -366,6 +395,52 @@ in
       description = "Declarative Herdr plugins registered via ~/.config/herdr/plugins.json.";
     };
 
+    plugins.navigator = {
+      enable = mkEnableOption "the bundled Herdr Navigator fuzzy navigator";
+      package = mkOption {
+        type = types.package;
+        description = "Herdr Navigator plugin package.";
+      };
+      manifestFile = mkOption {
+        type = types.nullOr types.path;
+        default = cfg.plugins.navigator.package.manifestFile or null;
+        defaultText = literalExpression "config.modules.home.herdr.plugins.navigator.package.manifestFile or null";
+        description = "Source manifest for Navigator; avoids import from derivation.";
+      };
+      settings = mkOption {
+        inherit (toml) type;
+        default = { };
+        example.picker.vim_mode = true;
+        description = ''
+          Settings written to herdr/plugins/config/herdr-navigator/config.toml.
+          Update checks default to false because Nix manages the package;
+          set picker.check_updates to true to override this.
+        '';
+      };
+      keybinds = {
+        enable = mkOption {
+          type = types.bool;
+          default = true;
+          description = "Add Navigator action keybindings.";
+        };
+        open = mkOption {
+          type = types.str;
+          default = "prefix+tab";
+          description = "Keybind for opening Navigator.";
+        };
+        openSide = mkOption {
+          type = types.str;
+          default = "prefix+shift+tab";
+          description = "Keybind for toggling the Navigator side pane.";
+        };
+        jumpBack = mkOption {
+          type = types.str;
+          default = "prefix+shift+a";
+          description = "Keybind for jumping to the previous workspace.";
+        };
+      };
+    };
+
     plugins.jjWorkspace.keybinds = {
       enable = mkOption {
         type = types.bool;
@@ -480,12 +555,6 @@ in
               description = "Pick a directory and create a workspace there";
             }
             {
-              key = "prefix+tab";
-              type = "pane";
-              command = "herdr-workspace-fzf";
-              description = "Fuzzy find and focus a workspace";
-            }
-            {
               key = "ctrl+h";
               type = "shell";
               command = "herdr-vim-navigate left";
@@ -509,7 +578,13 @@ in
               command = "herdr-vim-navigate right";
               description = "Navigate right (Vim/Herdr)";
             }
-          ];
+          ]
+          ++ lib.optional (!navigatorKeysEnabled) {
+            key = "prefix+tab";
+            type = "pane";
+            command = "herdr-workspace-fzf";
+            description = "Fuzzy find and focus a workspace";
+          };
         };
         ui = {
           confirm_close = true;
@@ -565,6 +640,14 @@ in
       lib.mkIf (cfg.plugins.nvim.enable && cfg.plugins.nvim.settings != { })
         {
           source = toml.generate "herdr-nvim-config.toml" cfg.plugins.nvim.settings;
+        };
+
+    modules.home.herdr.plugins.navigator.settings.picker.check_updates = lib.mkDefault false;
+
+    xdg.configFile."herdr/plugins/config/herdr-navigator/config.toml" =
+      lib.mkIf cfg.plugins.navigator.enable
+        {
+          source = toml.generate "herdr-navigator-config.toml" cfg.plugins.navigator.settings;
         };
 
     home.packages = [
