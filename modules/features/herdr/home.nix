@@ -34,6 +34,11 @@ let
       inherit (cfg.plugins.navigator) package manifestFile;
       enabled = true;
     }
+    ++ lib.optional cfg.plugins.annotate.enable {
+      id = "annotate";
+      inherit (cfg.plugins.annotate) package manifestFile;
+      enabled = true;
+    }
     ++ cfg.extraPlugins;
   navigatorKeybindCommands =
     lib.optionals (cfg.plugins.navigator.enable && cfg.plugins.navigator.keybinds.enable)
@@ -71,6 +76,46 @@ let
       description = "Open file from agent output in Neovim";
     }
   ];
+  annotateKeybindCommands =
+    lib.optionals (cfg.plugins.annotate.enable && cfg.plugins.annotate.keybinds.enable)
+      [
+        {
+          key = cfg.plugins.annotate.keybinds.capture;
+          type = "plugin_action";
+          command = "annotate.capture";
+          description = "Annotate selected terminal text";
+        }
+        {
+          key = cfg.plugins.annotate.keybinds.copyContext;
+          type = "plugin_action";
+          command = "annotate.copy-context";
+          description = "Copy annotations as agent context";
+        }
+        {
+          key = cfg.plugins.annotate.keybinds.copyArchive;
+          type = "plugin_action";
+          command = "annotate.copy-archive";
+          description = "Copy and archive annotations";
+        }
+        {
+          key = cfg.plugins.annotate.keybinds.manage;
+          type = "plugin_action";
+          command = "annotate.manage";
+          description = "Manage annotations";
+        }
+        {
+          key = cfg.plugins.annotate.keybinds.open;
+          type = "plugin_action";
+          command = "annotate.open";
+          description = "Review documents in this folder";
+        }
+        {
+          key = cfg.plugins.annotate.keybinds.last;
+          type = "plugin_action";
+          command = "annotate.last";
+          description = "Review the agent's last reply";
+        }
+      ];
   jjWorkspaceKeybindCommands =
     lib.optionals (cfg.plugins.jjWorkspace.enable && cfg.plugins.jjWorkspace.keybinds.enable)
       [
@@ -124,7 +169,8 @@ let
         ++ jjWorkspaceKeybindCommands
         ++ worktrunkKeybindCommands
         ++ nvimKeybindCommands
-        ++ navigatorKeybindCommands;
+        ++ navigatorKeybindCommands
+        ++ annotateKeybindCommands;
     };
   };
   herdrBin = lib.getExe' cfg.package "herdr";
@@ -348,6 +394,57 @@ in
           type = types.str;
           default = "prefix+shift+e";
           description = "Keybind for opening the Neovim file picker.";
+        };
+      };
+    };
+
+    plugins.annotate = {
+      enable = mkEnableOption "the bundled Herdr Annotate selection and document review plugin";
+      package = mkOption {
+        type = types.package;
+        description = "Herdr Annotate plugin package, including its Plannotator TUI runtime.";
+      };
+      manifestFile = mkOption {
+        type = types.nullOr types.path;
+        default = cfg.plugins.annotate.package.manifestFile or null;
+        defaultText = literalExpression "config.modules.home.herdr.plugins.annotate.package.manifestFile or null";
+        description = "Source manifest for Herdr Annotate; avoids import from derivation.";
+      };
+      keybinds = {
+        enable = mkOption {
+          type = types.bool;
+          default = true;
+          description = "Add conflict-free Herdr Annotate action keybindings.";
+        };
+        capture = mkOption {
+          type = types.str;
+          default = "prefix+s";
+          description = "Keybind for annotating selected terminal text.";
+        };
+        copyContext = mkOption {
+          type = types.str;
+          default = "prefix+shift+s";
+          description = "Keybind for copying annotations as agent context.";
+        };
+        copyArchive = mkOption {
+          type = types.str;
+          default = "prefix+ctrl+s";
+          description = "Keybind for copying and archiving annotations.";
+        };
+        manage = mkOption {
+          type = types.str;
+          default = "prefix+m";
+          description = "Keybind for managing annotations.";
+        };
+        open = mkOption {
+          type = types.str;
+          default = "prefix+shift+f";
+          description = "Keybind for reviewing documents in the focused pane's directory.";
+        };
+        last = mkOption {
+          type = types.str;
+          default = "prefix+shift+l";
+          description = "Keybind for reviewing the focused agent's last reply.";
         };
       };
     };
@@ -656,6 +753,8 @@ in
       pkgs.fzf
       pkgs.jq
     ]
+    ++ lib.optional cfg.plugins.annotate.enable pkgs.bun
+    ++ lib.optional (cfg.plugins.annotate.enable && pkgs.stdenv.hostPlatform.isLinux) pkgs.wl-clipboard
     # Keep manifests and plugin-private resources out of the shared profile:
     # multiple plugins contain the same root-level herdr-plugin.toml. The
     # registry references the complete packages, retaining their runtime data.

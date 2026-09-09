@@ -130,6 +130,15 @@ modules.home.herdr = {
     keybinds.jumpBack = "prefix+shift+a";
     settings.picker.vim_mode = true;
   };
+  plugins.annotate = {
+    enable = true; # defaults to false
+    keybinds.capture = "prefix+s";
+    keybinds.copyContext = "prefix+shift+s";
+    keybinds.copyArchive = "prefix+ctrl+s";
+    keybinds.manage = "prefix+m";
+    keybinds.open = "prefix+shift+f";
+    keybinds.last = "prefix+shift+l";
+  };
   plugins.nvim = {
     enable = true; # defaults to false
     keybinds.toggle = "prefix+e";
@@ -172,6 +181,12 @@ the default `prefix+tab` workspace-fzf binding with Navigator and bind
 `prefix+shift+a` to previous workspace, keeping `prefix+a` for last pane.
 Disabling Navigator or its keybindings restores the old picker binding. Zoxide and Herdr Plus are
 optional integrations and are not installed by this plugin.
+
+Herdr Annotate requires Herdr >= 0.8.0. The package includes the pinned
+Plannotator TUI release and enabling it adds Bun and, on Linux, `wl-clipboard`
+to the Home Manager profile. Its module defaults intentionally differ from
+upstream's recommended bindings so it can be enabled alongside this module's
+sessionizer, last-pane, notification-target, and Navigator bindings.
 
 Third-party plugins can be registered with `modules.home.herdr.extraPlugins`,
 a list of records with `id`, `package`, optional `manifestFile` (defaults to

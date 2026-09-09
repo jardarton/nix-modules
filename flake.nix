@@ -69,6 +69,10 @@
       url = "github:thanhdat77/herdr-navigator";
       flake = false;
     };
+    herdr-annotate = {
+      url = "github:plannotator/herdr-annotate";
+      flake = false;
+    };
     jj-starship = {
       url = "github:dmmulroy/jj-starship";
       inputs.nixpkgs.follows = "nixpkgs";

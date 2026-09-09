@@ -411,6 +411,22 @@
         "type": "github"
       }
     },
+    "herdr-annotate": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1788883683,
+        "narHash": "sha256-+fvhp6goKaYX8WsI0oGeTYkpfX/wnGFkmyCzR0WqdB4=",
+        "owner": "plannotator",
+        "repo": "herdr-annotate",
+        "rev": "bfe0de8af9912b90a8a89a07a58a7b9b0dcfea88",
+        "type": "github"
+      },
+      "original": {
+        "owner": "plannotator",
+        "repo": "herdr-annotate",
+        "type": "github"
+      }
+    },
     "herdr-navigator": {
       "flake": false,
       "locked": {
@@ -722,6 +738,7 @@
         "flake-parts": "flake-parts",
         "fsel": "fsel",
         "herdr": "herdr",
+        "herdr-annotate": "herdr-annotate",
         "herdr-navigator": "herdr-navigator",
         "herdr-nvim": "herdr-nvim",
         "herdr-plugin-jj-workspace": "herdr-plugin-jj-workspace",

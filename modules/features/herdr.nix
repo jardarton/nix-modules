@@ -24,6 +24,7 @@ in
         plugins.worktrunk.package = lib.mkDefault config.packages.herdr-plugin-worktrunk;
         plugins.nvim.package = lib.mkDefault config.packages.herdr-plugin-nvim;
         plugins.navigator.package = lib.mkDefault config.packages.herdr-plugin-navigator;
+        plugins.annotate.package = lib.mkDefault config.packages.herdr-plugin-annotate;
       };
     }
   );
@@ -54,6 +55,7 @@ in
         plugins.worktrunk.enable = true;
         plugins.nvim.enable = true;
         plugins.navigator.enable = true;
+        plugins.annotate.enable = true;
       };
       navigatorEnabled = mkHome {
         plugins.jjWorkspace.enable = false;
@@ -87,6 +89,18 @@ in
         plugins.jjWorkspace.enable = false;
         plugins.nvim.enable = true;
         plugins.nvim.keybinds.enable = false;
+      };
+      annotateEnabled = mkHome {
+        plugins.jjWorkspace.enable = false;
+        plugins.annotate = {
+          enable = true;
+          keybinds.capture = "prefix+shift+s";
+        };
+      };
+      annotateNoKeys = mkHome {
+        plugins.jjWorkspace.enable = false;
+        plugins.annotate.enable = true;
+        plugins.annotate.keybinds.enable = false;
       };
       enabled = mkHome {
         plugins.jjWorkspace.enable = false;
@@ -144,6 +158,9 @@ in
       checks.herdr-combined-plugins = pkgs.runCommand "check-herdr-combined-plugins" { } ''
         test -x ${combined.config.home.path}/bin/herdr-nvim
         test -x ${combined.config.home.path}/bin/herdr-navigator
+        test -x ${
+          self.packages.${pkgs.stdenv.hostPlatform.system}.herdr-plugin-annotate
+        }/bin/plannotator-tui.exe
         test ! -e ${combined.config.home.path}/herdr-plugin.toml
         touch "$out"
       '';
@@ -200,6 +217,27 @@ in
         touch "$out"
       '';
 
+      checks.herdr-annotate =
+        pkgs.runCommand "check-herdr-annotate" { nativeBuildInputs = [ pkgs.jq ]; }
+          ''
+            jq -e 'length == 1 and .[0].plugin_id == "annotate" and .[0].enabled and (.[0].actions | length == 7) and (.[0].panes | length == 3) and (.[0].link_handlers | length == 1)' \
+              ${annotateEnabled.config.xdg.configFile."herdr/plugins.json".source}
+            grep -F 'prefix+shift+s' ${annotateEnabled.config.xdg.configFile."herdr/config.toml".source}
+            grep -F 'annotate.open' ${annotateEnabled.config.xdg.configFile."herdr/config.toml".source}
+            if grep -F 'annotate.' ${annotateNoKeys.config.xdg.configFile."herdr/config.toml".source}; then
+              echo "Disabled Annotate keybindings are still present" >&2
+              exit 1
+            fi
+            test -x ${annotateEnabled.config.home.path}/bin/bun
+            test -x ${
+              self.packages.${pkgs.stdenv.hostPlatform.system}.herdr-plugin-annotate
+            }/bin/plannotator-tui.exe
+            cmp ${self.packages.${pkgs.stdenv.hostPlatform.system}.herdr-plugin-annotate}/herdr-plugin.toml ${
+              self.packages.${pkgs.stdenv.hostPlatform.system}.herdr-plugin-annotate.manifestFile
+            }
+            touch "$out"
+          '';
+
       checks.herdr-navigator =
         assert navigatorNoKeys.config.modules.home.herdr.plugins.navigator.package == navigatorOverride;
         assert
@@ -243,6 +281,9 @@ in
         '';
 
       packages = {
+        herdr-plugin-annotate = pkgs.callPackage ./herdr/annotate-plugin.pkg.nix {
+          src = moduleFlake.inputs.herdr-annotate;
+        };
         herdr-plugin-navigator = pkgs.callPackage ./herdr/navigator-plugin.pkg.nix {
           src = moduleFlake.inputs.herdr-navigator;
         };
