@@ -49,6 +49,12 @@ in
           ];
         };
       disabled = mkHome { plugins.jjWorkspace.enable = false; };
+      combined = mkHome {
+        plugins.jjWorkspace.enable = true;
+        plugins.worktrunk.enable = true;
+        plugins.nvim.enable = true;
+        plugins.navigator.enable = true;
+      };
       navigatorEnabled = mkHome {
         plugins.jjWorkspace.enable = false;
         plugins.navigator = {
@@ -135,6 +141,13 @@ in
       };
     in
     {
+      checks.herdr-combined-plugins = pkgs.runCommand "check-herdr-combined-plugins" { } ''
+        test -x ${combined.config.home.path}/bin/herdr-nvim
+        test -x ${combined.config.home.path}/bin/herdr-navigator
+        test ! -e ${combined.config.home.path}/herdr-plugin.toml
+        touch "$out"
+      '';
+
       checks.herdr-plugins =
         assert !disabled.config.modules.home.herdr.plugins.navigator.enable;
         assert !(disabled.config.xdg.configFile ? "herdr/plugins/config/herdr-navigator/config.toml");

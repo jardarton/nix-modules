@@ -656,7 +656,16 @@ in
       pkgs.fzf
       pkgs.jq
     ]
-    ++ map (plugin: plugin.package) configuredPlugins;
+    # Keep manifests and plugin-private resources out of the shared profile:
+    # multiple plugins contain the same root-level herdr-plugin.toml. The
+    # registry references the complete packages, retaining their runtime data.
+    ++ lib.optional (configuredPlugins != [ ]) (
+      pkgs.buildEnv {
+        name = "herdr-plugin-executables";
+        paths = map (plugin: plugin.package) configuredPlugins;
+        pathsToLink = [ "/bin" ];
+      }
+    );
 
     home.file.".local/scripts/herdr-vim-navigate" = {
       executable = true;
