@@ -6,6 +6,7 @@
   makeWrapper,
   installShellFiles,
   bubblewrap,
+  ripgrep,
   installShellCompletions ? stdenv.buildPlatform.canExecute stdenv.hostPlatform,
 }:
 
@@ -71,23 +72,26 @@ stdenvNoCC.mkDerivation {
   installPhase = ''
     runHook preInstall
 
-    mkdir -p $out/bin $out/libexec
+    mkdir -p $out/bin $out/libexec/package/{bin,codex-path,codex-resources}
 
     # Codex looks for the code-mode host next to the executable it runs, so both
     # binaries live in libexec and only the wrapper goes on PATH.
-    tar -xzf ${codexBinary} -C $out/libexec
-    tar -xzf ${codeModeHost} -C $out/libexec
-    mv $out/libexec/codex-${target} $out/libexec/codex
-    mv $out/libexec/codex-code-mode-host-${target} $out/libexec/codex-code-mode-host
-    chmod +x $out/libexec/codex $out/libexec/codex-code-mode-host
+    tar -xzf ${codexBinary} -C $out/libexec/package/bin
+    tar -xzf ${codeModeHost} -C $out/libexec/package/bin
+    mv $out/libexec/package/bin/codex-${target} $out/libexec/package/bin/codex
+    mv $out/libexec/package/bin/codex-code-mode-host-${target} $out/libexec/package/bin/codex-code-mode-host
+    chmod +x $out/libexec/package/bin/codex $out/libexec/package/bin/codex-code-mode-host
+    cp ${ripgrep}/bin/rg $out/libexec/package/codex-path/rg
+    ${lib.optionalString stdenv.hostPlatform.isLinux "cp ${bubblewrap}/bin/bwrap $out/libexec/package/codex-resources/bwrap"}
+    printf '%s\n' '{"version":"${version}","target":"${target}","entrypoint":"bin/codex"}' > $out/libexec/package/codex-package.json
 
-    ln -s ../libexec/codex-code-mode-host $out/bin/codex-code-mode-host
+    ln -s ../libexec/package/bin/codex-code-mode-host $out/bin/codex-code-mode-host
 
     # Inherited from sadjow/codex-cli-nix: a stable executable path is intended
     # to avoid macOS permission resets when Nix store paths change. This package
     # does not create ~/.local/bin/codex; consumers must provide that symlink or
     # set CODEX_EXECUTABLE_PATH to their own stable launcher path.
-    makeWrapper $out/libexec/codex $out/bin/codex \
+    makeWrapper $out/libexec/package/bin/codex $out/bin/codex \
       --set DISABLE_AUTOUPDATER 1 \
       --run 'export CODEX_EXECUTABLE_PATH="''${CODEX_EXECUTABLE_PATH:-$HOME/.local/bin/codex}"' \
       ${lib.optionalString stdenv.hostPlatform.isLinux ''--prefix PATH : "${runtimePath}"''}
