@@ -16,11 +16,11 @@ let
 in
 stdenv.mkDerivation (finalAttrs: {
   pname = "ntn";
-  version = "0.23.2";
+  version = "0.23.13";
 
   src = fetchurl {
     url = "https://registry.npmjs.org/ntn/-/ntn-${finalAttrs.version}.tgz";
-    hash = "sha256-kAemOX9WuDbgGV629qxfllb0DHiOvhhgoYdp7GfB1hs=";
+    hash = "sha256-NHLun1oYG3QvmnAOajyr6oMD1h5O5kBBKPIPyoyn7Bs=";
   };
 
   sourceRoot = "package";

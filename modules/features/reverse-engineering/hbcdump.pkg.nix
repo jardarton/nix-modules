@@ -9,13 +9,13 @@
 }:
 stdenv.mkDerivation (finalAttrs: {
   pname = "hbcdump";
-  version = "260318099.0.2";
+  version = "260318099.0.4";
 
   src = fetchFromGitHub {
     owner = "facebook";
     repo = "hermes";
     tag = "hermes-v${finalAttrs.version}";
-    hash = "sha256-qTGlVBkNwLfZmR88HWz4VK1y+GvzOUMiyUBfv/2wvrg=";
+    hash = "sha256-ZH1BraxaRsEs/uGlJ8oXrUg/pl2kj8jkdavJ7Ly5JNg=";
   };
 
   buildInputs = [ icu ];
