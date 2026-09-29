@@ -138,6 +138,9 @@
         test -x ${
           self.packages.${pkgs.stdenv.hostPlatform.system}.herdr-plugin-annotate
         }/bin/plannotator-tui.exe
+        test -x ${
+          self.packages.${pkgs.stdenv.hostPlatform.system}.herdr-plugin-annotate
+        }/bin/herdr-annotate.exe
         test ! -e ${combined.config.home.path}/herdr-plugin.toml
         touch "$out"
       '';
@@ -197,7 +200,7 @@
       checks.herdr-annotate =
         pkgs.runCommand "check-herdr-annotate" { nativeBuildInputs = [ pkgs.jq ]; }
           ''
-            jq -e 'length == 1 and .[0].plugin_id == "annotate" and .[0].enabled and (.[0].actions | length == 7) and (.[0].panes | length == 3) and (.[0].link_handlers | length == 1)' \
+            jq -e 'length == 1 and .[0].plugin_id == "annotate" and .[0].enabled and (.[0].actions | length == 11) and (.[0].panes | length == 3) and (.[0].link_handlers | length == 1)' \
               ${annotateEnabled.config.xdg.configFile."herdr/plugins.json".source}
             grep -F 'prefix+shift+s' ${annotateEnabled.config.xdg.configFile."herdr/config.toml".source}
             grep -F 'annotate.open' ${annotateEnabled.config.xdg.configFile."herdr/config.toml".source}
@@ -205,7 +208,9 @@
               echo "Disabled Annotate keybindings are still present" >&2
               exit 1
             fi
-            test -x ${annotateEnabled.config.home.path}/bin/bun
+            test -x ${
+              self.packages.${pkgs.stdenv.hostPlatform.system}.herdr-plugin-annotate
+            }/bin/herdr-annotate.exe
             test -x ${
               self.packages.${pkgs.stdenv.hostPlatform.system}.herdr-plugin-annotate
             }/bin/plannotator-tui.exe

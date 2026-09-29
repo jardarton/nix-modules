@@ -7,17 +7,17 @@
 
 buildNpmPackage rec {
   pname = "playwright-cli";
-  version = "0.1.19";
+  version = "0.1.22";
 
   src = fetchFromGitHub {
     owner = "microsoft";
     repo = "playwright-cli";
-    rev = "655530f6d0dc71a0d6bf46ae165877d3c7311099";
-    hash = "sha256-Z9+WgdgqtSYTKfRgJ51UAnXqlPPhhtU/yzH+qYblVeg=";
+    tag = "v${version}";
+    hash = "sha256-80xzHvf7BHGvoKvMdkGeNUsUrpZrpw5eryuQM8NKT/E=";
   };
 
   nodejs = nodejs_24;
-  npmDepsHash = "sha256-aY3i+sc2p8iQAEpfs+j/ifeBVmMpDDmwctEqOIDmCqI=";
+  npmDepsHash = "sha256-mGD7a/v1cx/xPGZo8nN3WA40mYGgF/KzMKiGbvUeX4E=";
 
   dontNpmBuild = true;
 

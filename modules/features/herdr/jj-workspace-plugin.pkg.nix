@@ -7,7 +7,7 @@
 let
   rustPackage = rustPlatform.buildRustPackage {
     pname = "jj-workspace";
-    version = "0.1.0";
+    version = "0.4.0";
     inherit src;
     cargoLock.lockFile = src + "/Cargo.lock";
     meta.mainProgram = "jj-workspace";

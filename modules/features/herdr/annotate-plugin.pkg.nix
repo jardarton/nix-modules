@@ -6,20 +6,24 @@
   stdenv,
 }:
 let
-  version = "0.3.0";
-  plannotatorTuiVersion = "0.7.0";
+  version = "0.8.0";
+  herdrAnnotateVersion = "0.2.0";
+  plannotatorTuiVersion = "0.9.4";
   targets = {
     x86_64-linux = {
       name = "x86_64-unknown-linux-gnu";
-      hash = "sha256-j4FK/WPGMQDf0Vx+TC1ciSTnSUPoF4gMOciAwvicmUQ=";
+      annotateHash = "sha256-o+9OcnhLuoz3nlgtYCHKNPDWAPFw2jCVvMYKh7G8uUI=";
+      tuiHash = "sha256-1U3GA8lfcQZ3vBPr5rJLLm6xDOdhV3r4qVoFAChit00=";
     };
     aarch64-linux = {
       name = "aarch64-unknown-linux-gnu";
-      hash = "sha256-GUgIcAHloC6Hn9oVhmjLVZ5ARTREageGEN55mwtTBRQ=";
+      annotateHash = "sha256-xNOA7VpwzXtDZCgsPXApCkgal5NQYrvlxnJXmRxpH28=";
+      tuiHash = "sha256-45B3qsLh537XmNJZD4Rc+ZjkVvoqIS/nyuLiX+v2III=";
     };
     aarch64-darwin = {
       name = "aarch64-apple-darwin";
-      hash = "sha256-tSA4uqJko3INV8mg5Wc9uG1eB7mNY5cz+WIb6IuPFSg=";
+      annotateHash = "sha256-WpxT03fNh+ZN4BueQ8hJBFP2q4GhExHTQKS/8HDqQwg=";
+      tuiHash = "sha256-qdpJ3WpE00lP7Q6DZsoymW7N9A4CcfztQQzsPIg5F10=";
     };
   };
   target =
@@ -27,7 +31,11 @@ let
       or (throw "herdr-annotate: unsupported system ${stdenv.hostPlatform.system}");
   plannotatorTui = fetchurl {
     url = "https://github.com/plannotator/plannotator-tui/releases/download/v${plannotatorTuiVersion}/plannotator-tui-${target.name}";
-    inherit (target) hash;
+    hash = target.tuiHash;
+  };
+  herdrAnnotate = fetchurl {
+    url = "https://github.com/plannotator/herdr-annotate/releases/download/rust-lite-v${herdrAnnotateVersion}/herdr-annotate-${target.name}";
+    hash = target.annotateHash;
   };
 in
 stdenv.mkDerivation {
@@ -44,6 +52,8 @@ stdenv.mkDerivation {
     mkdir -p "$out"
     cp -R . "$out/"
     chmod -R u+w "$out"
+    install -Dm755 ${herdrAnnotate} "$out/bin/herdr-annotate.exe"
+    printf %s ${lib.escapeShellArg herdrAnnotateVersion} > "$out/bin/herdr-annotate.version"
     install -Dm755 ${plannotatorTui} "$out/bin/plannotator-tui.exe"
     printf %s ${lib.escapeShellArg plannotatorTuiVersion} > "$out/bin/plannotator-tui.version"
 
@@ -57,5 +67,6 @@ stdenv.mkDerivation {
     homepage = "https://github.com/plannotator/herdr-annotate";
     license = lib.licenses.mit;
     platforms = builtins.attrNames targets;
+    sourceProvenance = [ lib.sourceTypes.binaryNativeCode ];
   };
 }
