@@ -16,6 +16,12 @@ in
       description = "Whether to enable Git and related tools.";
     };
 
+    hunk.enable = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = "Whether to install Hunk and use it as the Git diff pager.";
+    };
+
     hunkPackage = lib.mkOption {
       type = lib.types.package;
       description = "Hunk package used as the Git pager.";
@@ -61,7 +67,7 @@ in
         "* merge=mergiraf"
       ];
       settings = {
-        core.pager = "${cfg.hunkPackage}/bin/hunk pager";
+        core.pager = lib.mkIf cfg.hunk.enable "${cfg.hunkPackage}/bin/hunk pager";
         pull.rebase = true;
       };
     };
@@ -77,8 +83,8 @@ in
       pkgs.gh-dash
       pkgs.mergiraf
       pkgs.difftastic
-      cfg.hunkPackage
     ]
+    ++ lib.optional cfg.hunk.enable cfg.hunkPackage
     ++ lib.optional cfg.worktrunk.enable cfg.worktrunk.package;
 
     xdg.configFile."worktrunk/config.toml" =
@@ -113,7 +119,7 @@ in
       };
     };
     home.shellAliases = {
-      hunk = "${cfg.hunkPackage}/bin/hunk";
+      hunk = lib.mkIf cfg.hunk.enable "${cfg.hunkPackage}/bin/hunk";
       lg = "lazygit";
     };
   };

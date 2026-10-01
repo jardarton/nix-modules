@@ -21,6 +21,12 @@ in
       description = "enable jujutsu";
     };
 
+    hunk.enable = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = "Whether to install Hunk and use it as the Jujutsu diff pager.";
+    };
+
     hunkPackage = lib.mkOption {
       type = lib.types.package;
       description = "Hunk package used as the Jujutsu pager.";
@@ -79,12 +85,14 @@ in
         })
         {
           ui.default-command = "log";
+        }
+        (lib.mkIf cfg.hunk.enable {
           ui.pager = [
             "${cfg.hunkPackage}/bin/hunk"
             "pager"
           ];
           ui.diff-formatter = ":git";
-        }
+        })
         cfg.settings
       ];
     };
@@ -117,7 +125,8 @@ in
     };
 
     home.packages =
-      lib.optionals cfg.jjStarship.enable [
+      lib.optional cfg.hunk.enable cfg.hunkPackage
+      ++ lib.optionals cfg.jjStarship.enable [
         cfg.jjStarship.package
       ]
       ++ lib.optionals zshEnabled [
