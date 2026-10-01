@@ -63,6 +63,7 @@ in
   config = lib.mkIf cfg.enable {
 
     programs.git = {
+      enable = lib.mkDefault true;
       attributes = [
         "* merge=mergiraf"
       ];

@@ -84,14 +84,14 @@ in
           ];
         })
         {
-          ui.default-command = "log";
+          ui.default-command = lib.mkDefault "log";
         }
         (lib.mkIf cfg.hunk.enable {
-          ui.pager = [
+          ui.pager = lib.mkDefault [
             "${cfg.hunkPackage}/bin/hunk"
             "pager"
           ];
-          ui.diff-formatter = ":git";
+          ui.diff-formatter = lib.mkDefault ":git";
         })
         cfg.settings
       ];

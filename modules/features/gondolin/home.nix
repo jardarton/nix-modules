@@ -95,7 +95,7 @@ let
         )
       ''}
 
-      exec gondolin bash "''${gondolin_args[@]}" -- nix "''${nix_args[@]}" develop "$@"
+      gondolin bash "''${gondolin_args[@]}" -- nix "''${nix_args[@]}" develop "$@"
     '';
   };
 in

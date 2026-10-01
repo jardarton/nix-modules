@@ -128,7 +128,7 @@ in
             local target normalized sessions
 
             target=$(normalize_path "$1")
-            sessions=$(tmux list-sessions -F '#{session_name}\t#{session_path}' 2>/dev/null || true)
+            sessions=$(tmux list-sessions -F $'#{session_name}\t#{session_path}' 2>/dev/null || true)
             while IFS=$'\t' read -r session_name session_path; do
               [[ -n ''${session_name:-} ]] || continue
               if [[ $(normalize_path "$session_path") == "$target" ]]; then
