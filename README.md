@@ -24,7 +24,6 @@ Home Manager modules are exported under `homeModules` and
 - `default`
 - `devops`
 - `direnv`
-- `dstask`
 - `dwm`
 - `eza`
 - `firefox`
@@ -81,6 +80,7 @@ NixOS modules are exported under `nixosModules` and `modules.nixos`:
 
 Packages are exported under `packages.${system}`:
 
+- `angr` (x86 Linux only)
 - `cclip` (Linux only)
 - `chdman`
 - `codex`
@@ -94,9 +94,14 @@ Packages are exported under `packages.${system}`:
 - `hunk`
 - `kli`
 - `mango` (Linux only)
+- `mitmproxy`
 - `ntn`
 - `playwright-cli`
 - `stack`
+
+The bundled `angr` package is available only on x86 Linux. On other platforms,
+enabling `modules.home.reverse-engineering.dynamicAnalysis.enable` requires
+a consumer-supplied `modules.home.reverse-engineering.angrPackage`.
 
 Build a package directly:
 

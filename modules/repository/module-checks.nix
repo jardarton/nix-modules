@@ -22,7 +22,6 @@
           "default"
           "devops"
           "direnv"
-          "dstask"
           "eza"
           "fzf"
           "git"

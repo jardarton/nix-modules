@@ -1,17 +1,20 @@
 # Focused Herdr evaluations live next to the feature, independently of its
 # package and public module definitions.
 {
-  inputs,
+  config,
   self,
   ...
 }:
+let
+  homeManager = config.nixModules.sourceFlake.inputs.home-manager;
+in
 {
   perSystem =
     { pkgs, ... }:
     let
       mkHome =
         settings:
-        inputs.home-manager.lib.homeManagerConfiguration {
+        homeManager.lib.homeManagerConfiguration {
           inherit pkgs;
           modules = [
             self.homeModules.herdr

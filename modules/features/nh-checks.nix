@@ -1,13 +1,16 @@
 # Exercise option overrides and conditional output independently of the broad
 # Home Manager composition check.
-{ inputs, self, ... }:
+{ config, self, ... }:
+let
+  homeManager = config.nixModules.sourceFlake.inputs.home-manager;
+in
 {
   perSystem =
     { pkgs, ... }:
     let
       mkHome =
         settings:
-        inputs.home-manager.lib.homeManagerConfiguration {
+        homeManager.lib.homeManagerConfiguration {
           inherit pkgs;
           modules = [
             self.homeModules.nh
