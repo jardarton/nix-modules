@@ -89,6 +89,7 @@
           "base-packages"
           "disk-monitor"
           "home-assistant"
+          "sudo-approval"
           "stylix"
         ];
       };
