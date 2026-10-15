@@ -29,6 +29,14 @@ let
           hash = "sha256:78816d4f24add8f10a06d6f05b4d424ad9e96cfebf68a4ddc99c65c0720d00c2";
         };
       };
+      # The pycparser pin rebuilds pybind11 locally, where this concurrent
+      # subinterpreter import test is flaky under load on Python 3.14. The
+      # tests run through the CMake check target, so disabledTests has no effect.
+      pybind11 = prev.pybind11.overridePythonAttrs (old: {
+        preCheck = (old.preCheck or "") + ''
+          export PYTEST_ADDOPTS="-k 'not test_import_in_subinterpreter_concurrently'"
+        '';
+      });
       archinfo = prev.archinfo.overridePythonAttrs {
         inherit version;
         src = fetchFromGitHub {
