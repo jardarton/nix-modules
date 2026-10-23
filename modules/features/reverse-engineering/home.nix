@@ -41,6 +41,17 @@ let
       ]
     );
 
+  # Qt 6.12's uic rejects Cutter 2.5.0's UI files (NixOS/nixpkgs#576576).
+  # Drop this once nixpkgs carries the fix from rizinorg/cutter#3670.
+  cutter = pkgs.cutter.overrideAttrs (old: {
+    patches = (old.patches or [ ]) ++ [
+      (pkgs.fetchpatch {
+        url = "https://github.com/rizinorg/cutter/commit/bfb65782c0b3e4df4e2f0e4f5284c51848bb8358.patch";
+        hash = "sha256-qhkGX+yr2Tn9twfwk6XWiiPlFpwdjMy7YNofywL9gvY=";
+      })
+    ];
+  });
+
   coreExtraPackages = with pkgs; [
     capa
     checksec
