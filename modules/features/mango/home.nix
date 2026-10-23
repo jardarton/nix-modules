@@ -36,7 +36,7 @@ let
     shadows_blur = 15;
     shadows_position_x = 0;
     shadows_position_y = 0;
-    shadowscolor = "0x000000ff";
+    shadows_color = "0x000000ff";
 
     border_radius = 6;
     no_radius_when_single = 0;
@@ -53,8 +53,8 @@ let
     tag_animation_direction = 0;
     zoom_initial_ratio = 0.3;
     zoom_end_ratio = 0.8;
-    fadein_begin_opacity = 0.5;
-    fadeout_begin_opacity = 0.8;
+    fade_in_begin_opacity = 0.5;
+    fade_out_begin_opacity = 0.8;
     animation_duration_move = 150;
     animation_duration_open = 400;
     animation_duration_tag = 250;
@@ -73,20 +73,20 @@ let
     scroller_default_proportion_single = 1.0;
     scroller_proportion_preset = "0.5,0.8,1.0";
     new_is_master = 0;
-    default_mfact = 0.55;
-    default_nmaster = 1;
-    smartgaps = 0;
+    default_master_factor = 0.55;
+    default_master_count = 1;
+    smart_gaps = 0;
 
     # Overview and focus behavior
     hotarea_size = 10;
     enable_hotarea = 1;
-    overviewgappi = 5;
-    overviewgappo = 30;
+    overview_gap_inner = 5;
+    overview_gap_outer = 30;
     no_border_when_single = 0;
     axis_bind_apply_timeout = 100;
     focus_on_activate = 1;
-    sloppyfocus = 1;
-    warpcursor = 1;
+    sloppy_focus = 1;
+    warp_cursor = 1;
     focus_cross_monitor = 0;
     focus_cross_tag = 0;
     enable_floating_snap = 0;
@@ -98,7 +98,7 @@ let
     # layout and any device-specific policy.
     repeat_rate = 25;
     repeat_delay = 600;
-    numlockon = 1;
+    numlock_on = 1;
     disable_trackpad = 0;
     tap_to_click = 0;
     tap_and_drag = 1;
@@ -111,23 +111,23 @@ let
     mouse_natural_scrolling = 1;
 
     # Appearance
-    gappih = 5;
-    gappiv = 5;
-    gappoh = 10;
-    gappov = 10;
+    gap_inner_horizontal = 5;
+    gap_inner_vertical = 5;
+    gap_outer_horizontal = 10;
+    gap_outer_vertical = 10;
     scratchpad_width_ratio = 0.8;
     scratchpad_height_ratio = 0.9;
-    borderpx = 4;
-    rootcolor = "0x201b14ff";
-    bordercolor = "0x444444ff";
-    focuscolor = "0xc9b890ff";
-    maximizescreencolor = "0x89aa61ff";
-    urgentcolor = "0xad401fff";
-    scratchpadcolor = "0x516c93ff";
-    globalcolor = "0xb153a7ff";
-    overlaycolor = "0x14a57cff";
+    border_px = 4;
+    root_color = "0x201b14ff";
+    border_color = "0x444444ff";
+    focus_color = "0xc9b890ff";
+    maximized_screen_color = "0x89aa61ff";
+    urgent_color = "0xad401fff";
+    scratchpad_color = "0x516c93ff";
+    global_color = "0xb153a7ff";
+    overlay_color = "0x14a57cff";
 
-    tagrule = map (tag: "id:${toString tag},layout_name:scroller") (lib.range 1 9);
+    tag_rule = map (tag: "id:${toString tag},layout_name:scroller") (lib.range 1 9);
 
     # These are compositor-management bindings only. Application, media,
     # lock-screen, and desktop-component bindings belong to consumers.
@@ -196,7 +196,7 @@ let
       "none,down,3,viewtoleft_have_client"
     ];
 
-    "exec-once" =
+    exec_once =
       optional (cfg.wallpaper != null) "swaybg -i ${cfg.wallpaper} -m fill" ++ cfg.extraAutostartCommands;
   };
 in
@@ -260,7 +260,7 @@ in
       default = [ ];
       example = [ "my-session-service" ];
       description = ''
-        Additional commands emitted as Mango `exec-once` entries. Use native
+        Additional commands emitted as Mango `exec_once` entries. Use native
         Home Manager service options when one exists for the program.
       '';
     };
