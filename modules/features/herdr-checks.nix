@@ -203,7 +203,7 @@ in
       checks.herdr-annotate =
         pkgs.runCommand "check-herdr-annotate" { nativeBuildInputs = [ pkgs.jq ]; }
           ''
-            jq -e 'length == 1 and .[0].plugin_id == "annotate" and .[0].enabled and (.[0].actions | length == 11) and (.[0].panes | length == 3) and (.[0].link_handlers | length == 1)' \
+            jq -e 'length == 1 and .[0].plugin_id == "annotate" and .[0].enabled and (.[0].actions | length == 10) and (.[0].panes | length == 3) and (.[0].link_handlers | length == 0)' \
               ${annotateEnabled.config.xdg.configFile."herdr/plugins.json".source}
             grep -F 'prefix+shift+s' ${annotateEnabled.config.xdg.configFile."herdr/config.toml".source}
             grep -F 'annotate.open' ${annotateEnabled.config.xdg.configFile."herdr/config.toml".source}
