@@ -29,7 +29,7 @@ in
       age
       sops
       ssh-to-age
-      awscli
+      awscli2
       tree
       fastfetch
       file
