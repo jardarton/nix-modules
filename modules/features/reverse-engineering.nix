@@ -34,7 +34,7 @@
         mitmproxy = pkgs.callPackage ./reverse-engineering/mitmproxy.pkg.nix { };
       }
       // lib.optionalAttrs (pkgs.stdenv.hostPlatform.system == "x86_64-linux") {
-        angr = pkgs.callPackage ./reverse-engineering/angr.pkg.nix { };
+        angr = pkgs.python3Packages.angr;
       };
 
       checks = lib.optionalAttrs (pkgs.stdenv.hostPlatform.system == "x86_64-linux") {
