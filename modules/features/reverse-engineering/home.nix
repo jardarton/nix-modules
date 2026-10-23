@@ -113,7 +113,7 @@ in
     angrPackage = mkOption {
       type = types.package;
       description = ''
-        Version-aligned angr package to use for dynamic analysis. The bundled
+        angr package to use for dynamic analysis. The bundled
         default supports x86_64-linux; consumers on other platforms must supply
         their own package when enabling dynamic analysis.
       '';
