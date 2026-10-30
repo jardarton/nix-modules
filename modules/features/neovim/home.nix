@@ -97,7 +97,7 @@ in
     home.file.".config/nvim" = {
       source = fetchGit {
         url = "https://github.com/jardarton/neovim.git";
-        rev = "4c64fbfa9224a53f909c713bccacb59a9858f727";
+        rev = "26b7fca2af9aad89614ce55a6be66a07960c77b7";
         ref = "nixcats";
       };
       recursive = true;
