@@ -94,7 +94,6 @@ Packages are exported under `packages.${system}`:
 - `hunk`
 - `kli`
 - `mango` (Linux only)
-- `mitmproxy`
 - `ntn`
 - `playwright-cli`
 - `stack`
