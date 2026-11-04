@@ -62,6 +62,13 @@
           "xdg"
           "zathura"
         ];
+
+        # Each Firefox export configures the same profile, so they cannot share
+        # a composition.
+        browser-minimal = [
+          "firefox-minimal"
+          "stylix"
+        ];
       };
 
       nixosCompositions = {

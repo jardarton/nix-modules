@@ -26,6 +26,10 @@
       url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    arkenfox = {
+      url = "github:arkenfox/user.js";
+      flake = false;
+    };
     mango = {
       url = "github:DreamMaoMao/mango";
       inputs.flake-parts.follows = "flake-parts";

@@ -27,6 +27,7 @@ Home Manager modules are exported under `homeModules` and
 - `dwm`
 - `eza`
 - `firefox`
+- `firefox-minimal`
 - `fonts`
 - `fsel`
 - `fzf`
@@ -293,7 +294,7 @@ NixOS module in a host configuration.
     inputs.nix-modules.homeModules.zsh
   ];
 
-  modules.home.firefox.profile = "default";
+  programs.firefox.profiles.default.settings."browser.startup.homepage" = "https://example.org";
 
   # The imported parent feature is active; optional tool groups remain opt-in.
   modules.home.reverse-engineering = {

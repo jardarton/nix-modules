@@ -1,5 +1,21 @@
 {
   "nodes": {
+    "arkenfox": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1793406515,
+        "narHash": "sha256-5K32F1jWZ3Q29h3ahklmcqS0vudAT9HhuK7DdMUk52g=",
+        "owner": "arkenfox",
+        "repo": "user.js",
+        "rev": "06914fb7d2d4904f078995005b65745ec9861bfc",
+        "type": "github"
+      },
+      "original": {
+        "owner": "arkenfox",
+        "repo": "user.js",
+        "type": "github"
+      }
+    },
     "base16": {
       "inputs": {
         "fromYaml": "fromYaml"
@@ -734,6 +750,7 @@
     },
     "root": {
       "inputs": {
+        "arkenfox": "arkenfox",
         "firefox-addons": "firefox-addons",
         "flake-parts": "flake-parts",
         "fsel": "fsel",
