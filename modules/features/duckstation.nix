@@ -4,8 +4,12 @@
   perSystem =
     { lib, pkgs, ... }:
     {
-      packages = lib.optionalAttrs (pkgs.stdenv.hostPlatform.system == "x86_64-linux") {
-        duckstation = pkgs.callPackage ./duckstation/package.pkg.nix { };
-      };
+      packages =
+        lib.optionalAttrs (pkgs.stdenv.hostPlatform.system == "x86_64-linux") {
+          duckstation = pkgs.callPackage ./duckstation/package.pkg.nix { };
+        }
+        // lib.optionalAttrs pkgs.stdenv.hostPlatform.isLinux {
+          openbios = pkgs.callPackage ./duckstation/openbios.pkg.nix { };
+        };
     };
 }
