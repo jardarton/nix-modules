@@ -82,6 +82,19 @@ in
       programs.firefox = {
         enable = true;
 
+        # The same cached Firefox, minus ONNX Runtime's OpenVINO provider and
+        # symbol tables. See firefox-unwrapped-slim.pkg.nix. PipeWire already
+        # brings headless ffmpeg, which keeps VA-API decoding, so the wrapper
+        # does not need a second, full ffmpeg.
+        package = mkIf pkgs.stdenv.hostPlatform.isLinux (
+          mkDefault (
+            (pkgs.wrapFirefox.override { ffmpeg_9 = pkgs.ffmpeg_9-headless; }) (pkgs.callPackage
+              ./firefox-unwrapped-slim.pkg.nix
+              { }
+            ) { }
+          )
+        );
+
         # Firefox keeps using the legacy root when it already exists, and
         # existing profiles live there. Consumers can opt into the XDG path.
         configPath = mkIf (!pkgs.stdenv.hostPlatform.isDarwin) (mkDefault ".mozilla/firefox");
@@ -91,10 +104,20 @@ in
         policies = defaults {
           DisableTelemetry = true;
           DisableFirefoxStudies = true;
-          DisablePocket = true;
           DisableFirefoxAccounts = true;
           DisableFeedbackCommands = true;
+          DisableFirefoxScreenshots = true;
+          DisableProfileImport = true;
+          DisableProfileRefresh = true;
           DisableSetDesktopBackground = true;
+          AutofillAddressEnabled = false;
+          AutofillCreditCardEnabled = false;
+          BrowserDataBackup = {
+            AllowBackup = false;
+            AllowRestore = false;
+          };
+          IPProtectionAvailable = false;
+          VisualSearchEnabled = false;
           DontCheckDefaultBrowser = true;
           NoDefaultBookmarks = true;
           OverrideFirstRunPage = "";
@@ -157,6 +180,14 @@ in
             # The push service keeps a connection to Mozilla open, and site
             # notifications are blocked by policy anyway.
             "dom.push.enabled" = false;
+            # Promotions for Mozilla's other products.
+            "browser.vpn_promo.enabled" = false;
+            "browser.promo.pin.enabled" = false;
+            "browser.promo.relay.enabled" = false;
+            "signon.firefoxRelay.feature" = "disabled";
+            "browser.contentblocking.report.hide_vpn_banner" = true;
+            # The profile switcher in the menu. Home Manager manages profiles.
+            "browser.profiles.enabled" = false;
             "browser.translations.neverTranslateLanguages" = "no";
           };
         };

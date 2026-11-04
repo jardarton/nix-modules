@@ -44,6 +44,9 @@ in
       };
     };
 
+    # Bitwarden manages passwords.
+    programs.firefox.policies.PasswordManagerEnabled = mkDefault false;
+
     programs.firefox.profiles.${cfg.profile} = {
       extensions.packages = with cfg.addons; [
         vimium
