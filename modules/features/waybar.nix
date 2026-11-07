@@ -1,3 +1,4 @@
+{ config, ... }:
 {
   flake.modules.homeManager.waybar =
     {
@@ -6,7 +7,10 @@
       ...
     }:
     {
-      imports = [ ./waybar/home.nix ];
+      imports = [
+        ./waybar/home.nix
+        config.nixModules.stylixHelper
+      ];
       modules.home.waybar.enable = lib.mkDefault pkgs.stdenv.hostPlatform.isLinux;
     };
 }

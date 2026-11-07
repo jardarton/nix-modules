@@ -1,3 +1,9 @@
+{ config, lib, ... }:
 {
-  flake.modules.homeManager.fzf = ./fzf/home.nix;
+  # Two definitions rather than one imports list, so the feature module keeps
+  # its place in the module order and only the helper is added.
+  flake.modules.homeManager.fzf = lib.mkMerge [
+    ./fzf/home.nix
+    { imports = [ config.nixModules.stylixHelper ]; }
+  ];
 }

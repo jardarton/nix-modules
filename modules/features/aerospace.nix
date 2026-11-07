@@ -1,3 +1,4 @@
+{ config, ... }:
 {
   flake.modules.homeManager.aerospace =
     {
@@ -6,7 +7,10 @@
       ...
     }:
     {
-      imports = [ ./aerospace/home.nix ];
+      imports = [
+        ./aerospace/home.nix
+        config.nixModules.stylixHelper
+      ];
       modules.home.aerospace.enable = lib.mkDefault pkgs.stdenv.hostPlatform.isDarwin;
     };
 }

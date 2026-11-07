@@ -13,7 +13,6 @@ let
     types
     ;
   cfg = config.modules.home.vscode;
-  stylix = import ../stylix/lib.nix { inherit config options; };
 in
 {
 
@@ -40,7 +39,7 @@ in
         };
       };
     }
-    // optionalAttrs stylix.hasStylix {
+    // optionalAttrs (options ? stylix) {
       stylix.targets.vscode.profileNames = [ "default" ];
     }
   );

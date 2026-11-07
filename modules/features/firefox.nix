@@ -18,6 +18,7 @@ let
   sources = {
     key = "nix-modules#firefox-sources";
     imports = [
+      config.nixModules.stylixHelper
       (
         { lib, pkgs, ... }:
         {

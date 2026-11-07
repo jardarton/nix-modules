@@ -3,13 +3,12 @@
 {
   config,
   lib,
-  options,
   ...
 }:
 let
   inherit (lib) mkDefault mkIf;
   cfg = config.modules.home.firefox;
-  stylix = import ../stylix/lib.nix { inherit config options; };
+  stylix = config.lib.nixModules.stylix;
 in
 {
   imports = [

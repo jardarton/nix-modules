@@ -23,6 +23,8 @@ let
   color = name: if hasStylix then config.lib.stylix.colors.${name} else fallback.${name};
 in
 {
-  inherit hasStylix color;
+  # Deliberately no `hasStylix`: deciding which attributes to define from
+  # `config.lib` loops, so modules test `options ? stylix` themselves.
+  inherit color;
   withHashtag = name: "#${color name}";
 }

@@ -1,7 +1,7 @@
 {
   lib,
-  config,
   options,
+  config,
   ...
 }:
 let
@@ -13,7 +13,6 @@ let
     types
     ;
   cfg = config.modules.home.kitty;
-  stylix = import ../stylix/lib.nix { inherit config options; };
 in
 {
 
@@ -66,7 +65,7 @@ in
         };
       };
     }
-    // optionalAttrs stylix.hasStylix {
+    // optionalAttrs (options ? stylix) {
       stylix.targets.kitty.variant256Colors = true;
     }
   );

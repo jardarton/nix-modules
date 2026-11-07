@@ -17,7 +17,6 @@ let
     types
     ;
   cfg = config.modules.home.firefox;
-  stylix = import ../stylix/lib.nix { inherit config options; };
   defaults = lib.mapAttrs (_: mkDefault);
 in
 {
@@ -200,7 +199,7 @@ in
         "x-scheme-handler/https" = [ "firefox.desktop" ];
       };
     }
-    (optionalAttrs stylix.hasStylix {
+    (optionalAttrs (options ? stylix) {
       stylix.targets.firefox = {
         enable = mkDefault true;
         profileNames = [ cfg.profile ];

@@ -2,13 +2,12 @@
   pkgs,
   lib,
   config,
-  options,
   ...
 }:
 let
   inherit (lib) mkIf mkOption types;
   cfg = config.modules.home.aerospace;
-  stylix = import ../stylix/lib.nix { inherit config options; };
+  stylix = config.lib.nixModules.stylix;
 in
 {
 

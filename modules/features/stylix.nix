@@ -1,5 +1,6 @@
 {
   config,
+  lib,
   ...
 }:
 let
@@ -93,7 +94,31 @@ let
     };
 in
 {
-  flake.modules = {
+  options.nixModules.stylixHelper = lib.mkOption {
+    type = lib.types.deferredModule;
+    description = ''
+      Home Manager module that exposes `config.lib.nixModules.stylix`, the
+      Stylix colour helpers with a Kanagawa fallback for configurations
+      without Stylix. Features that theme themselves import it. Only use it
+      inside option values; test `options ? stylix` to decide which
+      attributes to define, because reading `config.lib` there recurses.
+    '';
+  };
+
+  config.nixModules.stylixHelper = {
+    # Several features import this; the key lets the module system keep one.
+    key = "nix-modules#stylix-helper";
+    imports = [
+      (
+        { config, options, ... }:
+        {
+          lib.nixModules.stylix = import ./stylix/lib.nix { inherit config options; };
+        }
+      )
+    ];
+  };
+
+  config.flake.modules = {
     homeManager.stylix = mkStylixModule {
       description = "Whether to enable Stylix for the whole home configuration.";
       extraConfig.stylix.targets.gnome.enable = false;

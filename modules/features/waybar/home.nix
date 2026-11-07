@@ -12,7 +12,7 @@ let
     types
     ;
   cfg = config.modules.home.waybar;
-  stylix = import ../stylix/lib.nix { inherit config options; };
+  stylix = config.lib.nixModules.stylix;
   color = stylix.withHashtag "base07";
   border-color = stylix.withHashtag "base04";
   background-color = stylix.withHashtag "base02";
@@ -668,7 +668,7 @@ in
         }
       '';
     }
-    // optionalAttrs stylix.hasStylix {
+    // optionalAttrs (options ? stylix) {
       stylix.targets.waybar.enable = true;
       stylix.targets.waybar.addCss = false;
     }
