@@ -1,4 +1,4 @@
-# Focused Herdr evaluations live next to the feature, independently of its
+# Focused Herdr evaluations, imported by herdr.nix and kept apart from its
 # package and public module definitions.
 {
   config,

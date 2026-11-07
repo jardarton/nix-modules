@@ -7,6 +7,8 @@ let
   moduleFlake = config.nixModules.sourceFlake;
 in
 {
+  imports = [ ./herdr/checks.nix ];
+
   flake.modules.homeManager.herdr = moduleWithSystem (
     { config, ... }:
     { lib, pkgs, ... }:

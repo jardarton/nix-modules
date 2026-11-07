@@ -88,22 +88,7 @@
   };
 
   outputs =
-    { self, flake-parts, ... }@inputs:
-    let
-      flakeModule =
-        { lib, ... }:
-        {
-          imports = [
-            inputs.flake-parts.flakeModules.modules
-            inputs.home-manager.flakeModules.home-manager
-            ./modules
-          ];
-
-          # Capture this flake so imported features never depend on the name a
-          # consumer assigned to the input.
-          nixModules.sourceFlake = lib.mkDefault self;
-        };
-    in
+    { flake-parts, ... }@inputs:
     flake-parts.lib.mkFlake { inherit inputs; } {
       systems = [
         "x86_64-linux"
@@ -114,10 +99,8 @@
       imports = [
         inputs.flake-parts.flakeModules.flakeModules
         ./modules/repository/development.nix
+        ./modules/repository/flake-module.nix
         ./modules/repository/module-checks.nix
-        flakeModule
       ];
-
-      flake.flakeModule = flakeModule;
     };
 }

@@ -13,7 +13,7 @@ let
 in
 {
   # Files directly below features/ are automatically discovered flake-parts
-  # modules. Subdirectories are reserved for lower-level modules and assets
-  # imported by their owning feature.
+  # modules. Subdirectories hold lower-level modules, packages, assets and
+  # extra flake-parts modules (such as checks) imported by their owning feature.
   imports = [ inputs.flake-parts.flakeModules.modules ] ++ featureModules;
 }
