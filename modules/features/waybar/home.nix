@@ -4,8 +4,13 @@
   options,
   ...
 }:
-with lib;
 let
+  inherit (lib)
+    mkIf
+    mkOption
+    optionalAttrs
+    types
+    ;
   cfg = config.modules.home.waybar;
   stylix = import ../stylix/lib.nix { inherit config options; };
   color = stylix.withHashtag "base07";

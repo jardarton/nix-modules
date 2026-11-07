@@ -74,14 +74,18 @@ let
   '';
 in
 {
-  options.modules.home.television = with lib; {
-    enable = mkOption {
-      type = types.bool;
-      default = false;
-      example = true;
-      description = "enable television";
+  options.modules.home.television =
+    let
+      inherit (lib) mkOption types;
+    in
+    {
+      enable = mkOption {
+        type = types.bool;
+        default = false;
+        example = true;
+        description = "enable television";
+      };
     };
-  };
 
   config = lib.mkIf cfg.enable {
     home.file.".config/television/cable/tmux-sessions.toml".text = tmuxSessionsChannelText;

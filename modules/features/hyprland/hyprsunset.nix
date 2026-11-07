@@ -1,8 +1,8 @@
 { config, lib, ... }:
 let
   cfg = config.modules.home.hypr;
+  inherit (lib) mkIf;
 in
-with lib;
 {
   services = {
     hyprsunset = mkIf cfg.hyprsunset {

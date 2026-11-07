@@ -266,457 +266,466 @@ let
   );
 in
 {
-  options.modules.home.herdr = with lib; {
-    enable = mkEnableOption "Herdr terminal workspace manager for AI coding agents";
+  options.modules.home.herdr =
+    let
+      inherit (lib)
+        literalExpression
+        mkEnableOption
+        mkOption
+        types
+        ;
+    in
+    {
+      enable = mkEnableOption "Herdr terminal workspace manager for AI coding agents";
 
-    package = mkOption {
-      type = types.package;
-      defaultText = literalExpression "inputs.herdr.packages.\${pkgs.stdenv.hostPlatform.system}.default";
-      description = "Herdr package to install.";
-    };
-
-    plugins.jjWorkspace.package = mkOption {
-      type = types.package;
-      description = "Bundled jj-workspace plugin package.";
-    };
-
-    plugins.jjWorkspace.manifestFile = mkOption {
-      type = types.nullOr types.path;
-      default = cfg.plugins.jjWorkspace.package.manifestFile or null;
-      defaultText = literalExpression "config.modules.home.herdr.plugins.jjWorkspace.package.manifestFile or null";
-      description = ''
-        Source manifest for the bundled jj-workspace plugin. Keeping this
-        separate from the built package avoids import from derivation during
-        module evaluation.
-      '';
-    };
-
-    plugins.worktrunk.package = mkOption {
-      type = types.package;
-      description = "Bundled Herdr Worktrunk plugin package.";
-    };
-
-    plugins.worktrunk.manifestFile = mkOption {
-      type = types.nullOr types.path;
-      default = cfg.plugins.worktrunk.package.manifestFile or null;
-      defaultText = literalExpression "config.modules.home.herdr.plugins.worktrunk.package.manifestFile or null";
-      description = "Source manifest for the Worktrunk plugin. Null reads the manifest from the package output.";
-    };
-
-    theme = mkOption {
-      type = types.nullOr types.str;
-      default = null;
-      example = "kanagawa";
-      description = "Optional Herdr theme name override. When null, settings.theme is left untouched.";
-    };
-
-    kittyGraphics = mkOption {
-      type = types.bool;
-      default = false;
-      description = "Enable Herdr's experimental Kitty graphics renderer.";
-    };
-
-    sshAutoStart = mkOption {
-      type = types.bool;
-      default = false;
-      description = ''
-        Replace interactive SSH logins with a Herdr session. The zsh startup
-        files run `exec herdr` when the shell has an SSH TTY, is not already
-        inside Herdr, and `HERDR_DISABLE_AUTO_START` is empty.
-      '';
-    };
-
-    stopServerOnActivation = mkOption {
-      type = types.bool;
-      default = cfg.sshAutoStart;
-      defaultText = literalExpression "config.modules.home.herdr.sshAutoStart";
-      description = ''
-        Stop the running Herdr server during Home Manager activation when the
-        Herdr package, the generated configuration, or the plugin registry
-        changed. Activations that leave those unchanged keep running sessions.
-
-        The stop is deferred by {option}`stopServerDelaySeconds`, because it
-        also kills the shell that started the rebuild.
-      '';
-    };
-
-    stopServerDelaySeconds = mkOption {
-      type = types.ints.positive;
-      default = 10;
-      description = ''
-        Delay between the end of the activation and the deferred
-        `herdr server stop`.
-      '';
-    };
-
-    plugins.jjWorkspace.enable = mkOption {
-      type = types.bool;
-      default = true;
-      description = "Enable the bundled NathanFlurry jj workspace Herdr plugin.";
-    };
-
-    plugins.worktrunk.enable = mkEnableOption "the bundled Herdr Worktrunk plugin";
-
-    plugins.nvim = {
-      enable = mkEnableOption "the bundled Herdr Neovim sidebar and file picker";
       package = mkOption {
         type = types.package;
-        description = "Herdr Neovim plugin package, including its sidebar Lua runtime.";
+        defaultText = literalExpression "inputs.herdr.packages.\${pkgs.stdenv.hostPlatform.system}.default";
+        description = "Herdr package to install.";
       };
-      manifestFile = mkOption {
+
+      plugins.jjWorkspace.package = mkOption {
+        type = types.package;
+        description = "Bundled jj-workspace plugin package.";
+      };
+
+      plugins.jjWorkspace.manifestFile = mkOption {
         type = types.nullOr types.path;
-        default = cfg.plugins.nvim.package.manifestFile or null;
-        defaultText = literalExpression "config.modules.home.herdr.plugins.nvim.package.manifestFile or null";
-        description = "Source manifest for the Neovim plugin; avoids import from derivation.";
-      };
-      settings = mkOption {
-        inherit (toml) type;
-        default = { };
-        example.sidebar.position = "left";
+        default = cfg.plugins.jjWorkspace.package.manifestFile or null;
+        defaultText = literalExpression "config.modules.home.herdr.plugins.jjWorkspace.package.manifestFile or null";
         description = ''
-          Settings written to herdr-nvim/config.toml. An empty set leaves the
-          file unmanaged. Requires Neovim >= 0.10 on PATH, or set
-          sidebar.nvim_bin to your wrapped Neovim executable.
+          Source manifest for the bundled jj-workspace plugin. Keeping this
+          separate from the built package avoids import from derivation during
+          module evaluation.
         '';
       };
-      keybinds = {
-        enable = mkOption {
-          type = types.bool;
-          default = true;
-          description = "Add keybindings for the Neovim sidebar and file picker.";
-        };
-        toggle = mkOption {
-          type = types.str;
-          default = "prefix+e";
-          description = "Keybind for toggling the Neovim sidebar.";
-        };
-        pickFile = mkOption {
-          type = types.str;
-          default = "prefix+shift+e";
-          description = "Keybind for opening the Neovim file picker.";
-        };
-      };
-    };
 
-    plugins.annotate = {
-      enable = mkEnableOption "the bundled Herdr Annotate selection and document review plugin";
-      package = mkOption {
+      plugins.worktrunk.package = mkOption {
         type = types.package;
-        description = "Herdr Annotate plugin package, including its Plannotator TUI runtime.";
+        description = "Bundled Herdr Worktrunk plugin package.";
       };
-      manifestFile = mkOption {
-        type = types.nullOr types.path;
-        default = cfg.plugins.annotate.package.manifestFile or null;
-        defaultText = literalExpression "config.modules.home.herdr.plugins.annotate.package.manifestFile or null";
-        description = "Source manifest for Herdr Annotate; avoids import from derivation.";
-      };
-      keybinds = {
-        enable = mkOption {
-          type = types.bool;
-          default = true;
-          description = "Add conflict-free Herdr Annotate action keybindings.";
-        };
-        capture = mkOption {
-          type = types.str;
-          default = "prefix+s";
-          description = "Keybind for annotating selected terminal text.";
-        };
-        copyContext = mkOption {
-          type = types.str;
-          default = "prefix+shift+s";
-          description = "Keybind for copying annotations as agent context.";
-        };
-        copyArchive = mkOption {
-          type = types.str;
-          default = "prefix+ctrl+s";
-          description = "Keybind for copying and archiving annotations.";
-        };
-        manage = mkOption {
-          type = types.str;
-          default = "prefix+m";
-          description = "Keybind for managing annotations.";
-        };
-        open = mkOption {
-          type = types.str;
-          default = "prefix+shift+f";
-          description = "Keybind for reviewing documents in the focused pane's directory.";
-        };
-        last = mkOption {
-          type = types.str;
-          default = "prefix+shift+l";
-          description = "Keybind for reviewing the focused agent's last reply.";
-        };
-      };
-    };
 
-    extraPlugins = mkOption {
-      type = types.listOf (
-        types.submodule (
-          { config, ... }: {
-            options = {
-              id = mkOption {
-                type = types.str;
-                description = "Plugin id matching the herdr-plugin.toml manifest.";
-              };
-              package = mkOption {
-                type = types.package;
-                description = "Package containing herdr-plugin.toml at its root.";
-              };
-              manifestFile = mkOption {
-                type = types.nullOr types.path;
-                default = config.package.manifestFile or null;
-                defaultText = literalExpression "package.manifestFile or null";
-                description = ''
-                  Optional source herdr-plugin.toml. Supplying it avoids reading
-                  the plugin package output during module evaluation.
-                '';
-              };
-              enabled = mkOption {
-                type = types.bool;
-                default = true;
-                description = "Whether the plugin is enabled in Herdr.";
-              };
-            };
-          }
-        )
-      );
-      default = [ ];
-      example = literalExpression ''
-        [
-          {
-            id = "example.layout";
-            package = pkgs.callPackage ./my-herdr-plugin.nix { };
-          }
-        ]
-      '';
-      description = "Declarative Herdr plugins registered via ~/.config/herdr/plugins.json.";
-    };
-
-    plugins.navigator = {
-      enable = mkEnableOption "the bundled Herdr Navigator fuzzy navigator";
-      package = mkOption {
-        type = types.package;
-        description = "Herdr Navigator plugin package.";
-      };
-      manifestFile = mkOption {
+      plugins.worktrunk.manifestFile = mkOption {
         type = types.nullOr types.path;
-        default = cfg.plugins.navigator.package.manifestFile or null;
-        defaultText = literalExpression "config.modules.home.herdr.plugins.navigator.package.manifestFile or null";
-        description = "Source manifest for Navigator; avoids import from derivation.";
+        default = cfg.plugins.worktrunk.package.manifestFile or null;
+        defaultText = literalExpression "config.modules.home.herdr.plugins.worktrunk.package.manifestFile or null";
+        description = "Source manifest for the Worktrunk plugin. Null reads the manifest from the package output.";
       };
-      settings = mkOption {
-        inherit (toml) type;
-        default = { };
-        example.picker.vim_mode = true;
+
+      theme = mkOption {
+        type = types.nullOr types.str;
+        default = null;
+        example = "kanagawa";
+        description = "Optional Herdr theme name override. When null, settings.theme is left untouched.";
+      };
+
+      kittyGraphics = mkOption {
+        type = types.bool;
+        default = false;
+        description = "Enable Herdr's experimental Kitty graphics renderer.";
+      };
+
+      sshAutoStart = mkOption {
+        type = types.bool;
+        default = false;
         description = ''
-          Settings written to herdr/plugins/config/herdr-navigator/config.toml.
-          Update checks default to false because Nix manages the package;
-          set picker.check_updates to true to override this.
+          Replace interactive SSH logins with a Herdr session. The zsh startup
+          files run `exec herdr` when the shell has an SSH TTY, is not already
+          inside Herdr, and `HERDR_DISABLE_AUTO_START` is empty.
         '';
       };
-      keybinds = {
-        enable = mkOption {
-          type = types.bool;
-          default = true;
-          description = "Add Navigator action keybindings.";
-        };
-        open = mkOption {
-          type = types.str;
-          default = "prefix+tab";
-          description = "Keybind for opening Navigator.";
-        };
-        openSide = mkOption {
-          type = types.str;
-          default = "prefix+shift+tab";
-          description = "Keybind for toggling the Navigator side pane.";
-        };
-        jumpBack = mkOption {
-          type = types.str;
-          default = "prefix+shift+a";
-          description = "Keybind for jumping to the previous workspace.";
-        };
-      };
-    };
 
-    plugins.jjWorkspace.keybinds = {
-      enable = mkOption {
+      stopServerOnActivation = mkOption {
+        type = types.bool;
+        default = cfg.sshAutoStart;
+        defaultText = literalExpression "config.modules.home.herdr.sshAutoStart";
+        description = ''
+          Stop the running Herdr server during Home Manager activation when the
+          Herdr package, the generated configuration, or the plugin registry
+          changed. Activations that leave those unchanged keep running sessions.
+
+          The stop is deferred by {option}`stopServerDelaySeconds`, because it
+          also kills the shell that started the rebuild.
+        '';
+      };
+
+      stopServerDelaySeconds = mkOption {
+        type = types.ints.positive;
+        default = 10;
+        description = ''
+          Delay between the end of the activation and the deferred
+          `herdr server stop`.
+        '';
+      };
+
+      plugins.jjWorkspace.enable = mkOption {
         type = types.bool;
         default = true;
-        description = "Add default keybinds for the bundled jj workspace plugin.";
+        description = "Enable the bundled NathanFlurry jj workspace Herdr plugin.";
       };
-      new = mkOption {
-        type = types.str;
-        default = "prefix+j";
-        description = "Keybind for creating a new jj workspace.";
-      };
-      remove = mkOption {
-        type = types.str;
-        default = "prefix+shift+j";
-        description = "Keybind for removing the current jj workspace.";
-      };
-    };
 
-    plugins.worktrunk.settings = mkOption {
-      inherit (toml) type;
-      default = { };
-      example = {
-        open_mode = "workspace";
-        picker_placement = "popup";
-        show_remote_branches = true;
-      };
-      description = ''
-        Worktrunk plugin settings written to its managed config.toml.
-        An empty set leaves the file unmanaged. These settings are read by
-        the plugin on each invocation; no server restart is needed.
-      '';
-    };
+      plugins.worktrunk.enable = mkEnableOption "the bundled Herdr Worktrunk plugin";
 
-    plugins.worktrunk.keybinds = {
-      enable = mkOption {
-        type = types.bool;
-        default = true;
-        description = "Add default keybinds for the bundled Worktrunk plugin.";
-      };
-      open = mkOption {
-        type = types.str;
-        default = "prefix+shift+g";
-        description = "Keybind for switching or creating a worktree from the default branch.";
-      };
-      openCurrent = mkOption {
-        type = types.str;
-        default = "prefix+shift+c";
-        description = "Keybind for switching or creating a worktree from the current branch.";
-      };
-      remove = mkOption {
-        type = types.str;
-        default = "prefix+shift+x";
-        description = "Keybind for removing a worktree.";
-      };
-    };
-
-    settings = mkOption {
-      inherit (toml) type;
-      default = {
-        onboarding = false;
-        theme.name = "gruvbox";
-        terminal = {
-          default_shell = "zsh";
-          shell_mode = "auto";
-          new_cwd = "follow";
+      plugins.nvim = {
+        enable = mkEnableOption "the bundled Herdr Neovim sidebar and file picker";
+        package = mkOption {
+          type = types.package;
+          description = "Herdr Neovim plugin package, including its sidebar Lua runtime.";
         };
-        worktrees.directory = "~/.herdr/worktrees";
-        keys = {
-          prefix = "ctrl+b";
-          detach = "prefix+shift+d";
-          goto = "prefix+g";
-          workspace_picker = "prefix+w";
-          new_workspace = "prefix+shift+n";
-          new_worktree = "prefix+t";
-          open_notification_target = "prefix+shift+o";
-          reload_config = "prefix+comma";
-          rename_workspace = "prefix+shift+r";
-          close_workspace = "prefix+shift+q";
-          last_pane = "prefix+a";
-          cycle_pane_next = "";
-          cycle_pane_previous = "";
-          new_tab = "prefix+c";
-          rename_tab = "prefix+shift+w";
-          close_tab = "prefix+q";
-          previous_tab = "prefix+p";
-          next_tab = "prefix+n";
-          switch_tab = "prefix+1..9";
-          switch_workspace = "prefix+shift+1..9";
-          focus_agent = "prefix+alt+1..9";
-          split_vertical = "prefix+v";
-          split_horizontal = "prefix+b";
-          close_pane = "prefix+x";
-          zoom = "prefix+enter";
-          focus_pane_left = "";
-          focus_pane_down = "";
-          focus_pane_up = "";
-          focus_pane_right = "";
-          navigate_pane_left = "h";
-          navigate_pane_down = "j";
-          navigate_pane_up = "k";
-          navigate_pane_right = "l";
-          navigate_workspace_up = "up";
-          navigate_workspace_down = "down";
-          toggle_sidebar = "prefix+shift+b";
-          copy_mode = "prefix+[";
-          resize_mode = "prefix+r";
-          command = [
-            {
-              key = "prefix+o";
-              type = "pane";
-              command = "herdr-sessionizer";
-              description = "Pick a directory and create a workspace there";
+        manifestFile = mkOption {
+          type = types.nullOr types.path;
+          default = cfg.plugins.nvim.package.manifestFile or null;
+          defaultText = literalExpression "config.modules.home.herdr.plugins.nvim.package.manifestFile or null";
+          description = "Source manifest for the Neovim plugin; avoids import from derivation.";
+        };
+        settings = mkOption {
+          inherit (toml) type;
+          default = { };
+          example.sidebar.position = "left";
+          description = ''
+            Settings written to herdr-nvim/config.toml. An empty set leaves the
+            file unmanaged. Requires Neovim >= 0.10 on PATH, or set
+            sidebar.nvim_bin to your wrapped Neovim executable.
+          '';
+        };
+        keybinds = {
+          enable = mkOption {
+            type = types.bool;
+            default = true;
+            description = "Add keybindings for the Neovim sidebar and file picker.";
+          };
+          toggle = mkOption {
+            type = types.str;
+            default = "prefix+e";
+            description = "Keybind for toggling the Neovim sidebar.";
+          };
+          pickFile = mkOption {
+            type = types.str;
+            default = "prefix+shift+e";
+            description = "Keybind for opening the Neovim file picker.";
+          };
+        };
+      };
+
+      plugins.annotate = {
+        enable = mkEnableOption "the bundled Herdr Annotate selection and document review plugin";
+        package = mkOption {
+          type = types.package;
+          description = "Herdr Annotate plugin package, including its Plannotator TUI runtime.";
+        };
+        manifestFile = mkOption {
+          type = types.nullOr types.path;
+          default = cfg.plugins.annotate.package.manifestFile or null;
+          defaultText = literalExpression "config.modules.home.herdr.plugins.annotate.package.manifestFile or null";
+          description = "Source manifest for Herdr Annotate; avoids import from derivation.";
+        };
+        keybinds = {
+          enable = mkOption {
+            type = types.bool;
+            default = true;
+            description = "Add conflict-free Herdr Annotate action keybindings.";
+          };
+          capture = mkOption {
+            type = types.str;
+            default = "prefix+s";
+            description = "Keybind for annotating selected terminal text.";
+          };
+          copyContext = mkOption {
+            type = types.str;
+            default = "prefix+shift+s";
+            description = "Keybind for copying annotations as agent context.";
+          };
+          copyArchive = mkOption {
+            type = types.str;
+            default = "prefix+ctrl+s";
+            description = "Keybind for copying and archiving annotations.";
+          };
+          manage = mkOption {
+            type = types.str;
+            default = "prefix+m";
+            description = "Keybind for managing annotations.";
+          };
+          open = mkOption {
+            type = types.str;
+            default = "prefix+shift+f";
+            description = "Keybind for reviewing documents in the focused pane's directory.";
+          };
+          last = mkOption {
+            type = types.str;
+            default = "prefix+shift+l";
+            description = "Keybind for reviewing the focused agent's last reply.";
+          };
+        };
+      };
+
+      extraPlugins = mkOption {
+        type = types.listOf (
+          types.submodule (
+            { config, ... }: {
+              options = {
+                id = mkOption {
+                  type = types.str;
+                  description = "Plugin id matching the herdr-plugin.toml manifest.";
+                };
+                package = mkOption {
+                  type = types.package;
+                  description = "Package containing herdr-plugin.toml at its root.";
+                };
+                manifestFile = mkOption {
+                  type = types.nullOr types.path;
+                  default = config.package.manifestFile or null;
+                  defaultText = literalExpression "package.manifestFile or null";
+                  description = ''
+                    Optional source herdr-plugin.toml. Supplying it avoids reading
+                    the plugin package output during module evaluation.
+                  '';
+                };
+                enabled = mkOption {
+                  type = types.bool;
+                  default = true;
+                  description = "Whether the plugin is enabled in Herdr.";
+                };
+              };
             }
+          )
+        );
+        default = [ ];
+        example = literalExpression ''
+          [
             {
-              key = "ctrl+h";
-              type = "shell";
-              command = "herdr-vim-navigate left";
-              description = "Navigate left (Vim/Herdr)";
-            }
-            {
-              key = "ctrl+j";
-              type = "shell";
-              command = "herdr-vim-navigate down";
-              description = "Navigate down (Vim/Herdr)";
-            }
-            {
-              key = "ctrl+k";
-              type = "shell";
-              command = "herdr-vim-navigate up";
-              description = "Navigate up (Vim/Herdr)";
-            }
-            {
-              key = "ctrl+l";
-              type = "shell";
-              command = "herdr-vim-navigate right";
-              description = "Navigate right (Vim/Herdr)";
+              id = "example.layout";
+              package = pkgs.callPackage ./my-herdr-plugin.nix { };
             }
           ]
-          ++ lib.optional (!navigatorKeysEnabled) {
-            key = "prefix+tab";
-            type = "pane";
-            command = "herdr-workspace-fzf";
-            description = "Fuzzy find and focus a workspace";
-          };
+        '';
+        description = "Declarative Herdr plugins registered via ~/.config/herdr/plugins.json.";
+      };
+
+      plugins.navigator = {
+        enable = mkEnableOption "the bundled Herdr Navigator fuzzy navigator";
+        package = mkOption {
+          type = types.package;
+          description = "Herdr Navigator plugin package.";
         };
-        ui = {
-          confirm_close = true;
-          prompt_new_tab_name = true;
-          show_agent_labels_on_pane_borders = true;
-          agent_panel_sort = "priority";
-          toast = {
-            delivery = "herdr";
-            delay_seconds = 1;
-            herdr.position = "bottom-right";
-            clipboard = {
-              enabled = true;
-              position = "bottom-center";
-            };
-          };
-          sound.enabled = false;
+        manifestFile = mkOption {
+          type = types.nullOr types.path;
+          default = cfg.plugins.navigator.package.manifestFile or null;
+          defaultText = literalExpression "config.modules.home.herdr.plugins.navigator.package.manifestFile or null";
+          description = "Source manifest for Navigator; avoids import from derivation.";
         };
-        session.resume_agents_on_restore = true;
-        advanced.scrollback_limit_bytes = 10485760;
-        experimental = {
-          pane_history = false;
-          allow_nested = false;
-          kitty_graphics = false;
+        settings = mkOption {
+          inherit (toml) type;
+          default = { };
+          example.picker.vim_mode = true;
+          description = ''
+            Settings written to herdr/plugins/config/herdr-navigator/config.toml.
+            Update checks default to false because Nix manages the package;
+            set picker.check_updates to true to override this.
+          '';
+        };
+        keybinds = {
+          enable = mkOption {
+            type = types.bool;
+            default = true;
+            description = "Add Navigator action keybindings.";
+          };
+          open = mkOption {
+            type = types.str;
+            default = "prefix+tab";
+            description = "Keybind for opening Navigator.";
+          };
+          openSide = mkOption {
+            type = types.str;
+            default = "prefix+shift+tab";
+            description = "Keybind for toggling the Navigator side pane.";
+          };
+          jumpBack = mkOption {
+            type = types.str;
+            default = "prefix+shift+a";
+            description = "Keybind for jumping to the previous workspace.";
+          };
         };
       };
-      example = literalExpression ''
-        {
+
+      plugins.jjWorkspace.keybinds = {
+        enable = mkOption {
+          type = types.bool;
+          default = true;
+          description = "Add default keybinds for the bundled jj workspace plugin.";
+        };
+        new = mkOption {
+          type = types.str;
+          default = "prefix+j";
+          description = "Keybind for creating a new jj workspace.";
+        };
+        remove = mkOption {
+          type = types.str;
+          default = "prefix+shift+j";
+          description = "Keybind for removing the current jj workspace.";
+        };
+      };
+
+      plugins.worktrunk.settings = mkOption {
+        inherit (toml) type;
+        default = { };
+        example = {
+          open_mode = "workspace";
+          picker_placement = "popup";
+          show_remote_branches = true;
+        };
+        description = ''
+          Worktrunk plugin settings written to its managed config.toml.
+          An empty set leaves the file unmanaged. These settings are read by
+          the plugin on each invocation; no server restart is needed.
+        '';
+      };
+
+      plugins.worktrunk.keybinds = {
+        enable = mkOption {
+          type = types.bool;
+          default = true;
+          description = "Add default keybinds for the bundled Worktrunk plugin.";
+        };
+        open = mkOption {
+          type = types.str;
+          default = "prefix+shift+g";
+          description = "Keybind for switching or creating a worktree from the default branch.";
+        };
+        openCurrent = mkOption {
+          type = types.str;
+          default = "prefix+shift+c";
+          description = "Keybind for switching or creating a worktree from the current branch.";
+        };
+        remove = mkOption {
+          type = types.str;
+          default = "prefix+shift+x";
+          description = "Keybind for removing a worktree.";
+        };
+      };
+
+      settings = mkOption {
+        inherit (toml) type;
+        default = {
           onboarding = false;
           theme.name = "gruvbox";
-          ui.toast.delivery = "herdr";
-        }
-      '';
-      description = "Settings written to ~/.config/herdr/config.toml.";
+          terminal = {
+            default_shell = "zsh";
+            shell_mode = "auto";
+            new_cwd = "follow";
+          };
+          worktrees.directory = "~/.herdr/worktrees";
+          keys = {
+            prefix = "ctrl+b";
+            detach = "prefix+shift+d";
+            goto = "prefix+g";
+            workspace_picker = "prefix+w";
+            new_workspace = "prefix+shift+n";
+            new_worktree = "prefix+t";
+            open_notification_target = "prefix+shift+o";
+            reload_config = "prefix+comma";
+            rename_workspace = "prefix+shift+r";
+            close_workspace = "prefix+shift+q";
+            last_pane = "prefix+a";
+            cycle_pane_next = "";
+            cycle_pane_previous = "";
+            new_tab = "prefix+c";
+            rename_tab = "prefix+shift+w";
+            close_tab = "prefix+q";
+            previous_tab = "prefix+p";
+            next_tab = "prefix+n";
+            switch_tab = "prefix+1..9";
+            switch_workspace = "prefix+shift+1..9";
+            focus_agent = "prefix+alt+1..9";
+            split_vertical = "prefix+v";
+            split_horizontal = "prefix+b";
+            close_pane = "prefix+x";
+            zoom = "prefix+enter";
+            focus_pane_left = "";
+            focus_pane_down = "";
+            focus_pane_up = "";
+            focus_pane_right = "";
+            navigate_pane_left = "h";
+            navigate_pane_down = "j";
+            navigate_pane_up = "k";
+            navigate_pane_right = "l";
+            navigate_workspace_up = "up";
+            navigate_workspace_down = "down";
+            toggle_sidebar = "prefix+shift+b";
+            copy_mode = "prefix+[";
+            resize_mode = "prefix+r";
+            command = [
+              {
+                key = "prefix+o";
+                type = "pane";
+                command = "herdr-sessionizer";
+                description = "Pick a directory and create a workspace there";
+              }
+              {
+                key = "ctrl+h";
+                type = "shell";
+                command = "herdr-vim-navigate left";
+                description = "Navigate left (Vim/Herdr)";
+              }
+              {
+                key = "ctrl+j";
+                type = "shell";
+                command = "herdr-vim-navigate down";
+                description = "Navigate down (Vim/Herdr)";
+              }
+              {
+                key = "ctrl+k";
+                type = "shell";
+                command = "herdr-vim-navigate up";
+                description = "Navigate up (Vim/Herdr)";
+              }
+              {
+                key = "ctrl+l";
+                type = "shell";
+                command = "herdr-vim-navigate right";
+                description = "Navigate right (Vim/Herdr)";
+              }
+            ]
+            ++ lib.optional (!navigatorKeysEnabled) {
+              key = "prefix+tab";
+              type = "pane";
+              command = "herdr-workspace-fzf";
+              description = "Fuzzy find and focus a workspace";
+            };
+          };
+          ui = {
+            confirm_close = true;
+            prompt_new_tab_name = true;
+            show_agent_labels_on_pane_borders = true;
+            agent_panel_sort = "priority";
+            toast = {
+              delivery = "herdr";
+              delay_seconds = 1;
+              herdr.position = "bottom-right";
+              clipboard = {
+                enabled = true;
+                position = "bottom-center";
+              };
+            };
+            sound.enabled = false;
+          };
+          session.resume_agents_on_restore = true;
+          advanced.scrollback_limit_bytes = 10485760;
+          experimental = {
+            pane_history = false;
+            allow_nested = false;
+            kitty_graphics = false;
+          };
+        };
+        example = literalExpression ''
+          {
+            onboarding = false;
+            theme.name = "gruvbox";
+            ui.toast.delivery = "herdr";
+          }
+        '';
+        description = "Settings written to ~/.config/herdr/config.toml.";
+      };
     };
-  };
 
   config = lib.mkIf cfg.enable {
     assertions = [

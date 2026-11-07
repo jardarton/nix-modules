@@ -20,94 +20,98 @@ let
   '';
 in
 {
-  options.modules.nixos.home-assistant = with lib; {
-    enable = mkOption {
-      type = types.bool;
-      default = false;
-      example = true;
-      description = "enable hass stack";
-    };
-    confDir = mkOption {
-      type = types.str;
-      default = "/var/lib/hass";
-      description = "Location to store config";
-    };
-    image = mkOption {
-      type = types.str;
-      default = "ghcr.io/home-assistant/home-assistant@sha256:f73512ba4fe06bb4d57636fe3578d0820cdec46f81e8f837ab59e451662ff3cb";
-      description = "Home Assistant container image, preferably pinned by digest.";
-    };
-    zigbee2mqtt = {
+  options.modules.nixos.home-assistant =
+    let
+      inherit (lib) mkOption types;
+    in
+    {
       enable = mkOption {
         type = types.bool;
-        default = true;
-        example = false;
-        description = "Run Zigbee2MQTT alongside the Home Assistant podman container.";
+        default = false;
+        example = true;
+        description = "enable hass stack";
       };
-      dataDir = mkOption {
+      confDir = mkOption {
         type = types.str;
-        default = "/var/lib/zigbee2mqtt";
-        description = "Location to store Zigbee2MQTT data and configuration.";
+        default = "/var/lib/hass";
+        description = "Location to store config";
       };
       image = mkOption {
         type = types.str;
-        default = "ghcr.io/koenkk/zigbee2mqtt@sha256:80f7f04f72a99e4c4ef51ef7e98ee736edba6db0ecbb7abc626d0c4b0f1871f1";
-        description = "Zigbee2MQTT container image, preferably pinned by digest.";
+        default = "ghcr.io/home-assistant/home-assistant@sha256:f73512ba4fe06bb4d57636fe3578d0820cdec46f81e8f837ab59e451662ff3cb";
+        description = "Home Assistant container image, preferably pinned by digest.";
       };
-      adapter = mkOption {
-        type = types.nullOr types.str;
-        default = null;
-        example = "/dev/serial/by-id/usb-Texas_Instruments_TI_CC2531_USB_CDC___0X00124B0018ED3DDF-if00";
-        description = "Host path for the Zigbee adapter. Prefer /dev/serial/by-id/* paths.";
+      zigbee2mqtt = {
+        enable = mkOption {
+          type = types.bool;
+          default = true;
+          example = false;
+          description = "Run Zigbee2MQTT alongside the Home Assistant podman container.";
+        };
+        dataDir = mkOption {
+          type = types.str;
+          default = "/var/lib/zigbee2mqtt";
+          description = "Location to store Zigbee2MQTT data and configuration.";
+        };
+        image = mkOption {
+          type = types.str;
+          default = "ghcr.io/koenkk/zigbee2mqtt@sha256:80f7f04f72a99e4c4ef51ef7e98ee736edba6db0ecbb7abc626d0c4b0f1871f1";
+          description = "Zigbee2MQTT container image, preferably pinned by digest.";
+        };
+        adapter = mkOption {
+          type = types.nullOr types.str;
+          default = null;
+          example = "/dev/serial/by-id/usb-Texas_Instruments_TI_CC2531_USB_CDC___0X00124B0018ED3DDF-if00";
+          description = "Host path for the Zigbee adapter. Prefer /dev/serial/by-id/* paths.";
+        };
+      };
+      mosquitto = {
+        enable = mkOption {
+          type = types.bool;
+          default = true;
+          example = false;
+          description = "Run Eclipse Mosquitto as the MQTT broker for the Home Assistant stack.";
+        };
+        dataDir = mkOption {
+          type = types.str;
+          default = "/var/lib/mosquitto";
+          description = "Location to store Mosquitto persistent data.";
+        };
+        image = mkOption {
+          type = types.str;
+          default = "docker.io/library/eclipse-mosquitto@sha256:6f8d8a947c506f8a2290ec65cd4bd2bc7cb4d43fb5f6271f861cb013e2ef9797";
+          description = "Mosquitto container image, preferably pinned by digest.";
+        };
+        logDir = mkOption {
+          type = types.str;
+          default = "/var/log/mosquitto";
+          description = "Location to store Mosquitto logs.";
+        };
+        port = mkOption {
+          type = types.port;
+          default = 1883;
+          description = "MQTT listener port.";
+        };
+        bindAddress = mkOption {
+          type = types.str;
+          default = "127.0.0.1";
+          example = "0.0.0.0";
+          description = "Address on which the MQTT broker listens.";
+        };
+        allowAnonymous = mkOption {
+          type = types.bool;
+          default = true;
+          example = false;
+          description = "Whether the MQTT broker accepts unauthenticated clients. Safe by default with the loopback-only bind address.";
+        };
+        autosaveInterval = mkOption {
+          type = types.ints.positive;
+          default = 1800;
+          example = 300;
+          description = "Seconds between writes of the in-memory Mosquitto database to persistent storage.";
+        };
       };
     };
-    mosquitto = {
-      enable = mkOption {
-        type = types.bool;
-        default = true;
-        example = false;
-        description = "Run Eclipse Mosquitto as the MQTT broker for the Home Assistant stack.";
-      };
-      dataDir = mkOption {
-        type = types.str;
-        default = "/var/lib/mosquitto";
-        description = "Location to store Mosquitto persistent data.";
-      };
-      image = mkOption {
-        type = types.str;
-        default = "docker.io/library/eclipse-mosquitto@sha256:6f8d8a947c506f8a2290ec65cd4bd2bc7cb4d43fb5f6271f861cb013e2ef9797";
-        description = "Mosquitto container image, preferably pinned by digest.";
-      };
-      logDir = mkOption {
-        type = types.str;
-        default = "/var/log/mosquitto";
-        description = "Location to store Mosquitto logs.";
-      };
-      port = mkOption {
-        type = types.port;
-        default = 1883;
-        description = "MQTT listener port.";
-      };
-      bindAddress = mkOption {
-        type = types.str;
-        default = "127.0.0.1";
-        example = "0.0.0.0";
-        description = "Address on which the MQTT broker listens.";
-      };
-      allowAnonymous = mkOption {
-        type = types.bool;
-        default = true;
-        example = false;
-        description = "Whether the MQTT broker accepts unauthenticated clients. Safe by default with the loopback-only bind address.";
-      };
-      autosaveInterval = mkOption {
-        type = types.ints.positive;
-        default = 1800;
-        example = 300;
-        description = "Seconds between writes of the in-memory Mosquitto database to persistent storage.";
-      };
-    };
-  };
 
   config = lib.mkIf cfg.enable {
     systemd.tmpfiles.rules = [

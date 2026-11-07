@@ -5,8 +5,13 @@
   options,
   ...
 }:
-with lib;
 let
+  inherit (lib)
+    mkIf
+    mkOption
+    optionalAttrs
+    types
+    ;
   cfg = config.modules.home.vscode;
   stylix = import ../stylix/lib.nix { inherit config options; };
 in

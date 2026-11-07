@@ -4,8 +4,14 @@
   pkgs,
   ...
 }:
-with lib;
 let
+  inherit (lib)
+    hasSuffix
+    literalExpression
+    mkIf
+    mkOption
+    types
+    ;
   cfg = config.modules.home.nh;
 in
 {

@@ -4,8 +4,17 @@
   pkgs,
   ...
 }:
-with lib;
 let
+  inherit (lib)
+    elem
+    getExe
+    literalExpression
+    mkIf
+    mkOption
+    optional
+    optionals
+    types
+    ;
   cfg = config.modules.home.ai;
   agentOptions =
     {

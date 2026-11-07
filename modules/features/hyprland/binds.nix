@@ -6,7 +6,6 @@
 let
   cfg = config.modules.home.hypr;
 in
-with lib;
 {
 
   home.file.".local/scripts/run_or_raise" = {

@@ -4,8 +4,13 @@
   options,
   ...
 }:
-with lib;
 let
+  inherit (lib)
+    attrByPath
+    mkIf
+    mkOption
+    types
+    ;
   cfg = config.modules.home.fzf;
   televisionEnabled = attrByPath [ "modules" "home" "television" "enable" ] false config;
   stylix = import ../stylix/lib.nix { inherit config options; };

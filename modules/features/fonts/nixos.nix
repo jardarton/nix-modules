@@ -9,14 +9,18 @@ let
   cfg = config.modules.nixos.fonts;
 in
 {
-  options.modules.nixos.fonts = with lib; {
-    enable = mkOption {
-      type = types.bool;
-      default = true;
-      example = true;
-      description = "enable fonts ";
+  options.modules.nixos.fonts =
+    let
+      inherit (lib) mkOption types;
+    in
+    {
+      enable = mkOption {
+        type = types.bool;
+        default = true;
+        example = true;
+        description = "enable fonts ";
+      };
     };
-  };
 
   config = lib.mkIf cfg.enable {
     # all fonts are linked to /nix/var/nix/profiles/system/sw/share/X11/fonts

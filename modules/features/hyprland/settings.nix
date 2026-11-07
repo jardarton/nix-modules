@@ -1,12 +1,10 @@
 {
   config,
-  lib,
   ...
 }:
 let
   cfg = config.modules.home.hypr;
 in
-with lib;
 {
   wayland.windowManager.hyprland = {
     settings = {

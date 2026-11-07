@@ -6,8 +6,8 @@
 }:
 let
   cfg = config.modules.home.hypr;
+  inherit (lib) mkForce mkIf;
 in
-with lib;
 {
 
   programs = {

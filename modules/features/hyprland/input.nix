@@ -1,9 +1,4 @@
-{
-  lib,
-  ...
-}:
-with lib;
-{
+_: {
   wayland.windowManager.hyprland = {
     settings = {
       input = {

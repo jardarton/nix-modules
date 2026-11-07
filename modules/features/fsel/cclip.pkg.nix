@@ -47,9 +47,9 @@ stdenv.mkDerivation rec {
   #   meson compile -C build
   # '';
 
-  meta = with lib; {
+  meta = {
     description = "cclip clipboard history";
-    license = licenses.mit;
-    platforms = platforms.linux;
+    license = lib.licenses.mit;
+    platforms = lib.platforms.linux;
   };
 }

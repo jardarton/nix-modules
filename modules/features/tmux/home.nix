@@ -5,8 +5,15 @@
   options,
   ...
 }:
-with lib;
 let
+  inherit (lib)
+    attrByPath
+    mkIf
+    mkOption
+    optionalAttrs
+    optionalString
+    types
+    ;
   cfg = config.modules.home.tmux;
   televisionEnabled = attrByPath [ "modules" "home" "television" "enable" ] false config;
   televisionCableDir = "$HOME/.config/television/cable";

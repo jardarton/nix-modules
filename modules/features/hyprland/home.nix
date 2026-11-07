@@ -5,8 +5,14 @@
   lib,
   ...
 }:
-with lib;
 let
+  inherit (lib)
+    mkDefault
+    mkIf
+    mkOption
+    strings
+    types
+    ;
   cfg = config.modules.home.hypr;
   osUsesUWSM =
     osConfig != null && osConfig.programs ? hyprland && osConfig.programs.hyprland.withUWSM;

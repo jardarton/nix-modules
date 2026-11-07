@@ -1,6 +1,6 @@
 { lib, config, ... }:
-with lib;
 let
+  inherit (lib) mkIf mkOption types;
   cfg = config.modules.home.starship;
 in
 {

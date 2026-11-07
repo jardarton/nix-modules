@@ -5,8 +5,8 @@
   options,
   ...
 }:
-with lib;
 let
+  inherit (lib) mkIf mkOption types;
   cfg = config.modules.home.aerospace;
   stylix = import ../stylix/lib.nix { inherit config options; };
 in

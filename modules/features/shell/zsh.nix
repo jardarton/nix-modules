@@ -4,8 +4,14 @@
   pkgs,
   ...
 }:
-with lib;
 let
+  inherit (lib)
+    attrByPath
+    mkDefault
+    mkIf
+    mkOption
+    types
+    ;
   cfg = config.modules.home.zsh;
   televisionEnabled = attrByPath [ "modules" "home" "television" "enable" ] false config;
   lsWithColor = if pkgs.stdenv.hostPlatform.isDarwin then "ls -G" else "ls --color";

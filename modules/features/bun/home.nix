@@ -4,8 +4,8 @@
   lib,
   ...
 }:
-with lib;
 let
+  inherit (lib) mkIf mkOption types;
   cfg = config.modules.home.bun;
   bunfig = (pkgs.formats.toml { }).generate "bunfig.toml" {
     smol = false;

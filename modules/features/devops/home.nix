@@ -4,8 +4,13 @@
   config,
   ...
 }:
-with lib;
 let
+  inherit (lib)
+    mkEnableOption
+    mkIf
+    mkOption
+    types
+    ;
   cfg = config.modules.home.devops;
   enableLimaOnMacOS = cfg.enableLima && pkgs.stdenv.hostPlatform.isDarwin;
   enableColimaOnMacOS = cfg.enableColima && pkgs.stdenv.hostPlatform.isDarwin;

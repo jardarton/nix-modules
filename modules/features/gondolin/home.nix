@@ -4,8 +4,17 @@
   pkgs,
   ...
 }:
-with lib;
 let
+  inherit (lib)
+    literalExpression
+    mkEnableOption
+    mkIf
+    mkOption
+    optional
+    optionalString
+    optionals
+    types
+    ;
   cfg = config.modules.home.gondolin;
 
   gondolinArch = if pkgs.stdenv.hostPlatform.isAarch64 then "aarch64" else "x86_64";
