@@ -22,4 +22,7 @@
     {
       packages.gondolin = pkgs.callPackage ./gondolin/package.pkg.nix { };
     };
+
+  # Export groups evaluated together by this flake's module checks.
+  nixModules.checkCompositions.homeManager.workstation = [ "gondolin" ];
 }

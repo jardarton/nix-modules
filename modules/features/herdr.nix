@@ -50,4 +50,7 @@ in
         };
       };
     };
+
+  # Export groups evaluated together by this flake's module checks.
+  nixModules.checkCompositions.homeManager.workstation = [ "herdr" ];
 }

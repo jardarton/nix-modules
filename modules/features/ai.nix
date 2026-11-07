@@ -43,4 +43,7 @@ in
         playwright-cli = pkgs.callPackage ./ai/playwright-cli.pkg.nix { };
       };
     };
+
+  # Export groups evaluated together by this flake's module checks.
+  nixModules.checkCompositions.homeManager.workstation = [ "ai" ];
 }

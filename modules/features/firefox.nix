@@ -50,4 +50,10 @@ in
       ./firefox/minimal.nix
     ];
   };
+
+  # Export groups evaluated together by this flake's module checks.
+  nixModules.checkCompositions.homeManager.graphical = [ "firefox" ];
+  # Each Firefox export configures the same profile, so they cannot share a
+  # group.
+  nixModules.checkCompositions.homeManager."browser-minimal" = [ "firefox-minimal" ];
 }

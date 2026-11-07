@@ -11,4 +11,7 @@
         sudo-approval = pkgs.testers.runNixOSTest (import ./sudo-approval/test.nix { inherit self; });
       };
     };
+
+  # Export groups evaluated together by this flake's module checks.
+  nixModules.checkCompositions.nixos.server = [ "sudo-approval" ];
 }

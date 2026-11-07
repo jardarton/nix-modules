@@ -18,4 +18,7 @@
     {
       packages.kli = pkgs.callPackage ./kli/package.pkg.nix { };
     };
+
+  # Export groups evaluated together by this flake's module checks.
+  nixModules.checkCompositions.homeManager.workstation = [ "devops" ];
 }

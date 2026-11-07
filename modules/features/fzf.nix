@@ -6,4 +6,7 @@
     ./fzf/home.nix
     { imports = [ config.nixModules.stylixHelper ]; }
   ];
+
+  # Export groups evaluated together by this flake's module checks.
+  nixModules.checkCompositions.homeManager.workstation = [ "fzf" ];
 }

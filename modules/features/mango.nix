@@ -83,4 +83,8 @@ in
             });
       };
     };
+
+  # Export groups evaluated together by this flake's module checks.
+  nixModules.checkCompositions.homeManager.graphical = [ "mango" ];
+  nixModules.checkCompositions.nixos."laptop-kanata" = [ "mango" ];
 }

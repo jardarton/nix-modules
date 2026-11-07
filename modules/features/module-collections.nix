@@ -17,6 +17,31 @@
     '';
   };
 
+  options.nixModules.checkCompositions =
+    let
+      compositions =
+        class:
+        lib.mkOption {
+          type = lib.types.attrsOf (lib.types.listOf lib.types.str);
+          default = { };
+          example = {
+            workstation = [
+              "bat"
+              "git"
+            ];
+          };
+          description = ''
+            Groups of exported ${class} modules that this flake's checks evaluate
+            together. Each feature adds its exports to the groups it belongs
+            to, and the checks require every export to be in at least one.
+          '';
+        };
+    in
+    {
+      homeManager = compositions "Home Manager";
+      nixos = compositions "NixOS";
+    };
+
   # Preserve the established outputs while storing modules in flake-parts'
   # class-aware module collection.
   config.flake = {

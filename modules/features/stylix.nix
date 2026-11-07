@@ -131,4 +131,10 @@ in
     };
   };
 
+  # Export groups evaluated together by this flake's module checks.
+  config.nixModules.checkCompositions.homeManager.graphical = [ "stylix" ];
+  config.nixModules.checkCompositions.homeManager."browser-minimal" = [ "stylix" ];
+  config.nixModules.checkCompositions.nixos."laptop-kanata" = [ "stylix" ];
+  config.nixModules.checkCompositions.nixos."laptop-keyd" = [ "stylix" ];
+  config.nixModules.checkCompositions.nixos.server = [ "stylix" ];
 }

@@ -9,4 +9,7 @@
       imports = [ ./dwm/home.nix ];
       modules.home.dwm.enable = lib.mkDefault pkgs.stdenv.hostPlatform.isLinux;
     };
+
+  # Export groups evaluated together by this flake's module checks.
+  nixModules.checkCompositions.homeManager.graphical = [ "dwm" ];
 }

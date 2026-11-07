@@ -1,4 +1,5 @@
 {
+  config,
   inputs,
   self,
   ...
@@ -10,96 +11,11 @@
       inherit (pkgs) lib;
 
       # Evaluate broad module combinations instead of constructing a complete
-      # configuration for every export. The coverage assertion below
+      # configuration for every export. Features register their exports in
+      # `nixModules.checkCompositions`, and the coverage assertion below
       # requires each public module to remain assigned to a composition.
-      homeCompositions = {
-        workstation = [
-          "ai"
-          "bat"
-          "btop"
-          "bun"
-          "cli-tools"
-          "default"
-          "devops"
-          "direnv"
-          "eza"
-          "fzf"
-          "git"
-          "gondolin"
-          "herdr"
-          "jujutsu"
-          "neovim"
-          "nh"
-          "node"
-          "presentation"
-          "reverse-engineering"
-          "starship"
-          "taskwarrior"
-          "television"
-          "tmux"
-          "yazi"
-          "zsh"
-        ];
-
-        graphical = [
-          "aerospace"
-          "bitwarden"
-          "dwm"
-          "firefox"
-          "fonts"
-          "fsel"
-          "ghostty"
-          "hyprland"
-          "i3"
-          "kitty"
-          "mango"
-          "media"
-          "screenshot"
-          "stylix"
-          "sway"
-          "vscode"
-          "waybar"
-          "xdg"
-          "zathura"
-        ];
-
-        # Each Firefox export configures the same profile, so they cannot share
-        # a composition.
-        browser-minimal = [
-          "firefox-minimal"
-          "stylix"
-        ];
-      };
-
-      nixosCompositions = {
-        laptop-kanata = [
-          "base-packages"
-          "bluetooth"
-          "fonts"
-          "kanata"
-          "laptop-base"
-          "mango"
-          "oryx"
-          "stylix"
-          "wifi"
-        ];
-
-        laptop-keyd = [
-          "base-packages"
-          "fonts"
-          "keyd"
-          "laptop-base"
-          "stylix"
-        ];
-
-        server = [
-          "base-packages"
-          "disk-monitor"
-          "home-assistant"
-          "sudo-approval"
-          "stylix"
-        ];
-      };
+      homeCompositions = config.nixModules.checkCompositions.homeManager;
+      nixosCompositions = config.nixModules.checkCompositions.nixos;
 
       requireCompleteCoverage =
         kind: exports: compositions:
