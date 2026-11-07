@@ -1,4 +1,4 @@
-{ self, ... }:
+{ config, ... }:
 {
   # Unlike most features here, importing this one does not enable it. The module
   # needs a consumer-supplied ntfy server and access tokens.
@@ -8,7 +8,11 @@
     { lib, pkgs, ... }:
     {
       checks = lib.optionalAttrs pkgs.stdenv.hostPlatform.isLinux {
-        sudo-approval = pkgs.testers.runNixOSTest (import ./sudo-approval/test.nix { inherit self; });
+        sudo-approval = pkgs.testers.runNixOSTest (
+          import ./sudo-approval/test.nix {
+            sudoApprovalModule = config.flake.modules.nixos.sudo-approval;
+          }
+        );
       };
     };
 

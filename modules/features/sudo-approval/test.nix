@@ -1,7 +1,7 @@
 # End-to-end test against a local ntfy server. The test driver plays the phone:
 # it reads requests with the phone user's credentials and replays the
 # notification's own Approve or Deny action.
-{ self }:
+{ sudoApprovalModule }:
 { pkgs, ... }:
 let
   # Test-only credentials; these bcrypt hashes are for phone-test-password and
@@ -15,7 +15,7 @@ in
   name = "sudo-approval";
 
   nodes.machine = {
-    imports = [ self.nixosModules.sudo-approval ];
+    imports = [ sudoApprovalModule ];
 
     services.ntfy-sh = {
       enable = true;

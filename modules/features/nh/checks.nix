@@ -1,8 +1,9 @@
 # Exercise option overrides and conditional output independently of the broad
 # Home Manager composition check.
-{ config, self, ... }:
+{ config, ... }:
 let
   homeManager = config.nixModules.sourceFlake.inputs.home-manager;
+  homeModules = config.flake.modules.homeManager;
 in
 {
   perSystem =
@@ -13,7 +14,7 @@ in
         homeManager.lib.homeManagerConfiguration {
           inherit pkgs;
           modules = [
-            self.homeModules.nh
+            homeModules.nh
             {
               home.username = "module-test";
               home.homeDirectory =

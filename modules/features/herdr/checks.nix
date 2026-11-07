@@ -2,23 +2,23 @@
 # package and public module definitions.
 {
   config,
-  self,
   ...
 }:
 let
   homeManager = config.nixModules.sourceFlake.inputs.home-manager;
+  homeModules = config.flake.modules.homeManager;
 in
 {
   perSystem =
-    { pkgs, ... }:
+    { config, pkgs, ... }:
     let
       mkHome =
         settings:
         homeManager.lib.homeManagerConfiguration {
           inherit pkgs;
           modules = [
-            self.homeModules.herdr
-            self.homeModules.git
+            homeModules.herdr
+            homeModules.git
             {
               home.username = "herdr-test";
               home.homeDirectory =
@@ -44,7 +44,7 @@ in
           settings.picker.vim_mode = true;
         };
       };
-      navigatorPackage = self.packages.${pkgs.stdenv.hostPlatform.system}.herdr-plugin-navigator;
+      navigatorPackage = config.packages.herdr-plugin-navigator;
       navigatorOverride = navigatorPackage.overrideAttrs (_: {
         pname = "herdr-navigator-override";
       });
@@ -93,7 +93,7 @@ in
           };
         };
       };
-      pluginPackage = self.packages.${pkgs.stdenv.hostPlatform.system}.herdr-plugin-worktrunk;
+      pluginPackage = config.packages.herdr-plugin-worktrunk;
       overriddenPackage = pluginPackage.overrideAttrs (_: {
         name = "herdr-worktrunk-override";
       });
@@ -138,12 +138,8 @@ in
       checks.herdr-combined-plugins = pkgs.runCommand "check-herdr-combined-plugins" { } ''
         test -x ${combined.config.home.path}/bin/herdr-nvim
         test -x ${combined.config.home.path}/bin/herdr-navigator
-        test -x ${
-          self.packages.${pkgs.stdenv.hostPlatform.system}.herdr-plugin-annotate
-        }/bin/plannotator-tui.exe
-        test -x ${
-          self.packages.${pkgs.stdenv.hostPlatform.system}.herdr-plugin-annotate
-        }/bin/herdr-annotate.exe
+        test -x ${config.packages.herdr-plugin-annotate}/bin/plannotator-tui.exe
+        test -x ${config.packages.herdr-plugin-annotate}/bin/herdr-annotate.exe
         test ! -e ${combined.config.home.path}/herdr-plugin.toml
         touch "$out"
       '';
@@ -165,7 +161,7 @@ in
           !(builtins.tryEval mismatched.config.xdg.configFile."herdr/plugins.json".source.drvPath).success;
         assert
           enabled.config.modules.home.herdr.plugins.worktrunk.package
-          == self.packages.${pkgs.stdenv.hostPlatform.system}.herdr-plugin-worktrunk;
+          == config.packages.herdr-plugin-worktrunk;
         pkgs.runCommand "check-herdr-plugins" { nativeBuildInputs = [ pkgs.jq ]; } ''
           jq -e 'length == 1 and .[0].plugin_id == "worktrunk" and .[0].enabled' \
             ${enabled.config.xdg.configFile."herdr/plugins.json".source}
@@ -193,10 +189,8 @@ in
           echo "Disabled Neovim keybindings are still present" >&2
           exit 1
         fi
-        test -x ${self.packages.${pkgs.stdenv.hostPlatform.system}.herdr-plugin-nvim}/bin/herdr-nvim
-        test -f ${
-          self.packages.${pkgs.stdenv.hostPlatform.system}.herdr-plugin-nvim
-        }/lua/herdr-nvim/init.lua
+        test -x ${config.packages.herdr-plugin-nvim}/bin/herdr-nvim
+        test -f ${config.packages.herdr-plugin-nvim}/lua/herdr-nvim/init.lua
         touch "$out"
       '';
 
@@ -211,15 +205,9 @@ in
               echo "Disabled Annotate keybindings are still present" >&2
               exit 1
             fi
-            test -x ${
-              self.packages.${pkgs.stdenv.hostPlatform.system}.herdr-plugin-annotate
-            }/bin/herdr-annotate.exe
-            test -x ${
-              self.packages.${pkgs.stdenv.hostPlatform.system}.herdr-plugin-annotate
-            }/bin/plannotator-tui.exe
-            cmp ${self.packages.${pkgs.stdenv.hostPlatform.system}.herdr-plugin-annotate}/herdr-plugin.toml ${
-              self.packages.${pkgs.stdenv.hostPlatform.system}.herdr-plugin-annotate.manifestFile
-            }
+            test -x ${config.packages.herdr-plugin-annotate}/bin/herdr-annotate.exe
+            test -x ${config.packages.herdr-plugin-annotate}/bin/plannotator-tui.exe
+            cmp ${config.packages.herdr-plugin-annotate}/herdr-plugin.toml ${config.packages.herdr-plugin-annotate.manifestFile}
             touch "$out"
           '';
 
