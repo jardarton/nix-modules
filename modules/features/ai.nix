@@ -26,7 +26,7 @@ in
       imports = [ ./ai/home.nix ];
 
       modules.home.ai.defaultPackages = lib.mapAttrs (_: lib.mkDefault) {
-        inherit (llmPackages) agent-browser copilot-cli;
+        inherit (llmPackages) agent-browser antigravity-cli copilot-cli;
         inherit opencode;
         claude = llmPackages.claude-code;
         codex = config.packages.codex;

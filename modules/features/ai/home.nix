@@ -69,6 +69,8 @@ in
       packageName = "claude-code";
     };
 
+    antigravity-cli = agentOptions { name = "antigravity-cli"; };
+
     codex = agentOptions { name = "codex"; };
 
     opencode = agentOptions { name = "opencode"; };
@@ -123,6 +125,9 @@ in
             pkgs.chromium;
       in
       optional cfg.claude.enable (packageOr cfg.claude cfg.defaultPackages.claude)
+      ++ optional cfg.antigravity-cli.enable (
+        packageOr cfg.antigravity-cli cfg.defaultPackages.antigravity-cli
+      )
       ++ optional cfg.codex.enable (packageOr cfg.codex cfg.defaultPackages.codex)
       ++ optional cfg.opencode.enable (packageOr cfg.opencode cfg.defaultPackages.opencode)
       ++ optional cfg.copilot-cli.enable (packageOr cfg.copilot-cli cfg.defaultPackages.copilot-cli)
