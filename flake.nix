@@ -16,6 +16,9 @@
       url = "github:danth/stylix";
       inputs.flake-parts.follows = "flake-parts";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.systems.follows = "fsel/flake-utils/systems";
+      # Override upstream's gitlab.gnome.org input with its GitHub mirror to
+      # avoid GitLab fetch failures.
       inputs.gnome-shell.url = "github:GNOME/gnome-shell/ef02db02bf0ff342734d525b5767814770d85b49";
     };
     textfox = {
@@ -34,6 +37,7 @@
       url = "github:DreamMaoMao/mango";
       inputs.flake-parts.follows = "flake-parts";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.scenefx.inputs.flake-utils.follows = "fsel/flake-utils";
     };
     naersk = {
       url = "github:nix-community/naersk";
@@ -48,14 +52,18 @@
       url = "github:numtide/llm-agents.nix";
       inputs.flake-parts.follows = "flake-parts";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.systems.follows = "fsel/flake-utils/systems";
     };
     hunk = {
       url = "github:modem-dev/hunk";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.bun2nix.inputs.flake-parts.follows = "flake-parts";
+      inputs.bun2nix.inputs.treefmt-nix.follows = "llm-agents/treefmt-nix";
     };
     herdr = {
       url = "github:ogulcancelik/herdr";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.rust-overlay.follows = "worktrunk/rust-overlay";
     };
     herdr-plugin-jj-workspace = {
       url = "github:NathanFlurry/herdr-plugin-jj-workspace";
@@ -79,10 +87,12 @@
     };
     jj-starship = {
       url = "github:dmmulroy/jj-starship";
+      inputs.flake-utils.follows = "fsel/flake-utils";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     worktrunk = {
       url = "github:max-sixty/worktrunk";
+      inputs.flake-utils.follows = "fsel/flake-utils";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
