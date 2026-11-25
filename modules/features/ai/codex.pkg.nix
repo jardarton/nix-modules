@@ -11,7 +11,7 @@
 }:
 
 let
-  version = "0.169.0";
+  version = "0.172.0";
 
   # Prebuilt Rust binaries from the upstream GitHub release. The Linux assets
   # are statically linked against musl, so they need no ELF patching.
@@ -24,20 +24,20 @@ let
 
   hashes = {
     "x86_64-unknown-linux-musl" = {
-      codex = "sha256-mvTXUfzhg/rt6mKUN9UlLb9FjusEEwz0+XvoRGIeqYU=";
-      codex-code-mode-host = "sha256-y+1qjSXoJoeSt1d2f7x21MYuhLz47kpj+XVH8N46rOs=";
+      codex = "sha256-ojQqj39o8Ii+MGIMz+nLhBYsk6a1YXeFWWHNo+1r45I=";
+      codex-code-mode-host = "sha256-ILCkvPMyQVpZl5FMlD0Er2w2J68MN5/b9lQAVQ41K7Q=";
     };
     "aarch64-unknown-linux-musl" = {
-      codex = "sha256-l7l9h+6gdcXLdwnH9hVqRRYip2Z5U+zaQOAnZjcZbz8=";
-      codex-code-mode-host = "sha256-BZOX5NW+2np6zHRBpqVkV9D3nhAB0SmXasDSaw5u4Ew=";
+      codex = "sha256-C5lSbBhaRCX+lqIhT7e2pqf3wUcYg7evvr6X4V6D554=";
+      codex-code-mode-host = "sha256-tmN+uqNT6jqTTUDjdRKJqaOe2Bz5b+P6Ov6hHjhA3Gg=";
     };
     "x86_64-apple-darwin" = {
-      codex = "sha256-aivgWnXsuI+SuvPmmIzm774daDQbaNrDrlBcS4u85HU=";
-      codex-code-mode-host = "sha256-LdMoXyQuqcsTAoEInu42BKlaSnUbHd8lqjkpwqSIp54=";
+      codex = "sha256-EKCXKhU1IGMF57DOKwlt20JTVCtKwVmSZbLQwImNJ4o=";
+      codex-code-mode-host = "sha256-j5N/5fwDLCpcvkAdRLvb4W9kLvihduI7MZ92+Cst31M=";
     };
     "aarch64-apple-darwin" = {
-      codex = "sha256-f0xJyAuuHQtONHrPzfEfqjR12Hrl5lpesSYdPDWBRe4=";
-      codex-code-mode-host = "sha256-1AsyD28laDXUCUcrfTvuYYonVJs/Phy4tx3GxW04J78=";
+      codex = "sha256-vRIfir1rKLP8R22gSjSOJag+ie2hnTkQf2j46WYFMJI=";
+      codex-code-mode-host = "sha256-6rJPiObiDIgdjBG39w7iIP0ZqUxYbsa86tEqIOAstuQ=";
     };
   };
 
