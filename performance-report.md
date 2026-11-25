@@ -32,25 +32,17 @@ The version-control feature retains the approach for architectural reasons: it c
 
 The pattern can be applied incrementally to packages that still come from eager upstream flake outputs, but package ownership alone should not be assumed to produce a measurable evaluation improvement without a workload-specific benchmark.
 
-### 2. Reduce the cost of exhaustive Home Manager checks
+### 2. Reduce the cost of exhaustive Home Manager checks (implemented)
 
-The current `checks` output creates a separate `homeManagerConfiguration` for every exported Home Manager module. There are roughly 45 such evaluations, and:
+Previously, `checks` created a separate `homeManagerConfiguration` for every exported Home Manager module (~45 evaluations), causing:
 
 ```console
 nix flake check --option eval-cache false --no-build
 ```
 
-took approximately **82.23 seconds**.
+to take approximately **82.23 seconds**.
 
-This primarily affects maintainers running `nix flake check` or inspecting the entire flake. It does not have the same impact on targeted consumer configuration evaluation.
-
-Possible approaches:
-
-- Keep representative profile or feature-combination checks under `checks`.
-- Move exhaustive standalone-module evaluation to a CI-specific output or `hydraJobs`.
-- Test meaningful combinations instead of evaluating every module through a separate complete Home Manager configuration.
-
-Any change should retain coverage for module option errors and package evaluation rather than replacing the current checks with syntax-only tests.
+This has since been refactored in `modules/repository/module-checks.nix`: features now register their exports in `nixModules.checkCompositions`, which evaluates a small set of representative Home Manager and NixOS compositions while enforcing complete export coverage via an evaluation-time assertion.
 
 ## Secondary observations
 
@@ -84,5 +76,4 @@ The complete `nix-modules` source is only approximately 504 KiB in the Nix store
 ## Suggested order of work
 
 1. Continue refactoring package contributions toward consumer-owned package sets as part of the dendritic migration.
-2. Redesign exhaustive Home Manager checks if maintainer evaluation time remains a concern.
-3. Keep standalone checks IFD-free as upstream module interfaces evolve.
+2. Keep standalone checks IFD-free as upstream module interfaces evolve.

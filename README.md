@@ -75,6 +75,7 @@ NixOS modules are exported under `nixosModules` and `modules.nixos`:
 - `mango`
 - `oryx`
 - `stylix`
+- `sudo-approval`
 - `wifi`
 
 ### Packages
@@ -85,9 +86,11 @@ Packages are exported under `packages.${system}`:
 - `cclip` (Linux only)
 - `chdman`
 - `codex`
+- `duckstation` (x86_64 Linux only)
 - `firecrawl-cli`
 - `gondolin`
 - `hbcdump`
+- `herdr-plugin-annotate`
 - `herdr-plugin-jj-workspace`
 - `herdr-plugin-worktrunk`
 - `herdr-plugin-nvim`
@@ -96,6 +99,7 @@ Packages are exported under `packages.${system}`:
 - `kli`
 - `mango` (Linux only)
 - `ntn`
+- `openbios` (Linux only)
 - `playwright-cli`
 - `stack`
 
@@ -255,10 +259,12 @@ Optional subfeatures remain opt-in. Collection and support modules without one
 primary behavior also expose explicit capability switches. Wrapped Neovim is
 consumed directly from its own flake rather than through this repository.
 
-Disk monitoring is also opt-in. Import `nixosModules.disk-monitor`, set
-`modules.nixos.disk-monitor.enable = true`, and supply
-`modules.nixos.disk-monitor.ntfyUrl` with your notification topic URL.
+Disk monitoring and `sudo-approval` are also opt-in. For disk monitoring, import
+`nixosModules.disk-monitor`, set `modules.nixos.disk-monitor.enable = true`, and
+supply `modules.nixos.disk-monitor.ntfyUrl` with your notification topic URL.
 There is no default URL to avoid sending alerts to an unrelated endpoint.
+Similarly, `nixosModules.sudo-approval` stays disabled until enabled with a
+consumer-supplied ntfy server and access tokens.
 
 Importing `flakeModules.default` only registers the public module collections and
 packages in a flake-parts consumer; it does not activate every Home Manager or

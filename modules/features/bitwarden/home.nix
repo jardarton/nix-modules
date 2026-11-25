@@ -25,14 +25,7 @@ in
       pkgs.pinentry-tty
     ];
 
-    programs.rbw = {
-      enable = true;
-      #TODO
-      # settings = {
-      #   base_url = "https://vault.bitwarden.eu";
-      #   lock_timout = 8888;
-      # };
-    };
+    programs.rbw.enable = true;
 
     home.file.".local/scripts/rbw-copy" = {
       executable = true;
