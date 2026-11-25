@@ -7,6 +7,11 @@
   installShellFiles,
   bubblewrap,
   ripgrep,
+  curl,
+  jq,
+  nix,
+  python3,
+  writeShellApplication,
   installShellCompletions ? stdenv.buildPlatform.canExecute stdenv.hostPlatform,
 }:
 
@@ -105,6 +110,73 @@ stdenvNoCC.mkDerivation {
       --fish <($out/bin/codex completion fish) \
       --zsh <($out/bin/codex completion zsh)
   '';
+
+  passthru.updateScript = lib.getExe (writeShellApplication {
+    name = "update-codex";
+    runtimeInputs = [
+      curl
+      jq
+      nix
+      python3
+    ];
+    text = ''
+      set -euo pipefail
+      pkg_file="modules/features/ai/codex.pkg.nix"
+      if [ ! -f "$pkg_file" ]; then
+        echo "Run from the repository root (missing $pkg_file)" >&2
+        exit 1
+      fi
+
+      latest_tag=$(curl -fsSL https://api.github.com/repos/openai/codex/releases/latest | jq -r '.tag_name')
+      new_version="''${latest_tag#rust-v}"
+      current_version="${version}"
+
+      if [ "$new_version" = "$current_version" ]; then
+        echo "codex is already at $current_version"
+        exit 0
+      fi
+
+      echo "Updating codex: $current_version -> $new_version"
+      declare -A new_hashes
+      for target in x86_64-unknown-linux-musl aarch64-unknown-linux-musl x86_64-apple-darwin aarch64-apple-darwin; do
+        for asset in codex codex-code-mode-host; do
+          url="https://github.com/openai/codex/releases/download/rust-v''${new_version}/''${asset}-''${target}.tar.gz"
+          raw_hash=$(nix-prefetch-url --type sha256 "$url")
+          new_hashes["''${target}:''${asset}"]=$(nix hash convert --hash-algo sha256 --to sri "$raw_hash")
+        done
+      done
+
+      NEW_VERSION="$new_version" \
+      HASH_X64_LINUX_CODEX="''${new_hashes[x86_64-unknown-linux-musl:codex]}" \
+      HASH_X64_LINUX_HOST="''${new_hashes[x86_64-unknown-linux-musl:codex-code-mode-host]}" \
+      HASH_ARM_LINUX_CODEX="''${new_hashes[aarch64-unknown-linux-musl:codex]}" \
+      HASH_ARM_LINUX_HOST="''${new_hashes[aarch64-unknown-linux-musl:codex-code-mode-host]}" \
+      HASH_X64_DARWIN_CODEX="''${new_hashes[x86_64-apple-darwin:codex]}" \
+      HASH_X64_DARWIN_HOST="''${new_hashes[x86_64-apple-darwin:codex-code-mode-host]}" \
+      HASH_ARM_DARWIN_CODEX="''${new_hashes[aarch64-apple-darwin:codex]}" \
+      HASH_ARM_DARWIN_HOST="''${new_hashes[aarch64-apple-darwin:codex-code-mode-host]}" \
+      python3 - "$pkg_file" <<'PY'
+      import os, re, sys
+
+      path = sys.argv[1]
+      text = open(path).read()
+      text = re.sub(r'(version\s*=\s*")[^"]+(";)', rf'\g<1>{os.environ["NEW_VERSION"]}\g<2>', text, count=1)
+
+      mapping = {
+          "x86_64-unknown-linux-musl": (os.environ["HASH_X64_LINUX_CODEX"], os.environ["HASH_X64_LINUX_HOST"]),
+          "aarch64-unknown-linux-musl": (os.environ["HASH_ARM_LINUX_CODEX"], os.environ["HASH_ARM_LINUX_HOST"]),
+          "x86_64-apple-darwin": (os.environ["HASH_X64_DARWIN_CODEX"], os.environ["HASH_X64_DARWIN_HOST"]),
+          "aarch64-apple-darwin": (os.environ["HASH_ARM_DARWIN_CODEX"], os.environ["HASH_ARM_DARWIN_HOST"]),
+      }
+      for target, (h_codex, h_host) in mapping.items():
+          pattern = rf'("{re.escape(target)}"\s*=\s*\{{\s*codex\s*=\s*")[^"]+(";\s*codex-code-mode-host\s*=\s*")[^"]+(";)'
+          text, n = re.subn(pattern, rf'\g<1>{h_codex}\g<2>{h_host}\g<3>', text, count=1)
+          assert n == 1, f"Failed to update hashes for {target}"
+
+      open(path, "w").write(text)
+      PY
+    '';
+  });
 
   meta = {
     description = "OpenAI Codex CLI, the coding agent that runs in your terminal";

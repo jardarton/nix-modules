@@ -10,6 +10,7 @@
   git,
   xxhash,
   cmake,
+  nix-update-script,
   pkg-config,
   ...
 }:
@@ -42,14 +43,13 @@ stdenv.mkDerivation rec {
     xxhash
   ];
 
-  # buildPhase = ''
-  #   meson setup --buildtype=release build
-  #   meson compile -C build
-  # '';
+  passthru.updateScript = nix-update-script { extraArgs = [ "--version=branch" ]; };
 
   meta = {
     description = "cclip clipboard history";
+    homepage = "https://github.com/heather7283/cclip";
     license = lib.licenses.mit;
+    mainProgram = "cclip";
     platforms = lib.platforms.linux;
   };
 }

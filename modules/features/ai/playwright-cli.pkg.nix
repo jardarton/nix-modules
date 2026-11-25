@@ -2,6 +2,7 @@
   lib,
   buildNpmPackage,
   fetchFromGitHub,
+  nix-update-script,
   nodejs_24,
 }:
 
@@ -20,6 +21,8 @@ buildNpmPackage rec {
   npmDepsHash = "sha256-mGD7a/v1cx/xPGZo8nN3WA40mYGgF/KzMKiGbvUeX4E=";
 
   dontNpmBuild = true;
+
+  passthru.updateScript = nix-update-script { };
 
   meta = {
     description = "Playwright CLI";

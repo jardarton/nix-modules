@@ -4,6 +4,7 @@
   icu,
   lib,
   ninja,
+  nix-update-script,
   python3,
   stdenv,
 }:
@@ -47,6 +48,13 @@ stdenv.mkDerivation (finalAttrs: {
     install -Dm755 bin/hbcdump "$out/bin/hbcdump"
     runHook postInstall
   '';
+
+  passthru.updateScript = nix-update-script {
+    extraArgs = [
+      "--version-regex"
+      "hermes-v(.*)"
+    ];
+  };
 
   meta = {
     description = "Disassembler for Hermes bytecode files";

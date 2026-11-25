@@ -2,6 +2,7 @@
   lib,
   buildNpmPackage,
   fetchFromGitHub,
+  nix-update-script,
   nodejs_24,
 }:
 
@@ -27,6 +28,8 @@ buildNpmPackage rec {
 
   npmFlags = [ "--omit=optional" ];
   npmBuildScript = "build";
+
+  passthru.updateScript = nix-update-script { extraArgs = [ "--version=branch" ]; };
 
   meta = {
     description = "Alpine Linux sandbox for running untrusted code with controlled filesystem and network access";

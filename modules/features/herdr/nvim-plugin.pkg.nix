@@ -1,4 +1,5 @@
 {
+  lib,
   rustPlatform,
   git,
   neovim,
@@ -32,5 +33,12 @@ rustPlatform.buildRustPackage {
   '';
 
   passthru.manifestFile = src + "/herdr-plugin.toml";
-  meta.mainProgram = "herdr-nvim";
+
+  meta = {
+    description = "Full-height Neovim sidebar plugin for Herdr with agent annotations";
+    homepage = "https://github.com/ChmaraX/herdr-nvim";
+    license = lib.licenses.mit;
+    mainProgram = "herdr-nvim";
+    platforms = lib.platforms.unix;
+  };
 }

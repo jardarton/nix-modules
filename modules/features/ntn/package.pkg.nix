@@ -2,6 +2,7 @@
   lib,
   stdenv,
   fetchurl,
+  nix-update-script,
 }:
 
 let
@@ -32,6 +33,8 @@ stdenv.mkDerivation (finalAttrs: {
 
     runHook postInstall
   '';
+
+  passthru.updateScript = nix-update-script { };
 
   meta = {
     description = "Notion CLI";

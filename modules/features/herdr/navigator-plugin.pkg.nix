@@ -1,4 +1,8 @@
-{ rustPlatform, src }:
+{
+  lib,
+  rustPlatform,
+  src,
+}:
 rustPlatform.buildRustPackage {
   pname = "herdr-plugin-navigator";
   version = "0.3.6";
@@ -12,5 +16,12 @@ rustPlatform.buildRustPackage {
   '';
 
   passthru.manifestFile = src + "/herdr-plugin.toml";
-  meta.mainProgram = "herdr-navigator";
+
+  meta = {
+    description = "Fuzzy navigator plugin for Herdr workspaces, agents, projects, sessions, and actions";
+    homepage = "https://github.com/thanhdat77/herdr-navigator";
+    license = lib.licenses.mit;
+    mainProgram = "herdr-navigator";
+    platforms = lib.platforms.unix;
+  };
 }

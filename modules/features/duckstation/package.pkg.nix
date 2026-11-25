@@ -5,6 +5,7 @@
   lib,
   appimageTools,
   fetchurl,
+  nix-update-script,
 }:
 let
   pname = "duckstation";
@@ -30,6 +31,8 @@ appimageTools.wrapType2 {
     install -Dm644 ${contents}/org.duckstation.DuckStation.png \
       $out/share/icons/hicolor/512x512/apps/org.duckstation.DuckStation.png
   '';
+
+  passthru.updateScript = nix-update-script { };
 
   meta = {
     description = "Fast PlayStation 1 emulator";

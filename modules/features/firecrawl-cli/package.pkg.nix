@@ -4,6 +4,7 @@
   fetchFromGitHub,
   fetchPnpmDeps,
   makeWrapper,
+  nix-update-script,
   nodejs_24,
   pnpm_10,
   pnpmConfigHook,
@@ -50,6 +51,8 @@ stdenv.mkDerivation (finalAttrs: {
 
     runHook postInstall
   '';
+
+  passthru.updateScript = nix-update-script { };
 
   meta = {
     description = "Command-line interface for Firecrawl";

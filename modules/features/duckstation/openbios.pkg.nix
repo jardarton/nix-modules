@@ -16,6 +16,7 @@
   lib,
   stdenvNoCC,
   fetchFromGitHub,
+  nix-update-script,
   path,
   stdenv,
 }:
@@ -62,6 +63,8 @@ stdenvNoCC.mkDerivation {
     install -Dm644 openbios/openbios.bin $out/share/openbios/openbios.bin
     runHook postInstall
   '';
+
+  passthru.updateScript = nix-update-script { extraArgs = [ "--version=branch" ]; };
 
   meta = {
     description = "Open-source PlayStation 1 BIOS from PCSX-Redux";

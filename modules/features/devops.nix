@@ -16,7 +16,7 @@
   perSystem =
     { pkgs, ... }:
     {
-      packages.kli = pkgs.callPackage ./kli/package.pkg.nix { };
+      packages.kli = pkgs.callPackage ./devops/kli.pkg.nix { };
     };
 
   # Export groups evaluated together by this flake's module checks.
